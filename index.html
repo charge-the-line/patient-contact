@@ -83,6 +83,7 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .big{font-family:"Saira Condensed";font-size:60px;font-weight:700;color:var(--orange);line-height:1}
 .mrow{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #2a3d5e;font-size:15px}.mrow:first-child{border-top:0}.mrow span{color:var(--soft)}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
+.syr{width:100%;height:58px;display:block;margin:4px 0}
 .scen{display:block;width:100%;text-align:left;padding:12px;margin-bottom:8px}.scen b{display:block;font-family:"Saira Condensed";font-size:21px;font-weight:600}.scen span{font-size:14px;color:var(--soft)}
 textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1a2e;color:var(--ink);width:100%}
 </style>
@@ -118,6 +119,13 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="v g"><div class="l">Pulse</div><div class="n" id="ov-hr">—</div></div>
     <div class="v w"><div class="l">GCS</div><div class="n" id="ov-gcs">—</div></div>
   </div>
+  <div class="vitals hidden" id="vitals-ep">
+    <div class="v g"><div class="l">Pulse</div><div class="n" id="ev-hr">—</div></div>
+    <div class="v w"><div class="l">BP</div><div class="n" id="ev-bp" style="font-size:26px">—</div></div>
+    <div class="v c"><div class="l">SpO₂</div><div class="n" id="ev-spo2">—</div></div>
+    <div class="v y"><div class="l">Resp</div><div class="n" id="ev-rr">—</div></div>
+  </div>
+  <div class="cprbar hidden" id="ep-line"><span id="ev-air">—</span><span id="ev-age"></span></div>
   <div class="cprbar hidden" id="od-line"><span id="ov-air">—</span><span id="ov-age"></span></div>
   <div class="cprbar hidden" id="mva-line"><span id="mv-skin">No vitals yet</span><span id="mv-age"></span></div>
   <div class="cprbar"><span id="who">No compressions</span><div class="track" id="fattrack"><div id="fat"></div></div><span id="pause"></span></div>
@@ -152,6 +160,13 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="stat" id="o-airtxt"></div></div>
   <div class="grp hidden" id="g-od-n"><h3>Naloxone</h3><div class="row"><button id="o-nal">Naloxone 4 mg intranasal</button><span class="stat" id="o-naltxt" style="margin:0;align-self:center"></span></div></div>
   <div class="grp hidden" id="g-od-t"><h3>Moving and in the back</h3><div class="row"><button id="o-load">Help him onto the cot · load</button><button id="o-reass">Reassess his breathing</button></div></div>
+  <div class="grp hidden" id="g-ep-a"><h3>Patient</h3><div class="row three"><button id="e-assess">Assess: airway, breathing, skin, BP</button><button id="e-sting">Scrape out the stinger</button><button id="e-pos">Lay flat, legs raised</button><button id="e-o2">O₂ NRB 15</button><button id="e-ox">Pulse oximeter on</button><button id="e-vitals">Vitals</button></div></div>
+  <div class="grp hidden" id="g-ep-m"><h3>Epinephrine kit</h3>
+    <div class="row three"><button id="e-check">Check the ampule</button><button id="e-another" class="hidden">Grab a new ampule</button><button id="e-syr">1 mL syringe + filter needle</button></div>
+    <svg class="syr" id="syr" viewBox="0 0 300 58" aria-label="Syringe"></svg>
+    <div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><button id="e-m10">−0.1</button><button id="e-m05">−0.05</button><button id="e-p05">+0.05</button><button id="e-p10">+0.1</button><button id="e-drawn">Done</button></div>
+    <div class="stat" id="e-drawtxt"></div>
+    <div class="row three" style="margin-top:6px"><button id="e-xcheck">Cross-check out loud</button><button id="e-swap">Swap to 1-inch IM needle</button><button id="e-inject">Inject</button><button id="e-time">Note the time</button><button id="e-reass" class="hidden">Reassess</button></div></div>
   <div class="grp hidden" id="g-ride"><h3>In the back</h3><div class="row"><button id="a-reassess">Reassess with the medic</button><span></span></div></div>
 </div>
 
@@ -171,7 +186,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You are the medical first responder. You get there first, you work the patient until ALS arrives, then you work for the medic — on scene and in the back of the rig.</p>
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.3 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.4 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -182,6 +197,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call1"><b>62-year-old man down</b><span>Witnessed collapse at home. His wife is doing CPR. Medic 1 is nine minutes out.</span></button>
   <button class="scen" id="b-call2"><b>Car versus tree, driver pinned</b><span>Single-vehicle crash on a county road, early morning, 41°F. Driver trapped, bleeding. Your engine crew is cutting. Medic 1 is seven minutes out.</span></button>
   <button class="scen" id="b-call3"><b>Unresponsive in the bathroom</b><span>11:47 p.m. A roommate found him on the bathroom floor, barely breathing. Suspected fentanyl. Medic 1 is eight minutes out.</span></button>
+  <button class="scen" id="b-call4"><b>Stung in the orchard</b><span>A yellow jacket sting, and now he can't catch his breath. No auto-injectors in Bay County — you draw up the epi. Medic 1 is eight minutes out.</span></button>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
   <button id="b-resume" class="go hidden" style="width:100%;margin-top:8px">Resume call</button>
 </div></div>
@@ -219,7 +235,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.3.0';
+const APP_VERSION='0.4.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -238,7 +254,7 @@ function radio(who,msg,cls=''){const r=$('radio');const d=document.createElement
 function ding(p,why){S.score=Math.max(0,S.score-p);S.incidents.push(why);radio('Feedback',`${why} (−${p})`,'bad');if(TIER===0){const k=incidentKey(why);if(k)radio('Guide',`Why it matters: Protocol guide → ${GUIDE[k].name}`);}}
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
 let CALL0=14*3600+41*60;
-function clockStr(){const s=CALL0+S.t;const h=Math.floor(s/3600)%24,m=Math.floor(s%3600/60);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
+function clockStr(at){const s=CALL0+(at===undefined?S.t:at);const h=Math.floor(s/3600)%24,m=Math.floor(s%3600/60);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
 
 /* ================= compressions ================= */
 function compressorNow(){return S.als.lucas===2?'LUCAS':S.cpr.who;}
@@ -286,6 +302,7 @@ $('a-reassess').onclick=()=>{if(S.mission!==3)return;if(S.t-S.tx.lastReass<40){r
 function tick(dtReal){
   if(CALL==='mva'){tickMVA(dtReal);return;}
   if(CALL==='od'){tickOD(dtReal);return;}
+  if(CALL==='ep'){tickEP(dtReal);return;}
   const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
   if(S.act){S.act.t-=dt;if(S.act.t<=0){const k=S.act.k;S.act=null;
     if(k==='breaths'||k==='suction'||k==='switch')startCPR();
@@ -429,9 +446,10 @@ const M_ARREST=[
    {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}
 ];
 let M=M_ARREST;
-function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:id==='od'?M_OD:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:14*3600+41*60;fresh();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
-  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':'Cardiac arrest';
-  if(id==='od')radio('Dispatch','Unit responding — 24-year-old male, unresponsive, breathing slow and snoring, possible overdose. Caller is his roommate. Medic 1 responding, eight minutes. PD notified.');
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:14*3600+41*60;fresh();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':'Cardiac arrest';
+  if(id==='ep')radio('Dispatch','Unit responding — 41-year-old male, stung by a bee, now short of breath and dizzy. Wife on the line. Medic 1 responding, eight minutes.');
+  else if(id==='od')radio('Dispatch','Unit responding — 24-year-old male, unresponsive, breathing slow and snoring, possible overdose. Caller is his roommate. Medic 1 responding, eight minutes. PD notified.');
   else if(id==='mva')radio('Dispatch','Single-vehicle crash into a tree, county road. Caller reports the driver is trapped and bleeding. Medic 1 responding, seven minutes. Engine responding for extrication.');
   else radio('Dispatch','Unit responding — 62-year-old male, unresponsive, CPR in progress by caller. Medic 1 responding, nine minutes.');loadMission(0);}
 function loadMission(i){S.mission=i;S.mStart=S.t;stepsDone=M[i].steps.map(()=>false);const m=M[i];if(m.onStart)m.onStart();
@@ -466,6 +484,7 @@ function finish(){const last=S.mission===M.length-1;$('done-t').textContent=M[S.
   let h=S.incidents.length?`<p><b>Feedback:</b> ${S.incidents.map(esc).join(' · ')}</p>`+(keys.length?`<div class="chips">${keys.map(k=>`<button class="chip warn" data-k="${k}">${esc(GUIDE[k].name)}</button>`).join('')}</div>`:''):'<p>Clean — no feedback items.</p>';
   if(last&&CALL==='mva'){h+=mvaDebrief();record();}
   else if(last&&CALL==='od'){h+=odDebrief();record();}
+  else if(last&&CALL==='ep'){h+=epDebrief();record();}
   else if(last){const ccf=S.arrestT?Math.round(S.compT/S.arrestT*100):0,avg=S.rateN?Math.round(S.rateSum/S.rateN):0;
     h+=`<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Outcome',S.rosc?'ROSC at '+mmss(S.roscAt)+' — delivered with a pulse':'Delivered in arrest, CPR continuous']].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div>`;
     h+=`<p style="font-size:14px;color:var(--soft);margin-top:10px">${S.rosc?'High-quality, continuous compressions, early shocks, and steady ventilation are what make ROSC possible. You gave him the chance.':'This outcome is driven mostly by compression quality: rate, depth, compressor switches, and short pauses. Check the numbers above for where time was lost.'}</p>`;
@@ -476,7 +495,8 @@ $('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length
 
 /* ================= render ================= */
 let wave=[],phase=0;
-function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}const A=S.aed;
+function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}
+  EPG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
   ODG.forEach(i=>$(i).classList.add('hidden'));$('fattrack').classList.remove('hidden');$('mon-mode').style.color='';
   ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
   $('clock').textContent=clockStr();$('score').textContent=S.score;
@@ -512,7 +532,8 @@ function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD(
   $('g-assess').classList.toggle('hidden',S.mission>1&&!S.air.vomit);$('g-cpr').classList.toggle('hidden',S.mission>=2&&S.als.lucas>=2);
 }
 function drawWave(){if(!S.active){requestAnimationFrame(drawWave);return;}const run=S.running;if(run){phase+=1;
-  let y=42;if(CALL==='od'){if(S.o&&S.o.ox&&S.o.pulse){const N=Math.max(18,Math.round(3600/Math.max(30,S.o.hr)));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(S.o.spo2/100);}}
+  let y=42;if(CALL==='ep'){if(S.e&&S.e.ox){const v=epV();const N=Math.max(18,Math.round(3600/v.hr));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(v.spo2/100);}}
+  else if(CALL==='od'){if(S.o&&S.o.ox&&S.o.pulse){const N=Math.max(18,Math.round(3600/Math.max(30,S.o.hr)));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(S.o.spo2/100);}}
   else if(CALL==='mva'){if(S.m&&S.m.alsMon){const N=Math.max(18,Math.round(3600/mvaV().hr));const p=phase%N;y=p===0?12:p===1?72:p===2?36:p<6?40:(p>N*.45&&p<N*.6)?36:42;}}
   else if(!S.checked)y=42;else if(S.rosc){const p=phase%40;y=p===0?14:p===1?70:p===2?36:p<6?40+Math.sin(p)*2:(p>18&&p<24)?36:42;}
   else if(S.cpr.on){y=42+Math.sin(phase*S.cpr.rate/60*0.105*Math.PI)*24*S.cpr.depth;}else if(S.arrest&&S.aed.pads){y=42+Math.sin(phase*.7)*9+Math.sin(phase*1.9)*6+(Math.random()-.5)*6;}
@@ -538,7 +559,7 @@ const GUIDE={
  rosc:{name:'Return of spontaneous circulation (ROSC)',what:'The heart has resumed an organized rhythm with a pulse.',when:'Recognized by the medic on a rhythm check — often signaled first by a jump in EtCO₂.',wrong:'Hyperventilating, relaxing, or forgetting that re-arrest is common.',tip:'Steady ventilation (one every 6 seconds), SpO₂ about 92–98%, and hands ready to restart compressions.',rel:['vent','etco2']},
  bridge:{name:'Transport delays: the river crossings',what:'Monitor Township is on the west side of the Saginaw River; East Side Hospital is across it. The four Bay City drawbridges open for river traffic.',when:'Any transport across the river, especially in boating season.',wrong:'Being surprised by an opening. A bridge going up for a freighter can add minutes.',tip:'Crews can request through dispatch that a bridge be held down for a priority patient. Commercial ships already committed may not be able to wait. Plan your oxygen and your arms for the longer ride.',rel:['o2math']}
 };
-function incidentKey(w){const R=[[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
+function incidentKey(w){const R=[[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
   const d=w.match(/^Decision — (.*)$/);if(d){const k=Object.keys(DEC).find(x=>DEC[x].tag===d[1]);return k?DEC[k].g:null;}for(const [r,k] of R)if(r.test(w))return k;return null;}
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
@@ -610,7 +631,7 @@ function tickMVA(dtReal){const m=S.m;const F=S.mission===3?5:3;const dt=dtReal*F
 function renderMVA(){const m=S.m;if(!m)return;
   $('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals'].forEach(i=>$(i).classList.add('hidden'));
-  ODG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
+  ODG.forEach(i=>$(i).classList.add('hidden'));EPG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
   $('eta-l').textContent=S.mission===3?'Regional Medical Center':'Medic 1';$('eta-v').textContent=S.mission===3?(m.tx.arrived?'Arrived':mmss(m.tx.total-m.tx.t)+' out'):m.alsArr?'On scene':mmss(m.eta)+' out';
   $('mon-name').textContent=m.alsMon?'Monitor':'Vitals — taken by hand';$('mon-mode').textContent=m.survey?(m.ctrl===2?'Bleeding controlled':m.ctrl===1?'Pressure on':'Arterial bleed!'):'—';
   const live=m.alsMon,v=live?mvaV():m.vit;
@@ -786,7 +807,7 @@ function tickOD(dtReal){const o=S.o;const F=S.mission===3?4:3;const dt=dtReal*F;
 function triggerWithdrawal(why){const o=S.o;o.withdrawal=true;o.vomit=true;o.gurgle=true;o.recov=false;ding(10,why);radio('You','He\'s up — vomiting, swinging his arms, ripping the mask off! Roll him, suction!','bad');}
 function renderOD(){const o=S.o;if(!o)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));
-  ['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
+  EPG.forEach(i=>$(i).classList.add('hidden'));['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-od-a',S.mission<=1);vis('g-od-b',S.mission<=1||S.mission===3);vis('g-od-n',S.mission<=1);vis('g-od-t',S.mission>=2);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(o.tx.arrived?'Arrived':mmss(o.tx.total-o.tx.t)+' out'):o.alsArr?'On scene':mmss(o.eta)+' out';
   $('mon-name').textContent=o.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!o.checked?'—':!o.pulse?'NO PULSE':o.withdrawal?'Agitated':o.rr<10?'Breathing inadequate':'Breathing on his own';$('mon-mode').style.color=!o.pulse||o.rr<10?'#ff8f8a':'';$('fattrack').classList.add('hidden');
@@ -897,6 +918,160 @@ function odDebrief(){const o=S.o;const rows=[['First effective breath',o.firstVe
   const msg=o.arrested?'He lost his pulse from hypoxia. In an overdose, oxygen is the emergency — the bag keeps him alive while naloxone works.':o.withdrawal?'You got him breathing, but extra naloxone threw him into withdrawal. Titrate to breathing, not to wide awake.':o.below90>180?'He made it, but he spent a long time hypoxic. Getting the airway open and the bag going sooner is the biggest improvement.':'Airway and breathing first, naloxone titrated to breathing, and you caught the re-sedation. That\'s the job.';
   return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
 
+/* ================= Anaphylaxis call ================= */
+const EPG=['vitals-ep','ep-line','g-ep-a','g-ep-m'];
+function freshEP(){return {assessed:false,sting:false,pos:false,o2:false,ox:false,sev:.42,doses:[],vol:0,syr:false,ampChecked:false,ampBad:TIER===2,ampOK:false,drawn:false,xcheck:false,swapped:false,injectAsked:false,site:null,injected:false,injT:null,timeNoted:false,
+  recogT:null,vitT:-999,vitCount:0,reassAfter:0,lastReass:-999,eta:480,alsArr:false,alsT:null,act:null,overdose:false,delayDing:false,faintDing:false,faintT:0,lowSbp:999,lowSpo2:100,
+  rebound:false,reboundPending:false,tx:{t:0,total:540,arrived:false,reass:0,lastReass:-999},chaos:{eta:false}};}
+function epE(){const e=S.e;let E=0;e.doses.forEach(d=>{const x=S.t-d.t,ramp=d.site==='thigh'?240:420,P=Math.min(1.5,d.mg/.3)*(d.site==='thigh'?.5:.36);E+=x<0?0:x<ramp?P*x/ramp:x<900?P:Math.max(P*.3,P-(x-900)/600*P*.7);});return E;}
+function epV(){const e=S.e,E=epE(),sev=Math.max(0,Math.min(1,e.sev-E)),od=e.overdose&&S.t-e.odT<600;
+  const sbp=Math.round(128-72*sev+(e.pos&&sev>.3?8:0)+(od?70:0));
+  return {sev,hr:Math.round(92+55*sev+(od?45:0)),sbp,dbp:Math.round(sbp*.62),rr:Math.round(18+16*sev),spo2:Math.round(Math.min(100,99-15*sev+(e.o2?4:0)))};}
+const EX=k=>$(k);
+function epNeed(){if(!S.e.assessed){radio('You','Assess him first.','bad');return true;}return false;}
+EX('e-assess').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(e.assessed||e.act)return;e.act={k:'assess',t:12};radio('You','Sir, I\'m with the fire department — tell me what happened.');};
+EX('e-sting').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.sting)return;e.sting=true;radio('Partner','Stinger\'s out — scraped it off his neck with a card.');};
+EX('e-pos').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.pos)return;e.pos=true;radio('You','Lay back for me — flat, legs up on the cooler. Don\'t get up.');};
+EX('e-o2').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.o2)return;e.o2=true;radio('Partner','Non-rebreather at 15.');};
+EX('e-ox').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.ox)return;e.ox=true;radio('Partner','Pulse ox on.');};
+EX('e-vitals').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.act)return;e.act={k:'vitals',t:18};radio('Partner','Getting a BP.');};
+EX('e-check').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.ampOK||e.act)return;e.act={k:'check',t:6};};
+EX('e-another').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.ampBad)return;e.ampBad=false;e.ampChecked=false;radio('Partner','Here\'s a fresh ampule from the spare kit.');};
+EX('e-syr').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(e.syr)return;if(!e.ampOK){radio('Partner','Check the ampule before you open anything.','bad');return;}e.syr=true;radio('You','Filter needle on the 1 mL syringe. Snapping the ampule neck away from me.');};
+function epDraw(d){if(CALL!=='ep')return;const e=S.e;if(!e.syr){radio('Partner','Syringe and filter needle first.','bad');return;}if(e.drawn)return;e.vol=Math.max(0,Math.min(1,Math.round((e.vol+d)*100)/100));}
+EX('e-m10').onclick=()=>epDraw(-.1);EX('e-m05').onclick=()=>epDraw(-.05);EX('e-p05').onclick=()=>epDraw(.05);EX('e-p10').onclick=()=>epDraw(.1);
+EX('e-drawn').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.syr||e.drawn||e.vol<=0)return;e.drawn=true;radio('You',`Drawn up: ${e.vol.toFixed(2)} mL.`);};
+EX('e-xcheck').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.drawn||e.xcheck||e.injected)return;
+  if(Math.abs(e.vol-.3)>.001){radio('Partner',`Hold on — that's ${e.vol.toFixed(2)} mL. At 1 mg per mL that's ${e.vol.toFixed(2)} mg. The adult dose is 0.3 mg — 0.3 mL. Waste it and redraw.`,'bad');ding(3,'Drew the wrong volume — caught on the cross-check');e.drawn=false;e.vol=0;return;}
+  e.xcheck=true;radio('Partner','Epinephrine, 1 mg per mL. 0.3 mg is 0.3 mL. IM, lateral thigh. Expiration good, solution clear. Check.','good');};
+EX('e-swap').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.drawn||e.swapped)return;e.swapped=true;radio('You','Filter needle off, 1-inch IM needle on. Air out.');};
+EX('e-inject').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.drawn||e.injected||e.act)return;if(!e.site){e.injectAsked=true;return;}epInject();};
+function epInject(){const e=S.e;if(!e.swapped)ding(5,'Injected through the filter needle — swap to the IM needle first');if(!e.xcheck)ding(3,'Gave a medication without a cross-check');e.act={k:'inject',t:6};radio('You',`Injecting into the ${e.site==='thigh'?'outer thigh':e.site}, 90 degrees… holding… done.`);}
+EX('e-time').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.injected||e.timeNoted)return;e.timeNoted=true;radio('You',`Epi 0.3 mg IM at ${clockStr(e.injT)}. Written down.`);};
+EX('e-reass').onclick=()=>{if(CALL!=='ep')return;const e=S.e;const since=S.t-(S.mission===3?e.tx.lastReass:e.lastReass);if(since<100){radio('Partner','Just did — give it a couple minutes.');return;}
+  const v=epV();if(S.mission===3){e.tx.lastReass=S.t;e.tx.reass++;}else{e.lastReass=S.t;e.reassAfter++;}e.vitT=S.t;radio('Partner',`Pulse ${v.hr}, BP ${v.sbp}/${v.dbp}, resp ${v.rr}, SpO₂ ${v.spo2}%. ${v.sev<.35?'Hives fading, breathing easier.':v.sev<.55?'Still wheezing a little.':'Still tight — not much better.'}`);};
+function tickEP(dtReal){const e=S.e;const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
+  if(e.act){e.act.t-=dt;if(e.act.t<=0){const k=e.act.k;e.act=null;
+    if(k==='assess'){e.assessed=true;radio('You','Hives across his chest and neck, face swelling, hoarse voice, wheezing. He\'s pale and dizzy. Stung on the neck about ten minutes ago. Allergic to bees — no auto-injector at home.','bad');}
+    if(k==='vitals'){e.vitT=S.t;e.vitCount++;const v=epV();radio('Partner',`Pulse ${v.hr}, BP ${v.sbp}/${v.dbp}, resp ${v.rr}, SpO₂ ${v.spo2}%.`);}
+    if(k==='check'){e.ampChecked=true;if(e.ampBad){radio('You','Label: Epinephrine 1 mg/mL — expired 03/2026, and the solution is brownish. We can\'t use this one.','bad');}else{e.ampOK=true;radio('You','Epinephrine 1 mg/mL — 1:1,000. Expires 08/2027. Clear and colorless. Right drug, right concentration.','good');}}
+    if(k==='inject'){const mg=e.vol;e.doses.push({t:S.t,mg,site:e.site});e.injected=true;e.injT=S.t;radio('You','Needle straight into the sharps container — no recapping.');
+      if(mg>.5){e.overdose=true;e.odT=S.t;ding(25,`Epinephrine overdose: ${mg.toFixed(2)} mg IM`);radio('You','His heart is pounding — he\'s grabbing his chest, 160s and his BP is through the roof!','bad');}
+      else if(mg<.2)ding(10,`Underdosed: ${mg.toFixed(2)} mg — the adult dose is 0.3 mg`);}}}
+  if(e.assessed){e.sev=Math.min(1,e.sev+(e.doses.length?.00025:.0011)*dt);
+    const v=epV();e.lowSbp=Math.min(e.lowSbp,v.sbp);e.lowSpo2=Math.min(e.lowSpo2,v.spo2);
+    if(e.recogT!==null&&!e.doses.length&&S.t-e.recogT>300&&!e.delayDing){e.delayDing=true;ding(10,'More than 5 minutes from recognizing anaphylaxis to epinephrine');}
+    if(v.sev>.9){e.faintT+=dt;if(e.faintT>60&&!e.faintDing){e.faintDing=true;ding(10,'He\'s nearly passing out — his airway and pressure are failing');radio('Wife','He\'s not answering me!','bad');}}}
+  if(!e.alsArr){e.eta-=dt;if(TIER===2&&!e.chaos.eta&&S.t>150){e.chaos.eta=true;e.eta+=180;radio('Dispatch','Medic 1 delayed — on another call\'s scene. Plus three minutes.','bad');}if(e.eta<=0){e.alsArr=true;e.alsT=S.t;radio('Medic 1','Medic 1 — what have we got?','good');}}
+  if(S.mission===3&&!S.briefing){e.tx.t+=dt;
+    if(!e.rebound&&e.tx.t>200){e.rebound=true;e.sev=Math.min(1,e.sev+.3);radio('Patient','It\'s… getting tight again. My throat.','bad');e.reboundPending=true;}
+    if(e.reboundPending&&!DEC_OPEN){e.reboundPending=false;openDecision('epRebound',-1);}
+    if(!e.tx.arrived&&e.tx.t>=e.tx.total){e.tx.arrived=true;radio('EMT','East Side Hospital — at the doors.','good');}}
+  checkMission(dt);renderEP();}
+function epSyr(){const v=S.e.vol;let g=`<rect x="20" y="16" width="230" height="26" rx="4" fill="#0f1a2e" stroke="#a9b7cc"/><rect x="20" y="16" width="${230*v}" height="26" rx="4" fill="#c7313a" opacity=".8"/>`;
+  for(let i=0;i<=10;i++){const x=20+23*i;g+=`<line x1="${x}" y1="16" x2="${x}" y2="${i%5===0?30:24}" stroke="#a9b7cc" stroke-width="${i%5===0?1.6:.8}"/>`;if(i%5===0)g+=`<text x="${x}" y="54" font-size="10" fill="#a9b7cc" text-anchor="middle" font-family="sans-serif">${(i/10).toFixed(1)}</text>`;}
+  g+=`<rect x="250" y="24" width="30" height="10" fill="#a9b7cc"/><rect x="${20+230*v-3}" y="10" width="6" height="38" fill="#e8eef6"/><line x1="0" y1="29" x2="20" y2="29" stroke="#e8eef6" stroke-width="2"/>`;$('syr').innerHTML=g;}
+function renderEP(){const e=S.e;if(!e)return;const v=epV();$('clock').textContent=clockStr();$('score').textContent=S.score;
+  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG).forEach(i=>$(i).classList.add('hidden'));
+  ['vitals-ep','ep-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!e.ox);$('fattrack').classList.add('hidden');
+  const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-ep-a',S.mission===0||S.mission===2);vis('g-ep-m',S.mission>=1);
+  $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(e.tx.arrived?'Arrived':mmss(e.tx.total-e.tx.t)+' out'):e.alsArr?'On scene':mmss(e.eta)+' out';
+  $('mon-name').textContent=e.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!e.assessed?'—':v.sev>.55?'Worsening':v.sev>.35?'Reacting':'Improving';$('mon-mode').style.color=v.sev>.55?'#ff8f8a':v.sev>.35?'#ffc23d':'';
+  const known=e.vitT>0||e.alsArr;$('ev-hr').textContent=e.ox?v.hr:'—';$('ev-spo2').textContent=e.ox?v.spo2:'—';$('ev-bp').textContent=known?`${v.sbp}/${v.dbp}`:'—';$('ev-rr').textContent=known?v.rr:'—';
+  $('ev-air').textContent=!e.assessed?'Not assessed':v.sev>.75?'Stridor — voice muffled, can\'t finish sentences':v.sev>.55?'Hoarse voice, wheezing, face swelling':v.sev>.35?'Wheezing, hives spreading':'Hives fading, breathing easier';
+  $('ev-age').textContent=e.injT!==null?`epi ${mmss(S.t-e.injT)} ago`:'';$('who').textContent='';$('pause').textContent='';
+  for(const [id,on] of [['e-assess',e.assessed],['e-sting',e.sting],['e-pos',e.pos],['e-o2',e.o2],['e-ox',e.ox],['e-check',e.ampOK],['e-syr',e.syr],['e-drawn',e.drawn],['e-xcheck',e.xcheck],['e-swap',e.swapped],['e-inject',e.injected],['e-time',e.timeNoted]])$(id).classList.toggle('on',on);
+  $('e-another').classList.toggle('hidden',!(e.ampChecked&&e.ampBad));$('e-reass').classList.toggle('hidden',!e.injected);$('e-time').classList.toggle('hot',e.injected&&!e.timeNoted);
+  $('e-check').textContent=e.act&&e.act.k==='check'?'Checking…':'Check the ampule';
+  const mg=e.vol;$('e-drawtxt').innerHTML=!e.syr?'':`<b style="color:${Math.abs(mg-.3)<.001?'#7fe3a4':'#ffc23d'}">${mg.toFixed(2)} mL</b> = ${mg.toFixed(2)} mg at 1 mg/mL${e.drawn?' · drawn':''}`;
+  ['e-m10','e-m05','e-p05','e-p10','e-drawn'].forEach(i=>$(i).disabled=!e.syr||e.drawn);epSyr();}
+const M_EP=[
+ {title:'Patient contact',sub:'Medic 1 is eight minutes out.',
+  brief:'41-year-old man picking apples at a U-pick orchard, stung on the neck by a yellow jacket about ten minutes ago. His wife says he\'s "allergic to bees" but has no auto-injector. He\'s sitting on a cooler, pale, scratching, and breathing hard. Your kit has oxygen, a pulse oximeter, and Bay County\'s epinephrine kit: ampules, syringes, filter needles, and IM needles.',
+  skills:['anaph','epi','upright','antihist'],
+  steps:[{t:'Assess: airway, breathing, skin, BP',f:()=>S.e.assessed},
+   {t:'Decision: what is this, and what does he need?',dec:'anaph',f:()=>S.e.assessed},
+   {t:'Decision: how to position him',dec:'epPos',f:()=>S.e.assessed},
+   {t:'Lay him flat, legs raised',f:()=>S.e.pos},{t:'Scrape out the stinger',f:()=>S.e.sting},
+   {t:'Oxygen: non-rebreather at 15 LPM',f:()=>S.e.o2},{t:'Pulse oximeter on',f:()=>S.e.ox}]},
+ {title:'Draw up the epinephrine',sub:'The skill you almost never do. Slow is smooth, smooth is fast.',
+  brief:'Bay County uses no auto-injectors — you draw the dose yourself. Check the drug, draw the right volume, cross-check with your partner, and give it in the right place. The game uses the common adult dose: 0.3 mg of 1 mg/mL epinephrine IM. Confirm your MCA\'s exact protocol.',
+  skills:['rights','conc','drawup','imsite','sharps'],
+  steps:[{t:'Check the ampule: drug, concentration, expiration, clarity',f:()=>S.e.ampOK},
+   {t:'Filter needle on a 1 mL syringe',f:()=>S.e.syr},
+   {t:'Draw up 0.3 mL (0.3 mg) and tap Done',f:()=>S.e.drawn||S.e.injected},
+   {t:'Cross-check out loud with your partner',f:()=>S.e.xcheck||S.e.injected},
+   {t:'Swap to the 1-inch IM needle',f:()=>S.e.swapped||S.e.injected},
+   {t:'Decision: injection site',dec:'epSite',any:true,f:()=>S.e.injectAsked},
+   {t:'Inject — needle straight into the sharps container',f:()=>S.e.injected},
+   {t:'Note the time',f:()=>S.e.timeNoted}]},
+ {title:'Is it working?',sub:'Reassess. Epinephrine takes a few minutes.',
+  brief:'The dose is in. Most patients start improving within a few minutes. Reassess, keep him flat, and be ready if it isn\'t enough.',
+  skills:['epi','biphasic','upright','handoff'],
+  steps:[{t:'Reassess a few minutes after the shot (twice)',wait:true,f:()=>S.e.reassAfter>=2},
+   {t:'Decision: "I feel better — I can walk"',dec:'epWalk',f:()=>S.e.reassAfter>=1},
+   {t:'Decision: handoff to Medic 1',dec:'epHandoff',any:true,f:()=>S.e.alsArr},
+   {t:'Medic 1 takes over',wait:true,f:()=>S.e.alsArr&&S.t-S.e.alsT>20}]},
+ {title:'Transport — East Side Hospital',sub:'A short ride. The reaction isn\'t finished.',
+  brief:'You\'re in the back with the medic. He\'s feeling better. Keep reassessing — anaphylaxis can come back.',
+  skills:['biphasic','epi'],
+  steps:[{t:'Reassess in the back (twice)',wait:true,f:()=>S.e.tx.reass>=2},
+   {t:'Arrive at East Side Hospital',wait:true,f:()=>S.e.tx.arrived},
+   {t:'Decision: ER handoff',dec:'epER',f:()=>S.e.tx.arrived}]}
+];
+Object.assign(DEC,{
+ anaph:{tag:'Recognizing anaphylaxis',q:'Hives on his chest and neck, face swelling, hoarse voice, wheezing, pale and dizzy — ten minutes after a sting. What is this, and what does he need first?',
+  opts:[{t:'Anaphylaxis — he needs epinephrine IM now, with oxygen and positioning while it\'s drawn up',r:'good',why:'Skin signs plus breathing trouble and low blood pressure after an exposure is anaphylaxis. Epinephrine is the only first-line treatment, and every minute matters.'},
+        {t:'A bad local reaction — oxygen, ice on the sting, and wait for Medic 1',r:'bad',why:'Hoarseness, wheezing, and dizziness are not local. Waiting ten minutes lets the airway and blood pressure keep failing.'},
+        {t:'Have him take the Benadryl his wife has in her purse',r:'bad',why:'Antihistamines help itching and hives but don\'t open an airway or raise blood pressure. They don\'t replace epinephrine.'}],
+  why:'Anaphylaxis: rapid onset with skin or mucosal signs plus breathing problems, low blood pressure, or GI symptoms — especially after a known trigger. Epinephrine IM, early.',g:'anaph',after:()=>{S.e.recogT=S.t;}},
+ epPos:{tag:'Positioning in anaphylaxis',q:'He\'s sitting on a cooler, dizzy and pale, breathing hard. How do you position him?',
+  opts:[{t:'Lay him flat with his legs raised — if breathing gets much harder, let him sit partly up, but never stand',r:'good',why:'Low blood pressure needs blood in the core. Sudden standing or sitting upright in anaphylaxis has been linked to collapse and death.'},
+        {t:'Keep him sitting up on the cooler so he can breathe',r:'partial',why:'Sitting can ease breathing, but he\'s pale and dizzy — his pressure is the bigger threat right now. Lay him back with legs up.'},
+        {t:'Walk him to the shade of the barn',r:'bad',why:'Standing and walking can drop his pressure through the floor. Bring the shade to him.'}],
+  why:'Hypotensive anaphylaxis patients should lie down with legs raised; those with mainly breathing trouble may sit. Avoid sudden standing or upright positions.',g:'upright'},
+ epSite:{tag:'Injection site',q:'The dose is drawn and checked. Where does it go?',
+  opts:[{t:'Outer thigh — the middle third of the vastus lateralis, 90 degrees, IM',r:'good',why:'The anterolateral thigh absorbs epinephrine fastest and most reliably, and it\'s a big muscle you can reach through the leg of his jeans if you have to.'},
+        {t:'The deltoid on his upper arm',r:'partial',why:'It\'s an IM site, but absorption in anaphylaxis is slower and less reliable than the thigh.'},
+        {t:'Under the skin of the arm (subcutaneous)',r:'bad',why:'Subcutaneous absorption is slower. Anaphylaxis needs IM.'}],
+  why:'The preferred site for IM epinephrine in anaphylaxis is the middle of the outer thigh.',g:'imsite',after:()=>{const r=S.lastChoice;S.e.site=r==='good'?'thigh':r==='partial'?'deltoid':'subcutaneous arm';epInject();}},
+ epWalk:{tag:'"I can walk"',q:'"I feel way better — I can walk to the ambulance." His wife is helping him sit up. The epi went in a few minutes ago.',
+  opts:[{t:'Keep him flat — he rides the cot. We bring the cot to him',r:'good',why:'Epinephrine improvement can be temporary, and sudden standing can still drop his pressure. Nothing he does should make his heart work harder right now.'},
+        {t:'Let him walk slowly with support',r:'bad',why:'Upright exertion in anaphylaxis can cause collapse. The cot comes to him.'},
+        {t:'Let him sit up but not stand',r:'partial',why:'Better than walking, but he still needs to stay down until he\'s on the cot.'}],
+  why:'Keep anaphylaxis patients lying down and avoid sudden position changes, even after they improve.',g:'upright'},
+ epHandoff:{tag:'Anaphylaxis handoff',q:'Medic 1 arrives: "Talk to me."',
+  opts:[{t:'"41-year-old, bee sting to the neck about 25 minutes ago, known allergy. Hives, facial swelling, wheezing, BP was in the 80s. Epi 0.3 mg IM, right thigh, at [time]. O₂ on, flat with legs up. Improving."',r:'good',why:'Trigger, timing, findings, the exact dose, site, and time of the epi, and the response.'},
+        {t:'"Allergic reaction — we gave epi."',r:'partial',why:'The medic needs the dose and time to decide whether and when to repeat.'},
+        {t:'"He\'s fine now, the epi worked."',r:'bad',why:'Improvement after epinephrine can be temporary. Hand off the facts, not a verdict.'}],
+  why:'The epinephrine dose and time are the most important part of an anaphylaxis handoff.',g:'epi'},
+ epRebound:{tag:'Symptoms returning',q:()=>`Ten minutes into the ride: "It's getting tight again." Hoarse voice is back, wheezing. SpO₂ ${epV().spo2}%. What do you do?`,
+  opts:[{t:'Tell the medic now — symptoms are returning, it\'s been about 15 minutes since the epi. Keep him flat and on oxygen',r:'good',why:'Anaphylaxis can return as the first dose wears off. A repeat dose is often needed, and the medic needs to know immediately.'},
+        {t:'Reassure him — the Benadryl at the hospital will handle it',r:'bad',why:'Returning airway symptoms are an emergency. Antihistamines won\'t fix them.'},
+        {t:'Wait five minutes and reassess',r:'partial',why:'Reassessing is good, but airway symptoms coming back need to be reported now.'}],
+  why:'Repeat epinephrine every 5–15 minutes if symptoms persist or return, per protocol. Biphasic reactions can occur hours later — another reason every patient goes to the hospital.',g:'biphasic',after:()=>{if(S.lastChoice!=='bad'){S.e.doses.push({t:S.t,mg:.3,site:'thigh'});radio('Medic 1','Second epi, 0.3 IM in the other thigh. Good call.','good');}else{S.e.doses.push({t:S.t+60,mg:.3,site:'thigh'});radio('Medic 1','Hold on — he\'s wheezing again! Giving a second epi now.','bad');}}},
+ epER:{tag:'ER handoff',q:'The ER nurse: "What did he get and when?"',
+  opts:[{t:'Two doses of epi 0.3 mg IM — ours at [time], the medic\'s about 15 minutes later when symptoms came back — plus O₂ and positioning',r:'good',why:'Doses, times, and the rebound tell the ER how closely to watch him.'},
+        {t:'"Epi. He\'s better."',r:'bad',why:'Without doses and times, the ER can\'t plan his observation.'},
+        {t:'Let the medic answer',r:'partial',why:'The medic leads, but you gave the first dose — make sure its time is heard.'}],
+  why:'Every medication handoff includes the drug, dose, route, site, and time.',g:'rights'}
+});
+Object.assign(GUIDE,{
+ anaph:{name:'Recognizing anaphylaxis',what:'A severe, rapid, whole-body allergic reaction. Often skin signs (hives, flushing, swelling) plus breathing problems, low blood pressure, or GI symptoms after a trigger like a sting, food, or medication.',when:'Minutes to an hour after exposure. It can also happen without hives.',wrong:'Calling it a local reaction, waiting for it to get worse, or treating it with antihistamines alone.',tip:'Hoarse voice, throat tightness, wheezing, dizziness, or fainting = epinephrine now. Remove the stinger quickly by any means — speed matters more than technique.',rel:['epi','upright']},
+ epi:{name:'Epinephrine for anaphylaxis',what:'The first-line treatment. It tightens blood vessels to raise blood pressure, opens airways, and reduces swelling.',when:'As soon as anaphylaxis is recognized.',wrong:'Delaying it, underdosing it, or skipping it because the patient "doesn\'t look that bad yet."',tip:'Common adult dose: 0.3 mg of 1 mg/mL epinephrine IM (0.3 mL). Repeat in 5–15 minutes if symptoms persist or return. Children are dosed by weight.',mca:'Bay County MFRs draw up epinephrine rather than using auto-injectors. Dose, concentration, kit contents, and repeat rules follow your MCA protocol — confirm them before relying on these numbers.',rel:['conc','drawup','biphasic']},
+ conc:{name:'Concentration: mg vs. mL',what:'Epinephrine comes in different concentrations. At 1 mg/mL (often labeled 1:1,000), 0.3 mg is 0.3 mL. Other concentrations (such as 0.1 mg/mL) are for other uses.',when:'Every time you draw up a medication.',wrong:'Confusing milligrams with milliliters, or grabbing the wrong concentration. A 1 mL draw of 1 mg/mL is 1 mg — over three times the adult dose.',tip:'Say the math out loud: "1 milligram per mL, I need 0.3 milligrams, so 0.3 mL."',mca:'Use only the concentration your MCA protocol specifies.',rel:['rights','drawup']},
+ drawup:{name:'Drawing up from an ampule',what:'Breaking a glass ampule and drawing the medication into a syringe.',when:'Whenever your protocol uses ampules instead of auto-injectors.',wrong:'Drawing without a filter needle (glass particles), injecting through the filter needle, or leaving air in the syringe.',tip:'Tap the drug down, snap the neck away from you, draw with a filter needle, swap to the IM needle, expel air, and re-check the volume at eye level.',mca:'Follow your MCA\'s drawing-up procedure and kit (ampule or vial, needle types).',rel:['conc','rights','sharps']},
+ rights:{name:'Medication rights and cross-check',what:'The checks before any medication: right patient, drug, dose, route, time, and documentation — plus expiration and clarity.',when:'Every medication, every time — especially the ones you rarely give.',wrong:'Skipping the check because it\'s an emergency. Rare skills under stress are exactly when errors happen.',tip:'Have your partner read the label back and say the dose math out loud. A two-person cross-check catches errors before they reach the patient.',mca:'Use your MCA\'s medication administration checklist.',rel:['conc','epi']},
+ imsite:{name:'IM injection site',what:'Epinephrine for anaphylaxis is given intramuscularly in the middle third of the outer thigh (vastus lateralis).',when:'Every IM epinephrine dose for anaphylaxis.',wrong:'Using the deltoid (slower absorption), going subcutaneous, or injecting into a vein.',tip:'90 degrees, all the way in, inject, then withdraw. You can go through thin clothing if needed.',rel:['epi','sharps']},
+ sharps:{name:'Sharps safety',what:'Handling needles so nobody gets stuck.',when:'From the moment a needle is uncapped until it\'s in the container.',wrong:'Recapping, setting needles down, or hunting for the container after the injection.',tip:'Open the sharps container before you inject. Needle goes straight in — no recapping.',rel:['drawup']},
+ upright:{name:'Positioning in anaphylaxis',what:'Low blood pressure in anaphylaxis is worsened by sitting or standing up.',when:'Any anaphylaxis patient — especially with dizziness or low BP.',wrong:'Walking them to the ambulance, standing them up, or sitting them upright suddenly.',tip:'Flat with legs raised for low blood pressure; a partly sitting position if breathing is the main problem; never sudden standing. Bring the cot to the patient.',rel:['anaph']},
+ biphasic:{name:'Returning symptoms',what:'Anaphylaxis can return as the first epinephrine dose wears off, and some patients have a second (biphasic) reaction hours later.',when:'Minutes to hours after initial improvement.',wrong:'Assuming the patient is out of danger because the first dose worked.',tip:'Keep reassessing, and report returning symptoms immediately. This is why every anaphylaxis patient goes to the hospital.',rel:['epi']},
+ antihist:{name:'Antihistamines are not first-line',what:'Antihistamines like diphenhydramine can ease itching and hives.',when:'Sometimes as an add-on by ALS or the hospital.',wrong:'Using them instead of — or before — epinephrine. They don\'t reverse airway swelling or shock.',tip:'Epinephrine first, every time anaphylaxis is suspected.',rel:['epi']}
+});
+function epDebrief(){const e=S.e,d=e.doses[0];const rows=[['Recognized anaphylaxis',e.recogT!==null?mmss(e.recogT)+' after contact':'—'],['Epinephrine given',d?mmss(d.t)+' after contact':'—'],['Your dose',d?d.mg.toFixed(2)+' mg ('+(Math.abs(d.mg-.3)<.001?'correct':'incorrect')+')':'—'],['Site',d?d.site:'—'],['Cross-checked',e.xcheck?'yes':'no'],['Swapped to IM needle',e.swapped?'yes':'no'],['Time noted',e.timeNoted?'yes':'no'],['Lowest BP',e.lowSbp<999?e.lowSbp+' systolic':'—'],['Lowest SpO₂',e.lowSpo2+'%']];
+  const msg=e.overdose?'He got far too much epinephrine. The cross-check is there for exactly this — say the math out loud every time.':!d?'No epinephrine was given.':(d.t-(e.recogT||0))>300?'The dose was right, but it took too long. Rare skills get faster with practice — run this call again.':'Fast recognition, the right drug at the right dose in the right place, and you caught the rebound. That\'s the skill.';
+  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
+
 /* ================= menu, progress, report ================= */
 const KEY='patient-contact';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:'',dept:''};}catch(e){return {runs:[],name:'',dept:''};}}
@@ -905,10 +1080,11 @@ function record(){const p=load();p.runs.push({call:CALL,d:new Date().toISOString
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
 function showMenu(){S.running=false;$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
-$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
+$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
 $('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
 $('b-start').onclick=()=>{$('intro').classList.add('hidden');const p=load();p.seen=true;save(p);showMenu();};
-function snapshot(){if(CALL==='od'){const o=S.o;return [`Patient Contact report — v${APP_VERSION}`,`Call: overdose · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${Math.round(o.rr)} SpO2 ${Math.round(o.spo2)} GCS ${Math.round(o.gcs)} · doses ${o.doses} · pulse ${o.pulse}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+function snapshot(){if(CALL==='ep'){const e=S.e,v=epV();return [`Patient Contact report — v${APP_VERSION}`,`Call: anaphylaxis · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · sev ${v.sev.toFixed(2)} · HR ${v.hr} BP ${v.sbp} SpO2 ${v.spo2} · drawn ${e.vol.toFixed(2)} mL · doses ${e.doses.length}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+  if(CALL==='od'){const o=S.o;return [`Patient Contact report — v${APP_VERSION}`,`Call: overdose · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${Math.round(o.rr)} SpO2 ${Math.round(o.spo2)} GCS ${Math.round(o.gcs)} · doses ${o.doses} · pulse ${o.pulse}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='mva')return [`Patient Contact report — v${APP_VERSION}`,`Call: MVA · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · blood loss ${Math.round(S.m.lost)} mL · control ${S.m.ctrl} · extrication stage ${S.m.extr.stage} · ALS ${S.m.alsArr?'on scene':'ETA '+mmss(S.m.eta)}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');return [`Patient Contact report — v${APP_VERSION}`,`Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim time ${mmss(S.t)} · arrest ${S.arrest} · ROSC ${S.rosc} · CPR ${S.cpr.on?compressorNow():'off'} · CCF ${S.arrestT?Math.round(S.compT/S.arrestT*100):0}%`,`AED ${S.aed.state} shocks ${S.aed.shocks} · ALS ${S.als.arrived?'on scene':'ETA '+mmss(S.als.eta)} · LUCAS ${S.als.lucas} · O2 ${Math.round(S.o2psi)} psi`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
 $('b-report').onclick=()=>{const p=load();$('r-name').value=p.name||'';$('r-dept').value=p.dept||'';$('r-note').value='';$('r-msg').textContent='';$('repov').classList.remove('hidden');};
 $('r-cancel').onclick=()=>$('repov').classList.add('hidden');
