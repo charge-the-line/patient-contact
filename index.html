@@ -133,6 +133,13 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="v y"><div class="l">Glucose</div><div class="n" id="sv-glu">—</div></div>
   </div>
   <div class="cprbar hidden" id="st-line"><span id="sv-lkw">Last known well: unknown</span><span id="sv-since"></span></div>
+  <div class="vitals hidden" id="vitals-fl">
+    <div class="v g"><div class="l">Pulse</div><div class="n" id="fv-hr">—</div></div>
+    <div class="v w"><div class="l">BP</div><div class="n" id="fv-bp" style="font-size:26px">—</div></div>
+    <div class="v c"><div class="l">SpO₂</div><div class="n" id="fv-spo2">—</div></div>
+    <div class="v y"><div class="l">GCS</div><div class="n" id="fv-gcs">—</div></div>
+  </div>
+  <div class="cprbar hidden" id="fl-line"><span id="fv-find">Not assessed</span><span id="fv-age"></span></div>
   <div class="cprbar hidden" id="od-line"><span id="ov-air">—</span><span id="ov-age"></span></div>
   <div class="cprbar hidden" id="mva-line"><span id="mv-skin">No vitals yet</span><span id="mv-age"></span></div>
   <div class="cprbar"><span id="who">No compressions</span><div class="track" id="fattrack"><div id="fat"></div></div><span id="pause"></span></div>
@@ -177,6 +184,8 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="grp hidden" id="g-st-a"><h3>Assess</h3><div class="row three"><button id="s-abc">Airway, breathing, circulation</button><button id="s-vitals">Vitals</button><button id="s-glu">Blood glucose</button><button id="s-meds">History and medications</button><button id="s-time">When was she last normal?</button><button id="s-fam">Husband: phone and med list</button></div></div>
   <div class="grp hidden" id="g-st-b"><h3>BE-FAST</h3><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><button id="s-B">B</button><button id="s-E">E</button><button id="s-F">F</button><button id="s-A">A</button><button id="s-S">S</button></div><div class="stat" id="s-find"></div></div>
   <div class="grp hidden" id="g-st-c"><h3>Moving and in the back</h3><div class="row three"><button id="s-cot">Onto the cot, weak side supported</button><button id="s-load">Power load</button><button id="s-reass">Recheck BE-FAST</button><button id="s-suct" class="hidden">Roll her, suction</button></div></div>
+  <div class="grp hidden" id="g-fl-a"><h3>Assess</h3><div class="row three"><button id="f-primary">Primary: ABCs</button><button id="f-why">What happened — and why?</button><button id="f-head">Head-to-toe exam</button><button id="f-meds">Medications</button><button id="f-vitals">Vitals</button><button id="f-glu">Blood glucose</button><button id="f-neuro">Neuro: GCS and pupils</button></div><div class="stat" id="f-findtxt"></div></div>
+  <div class="grp hidden" id="g-fl-c"><h3>Care</h3><div class="row three"><button id="f-warm">Blanket — warm her up</button><button id="f-pad">Pad and support the hip</button><button id="f-load">Power load</button><button id="f-reass">Neuro recheck</button></div></div>
   <div class="grp hidden" id="g-ride"><h3>In the back</h3><div class="row"><button id="a-reassess">Reassess with the medic</button><span></span></div></div>
 </div>
 
@@ -196,7 +205,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You are the medical first responder. You get there first, you work the patient until ALS arrives, then you work for the medic — on scene and in the back of the rig.</p>
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.5.1 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.6 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -209,6 +218,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call3"><b>Unresponsive in the bathroom</b><span>11:47 p.m. A roommate found him on the bathroom floor, barely breathing. Suspected fentanyl. Medic 1 is eight minutes out.</span></button>
   <button class="scen" id="b-call4"><b>Stung in the orchard</b><span>A yellow jacket sting, and now he can't catch his breath. No auto-injectors in Bay County — you draw up the epi. Medic 1 is eight minutes out.</span></button>
   <button class="scen" id="b-call5"><b>Something's wrong with Mom</b><span>10:07 a.m. Her husband found her slumped at the kitchen table, slurring and weak on one side. Medic 1 is six minutes out — and East Side Hospital is across the river.</span></button>
+  <button class="scen" id="b-call6"><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
   <button id="b-resume" class="go hidden" style="width:100%;margin-top:8px">Resume call</button>
 </div></div>
@@ -246,7 +256,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.5.1';
+const APP_VERSION='0.6.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -316,6 +326,7 @@ function tick(dtReal){
   if(CALL==='od'){tickOD(dtReal);return;}
   if(CALL==='ep'){tickEP(dtReal);return;}
   if(CALL==='st'){tickST(dtReal);return;}
+  if(CALL==='fl'){tickFL(dtReal);return;}
   const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
   if(S.act){S.act.t-=dt;if(S.act.t<=0){const k=S.act.k;S.act=null;
     if(k==='breaths'||k==='suction'||k==='switch')startCPR();
@@ -459,9 +470,10 @@ const M_ARREST=[
    {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}
 ];
 let M=M_ARREST;
-function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:14*3600+41*60;fresh();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
-  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':'Cardiac arrest';
-  if(id==='st')radio('Dispatch','Unit responding — 68-year-old female, slurred speech and weakness, possible stroke. Husband is the caller. Medic 1 responding, six minutes.');
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:14*3600+41*60;fresh();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':'Cardiac arrest';
+  if(id==='fl')radio('Dispatch','Unit responding — 82-year-old female, fallen, unable to get up. Daughter calling from out of state; key is under the mat. Medic 1 responding, eight minutes.');
+  else if(id==='st')radio('Dispatch','Unit responding — 68-year-old female, slurred speech and weakness, possible stroke. Husband is the caller. Medic 1 responding, six minutes.');
   else if(id==='ep')radio('Dispatch','Unit responding — 41-year-old male, stung by a bee, now short of breath and dizzy. Wife on the line. Medic 1 responding, eight minutes.');
   else if(id==='od')radio('Dispatch','Unit responding — 24-year-old male, unresponsive, breathing slow and snoring, possible overdose. Caller is his roommate. Medic 1 responding, eight minutes. PD notified.');
   else if(id==='mva')radio('Dispatch','Single-vehicle crash into a tree, county road. Caller reports the driver is trapped and bleeding. Medic 1 responding, seven minutes. Engine responding for extrication.');
@@ -500,6 +512,7 @@ function finish(){const last=S.mission===M.length-1;$('done-t').textContent=M[S.
   else if(last&&CALL==='od'){h+=odDebrief();record();}
   else if(last&&CALL==='ep'){h+=epDebrief();record();}
   else if(last&&CALL==='st'){h+=stDebrief();record();}
+  else if(last&&CALL==='fl'){h+=flDebrief();record();}
   else if(last){const ccf=S.arrestT?Math.round(S.compT/S.arrestT*100):0,avg=S.rateN?Math.round(S.rateSum/S.rateN):0;
     h+=`<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Outcome',S.rosc?'ROSC at '+mmss(S.roscAt)+' — delivered with a pulse':'Delivered in arrest, CPR continuous']].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div>`;
     h+=`<p style="font-size:14px;color:var(--soft);margin-top:10px">${S.rosc?'High-quality, continuous compressions, early shocks, and steady ventilation are what make ROSC possible. You gave him the chance.':'This outcome is driven mostly by compression quality: rate, depth, compressor switches, and short pauses. Check the numbers above for where time was lost.'}</p>`;
@@ -510,8 +523,8 @@ $('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length
 
 /* ================= render ================= */
 let wave=[],phase=0;
-function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}
-  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
+function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}
+  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
   ODG.forEach(i=>$(i).classList.add('hidden'));$('fattrack').classList.remove('hidden');$('mon-mode').style.color='';
   ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
   $('clock').textContent=clockStr();$('score').textContent=S.score;
@@ -547,7 +560,8 @@ function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD(
   $('g-assess').classList.toggle('hidden',S.mission>1&&!S.air.vomit);$('g-cpr').classList.toggle('hidden',S.mission>=2&&S.als.lucas>=2);
 }
 function drawWave(){if(!S.active){requestAnimationFrame(drawWave);return;}const run=S.running;if(run){phase+=1;
-  let y=42;if(CALL==='st'){if(S.s&&S.s.ox){const N=Math.round(3600/88);const p=(phase+(Math.floor(phase/N)%3===1?7:0))%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
+  let y=42;if(CALL==='fl'){if(S.f&&S.f.vitCount){const N=Math.round(3600/98);const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
+  else if(CALL==='st'){if(S.s&&S.s.ox){const N=Math.round(3600/88);const p=(phase+(Math.floor(phase/N)%3===1?7:0))%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
   else if(CALL==='ep'){if(S.e&&S.e.ox){const v=epV();const N=Math.max(18,Math.round(3600/v.hr));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(v.spo2/100);}}
   else if(CALL==='od'){if(S.o&&S.o.ox&&S.o.pulse){const N=Math.max(18,Math.round(3600/Math.max(30,S.o.hr)));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(S.o.spo2/100);}}
   else if(CALL==='mva'){if(S.m&&S.m.alsMon){const N=Math.max(18,Math.round(3600/mvaV().hr));const p=phase%N;y=p===0?12:p===1?72:p===2?36:p<6?40:(p>N*.45&&p<N*.6)?36:42;}}
@@ -575,7 +589,7 @@ const GUIDE={
  rosc:{name:'Return of spontaneous circulation (ROSC)',what:'The heart has resumed an organized rhythm with a pulse.',when:'Recognized by the medic on a rhythm check — often signaled first by a jump in EtCO₂.',wrong:'Hyperventilating, relaxing, or forgetting that re-arrest is common.',tip:'Steady ventilation (one every 6 seconds), SpO₂ about 92–98%, and hands ready to restart compressions.',rel:['vent','etco2']},
  bridge:{name:'Transport delays: the river crossings',what:'Monitor Township is on the west side of the Saginaw River; East Side Hospital is across it. The four Bay City drawbridges open for river traffic.',when:'Any transport across the river, especially in boating season.',wrong:'Being surprised by an opening. A bridge going up for a freighter can add minutes.',tip:'Crews can request through dispatch that a bridge be held down for a priority patient. Commercial ships already committed may not be able to wait. Plan your oxygen and your arms for the longer ride.',rel:['o2math']}
 };
-function incidentKey(w){const R=[[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
+function incidentKey(w){const R=[[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
   const d=w.match(/^Decision — (.*)$/);if(d){const k=Object.keys(DEC).find(x=>DEC[x].tag===d[1]);return k?DEC[k].g:null;}for(const [r,k] of R)if(r.test(w))return k;return null;}
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
@@ -647,7 +661,7 @@ function tickMVA(dtReal){const m=S.m;const F=S.mission===3?7:3;const dt=dtReal*F
 function renderMVA(){const m=S.m;if(!m)return;
   $('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals'].forEach(i=>$(i).classList.add('hidden'));
-  ODG.forEach(i=>$(i).classList.add('hidden'));EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
+  ODG.forEach(i=>$(i).classList.add('hidden'));EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
   $('eta-l').textContent=S.mission===3?'Regional Medical Center':'Medic 1';$('eta-v').textContent=S.mission===3?(m.tx.arrived?'Arrived':mmss(m.tx.total-m.tx.t)+' out'):m.alsArr?'On scene':mmss(m.eta)+' out';
   $('mon-name').textContent=m.alsMon?'Monitor':'Vitals — taken by hand';$('mon-mode').textContent=m.survey?(m.ctrl===2?'Bleeding controlled':m.ctrl===1?'Pressure on':'Arterial bleed!'):'—';
   const live=m.alsMon,v=live?mvaV():m.vit;
@@ -823,7 +837,7 @@ function tickOD(dtReal){const o=S.o;const F=S.mission===3?4:3;const dt=dtReal*F;
 function triggerWithdrawal(why){const o=S.o;o.withdrawal=true;o.vomit=true;o.gurgle=true;o.recov=false;ding(10,why);radio('You','He\'s up — vomiting, swinging his arms, ripping the mask off! Roll him, suction!','bad');}
 function renderOD(){const o=S.o;if(!o)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));
-  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
+  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-od-a',S.mission<=1);vis('g-od-b',S.mission<=1||S.mission===3);vis('g-od-n',S.mission<=1);vis('g-od-t',S.mission>=2);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(o.tx.arrived?'Arrived':mmss(o.tx.total-o.tx.t)+' out'):o.alsArr?'On scene':mmss(o.eta)+' out';
   $('mon-name').textContent=o.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!o.checked?'—':!o.pulse?'NO PULSE':o.withdrawal?'Agitated':o.rr<10?'Breathing inadequate':'Breathing on his own';$('mon-mode').style.color=!o.pulse||o.rr<10?'#ff8f8a':'';$('fattrack').classList.add('hidden');
@@ -989,7 +1003,7 @@ function epSyr(){const v=S.e.vol;let g=`<rect x="20" y="16" width="230" height="
   g+=`<rect x="250" y="24" width="30" height="10" fill="#a9b7cc"/><rect x="${20+230*v-3}" y="10" width="6" height="38" fill="#e8eef6"/><line x1="0" y1="29" x2="20" y2="29" stroke="#e8eef6" stroke-width="2"/>`;$('syr').innerHTML=g;}
 function renderEP(){const e=S.e;if(!e)return;const v=epV();$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG).forEach(i=>$(i).classList.add('hidden'));
-  STG.forEach(i=>$(i).classList.add('hidden'));['vitals-ep','ep-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!e.ox);$('fattrack').classList.add('hidden');
+  STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));['vitals-ep','ep-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!e.ox);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-ep-a',S.mission===0||S.mission===2);vis('g-ep-m',S.mission>=1);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(e.tx.arrived?'Arrived':mmss(e.tx.total-e.tx.t)+' out'):e.alsArr?'On scene':mmss(e.eta)+' out';
   $('mon-name').textContent=e.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!e.assessed?'—':v.sev>.55?'Worsening':v.sev>.35?'Reacting':'Improving';$('mon-mode').style.color=v.sev>.55?'#ff8f8a':v.sev>.35?'#ffc23d':'';
@@ -1130,7 +1144,7 @@ function tickST(dtReal){const x=S.s;const F=S.mission===3?4:3;const dt=dtReal*F;
   checkMission(dt);renderST();}
 function renderST(){const x=S.s;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG).forEach(i=>$(i).classList.add('hidden'));
-  ['vitals-st','st-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.ox);$('fattrack').classList.add('hidden');
+  FLG.forEach(i=>$(i).classList.add('hidden'));['vitals-st','st-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.ox);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-st-a',S.mission<=1);vis('g-st-b',S.mission<=1);vis('g-st-c',S.mission>=1);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
   $('mon-name').textContent=x.ox?'Pulse oximeter':'No monitor';const n=Object.values(x.bf).filter(Boolean).length;$('mon-mode').textContent=!x.abc?'—':`BE-FAST ${n}/5 checked`;$('mon-mode').style.color=x.sev>.5?'#ff8f8a':'';
@@ -1221,6 +1235,146 @@ function stDebrief(){const x=S.s;const scene=x.txStart!==null?x.txStart:null;con
   const msg=x.lkw==='bad'?'The care was good, but the last known well was the time she was found. That 25-minute difference can decide whether she\'s eligible for treatment.':(scene!==null&&scene>1200)?'Good assessment, but a long scene time. Stroke patients need to be moving quickly.':'Accurate last known well, a complete BE-FAST, the glucose ruled out the mimic, and the stroke team got everything they needed. That\'s a great stroke call.';
   return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
 
+/* ================= Elderly fall call ================= */
+const FLG=['vitals-fl','fl-line','g-fl-a','g-fl-c'];
+function freshFL(){return {primary:false,why:false,head:false,meds:false,vitCount:0,glu:false,neuro:0,warm:false,pad:false,lifted:false,riskId:null,refusal:null,smr:null,moved:false,loaded:false,
+  gcs:15,act:null,eta:480,alsArr:false,alsT:null,txStart:null,coldDing:false,declineReported:null,declineT:null,
+  tx:{t:0,total:540,arrived:false,reass:0,lastReass:-999,decline:false,declinePending:false,diverted:false}};}
+const FX=k=>$(k);
+function flNeed(){if(!S.f.primary){radio('You','Primary assessment first.','bad');return true;}return false;}
+FX('f-primary').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(x.primary||x.act)return;x.act={k:'primary',t:10};radio('You','Good morning, ma\'am — I\'m with the fire department. Let\'s take a look at you before we move anything.');};
+FX('f-why').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(flNeed()||x.why||x.act)return;x.act={k:'why',t:12};radio('You','Tell me exactly what happened — what were you doing right before you fell?');};
+FX('f-head').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(flNeed()||x.head||x.act)return;x.act={k:'head',t:20};radio('You','I\'m going to check you from head to toe, okay? Tell me if anything hurts.');};
+FX('f-meds').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(flNeed()||x.meds||x.act)return;x.act={k:'meds',t:12};radio('Partner','I\'ve got her pill bottles from the bathroom counter.');};
+FX('f-vitals').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(flNeed()||x.act)return;x.act={k:'vitals',t:16};};
+FX('f-glu').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(flNeed()||x.glu||x.act)return;x.act={k:'glu',t:12};};
+FX('f-neuro').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(flNeed()||x.act)return;x.act={k:'neuro',t:10};};
+FX('f-warm').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(flNeed()||x.warm)return;x.warm=true;radio('You','Blanket over her — the floor is freezing and she\'s been on it all night.');};
+FX('f-pad').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(!x.head){radio('You','Find out what\'s hurt first.','bad');return;}if(x.pad)return;x.pad=true;radio('Partner','Pillows under her right knee and along the hip — supporting it right where it lies.');};
+FX('f-load').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(!x.moved||x.loaded||x.act||S.mission!==2||S.briefing)return;x.act={k:'load',t:10};radio('EMT','Power load — locked in.');if(x.txStart===null)x.txStart=S.t;};
+FX('f-reass').onclick=()=>{if(CALL!=='fl')return;const x=S.f;if(S.mission!==3)return;if(S.t-x.tx.lastReass<100){radio('Medic 1','Just checked her — give it a few minutes.');return;}x.tx.lastReass=S.t;x.tx.reass++;
+  radio('You',x.gcs>=15?'Alert, knows where she is and why. Pupils equal and reactive. Grip strong both sides.':`GCS ${x.gcs} — she\'s drowsy and keeps asking the same question. Right pupil slightly bigger than the left.`,x.gcs<15?'bad':'');};
+function tickFL(dtReal){const x=S.f;const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
+  if(x.act){x.act.t-=dt;if(x.act.t<=0){const k=x.act.k;x.act=null;
+    if(k==='primary'){x.primary=true;radio('You','Airway open, she\'s talking in full sentences. Breathing fine. Pulse a bit fast. Skin cool and pale — she\'s cold.');}
+    if(k==='why'){x.why=true;radio('Patient','I got up to use the bathroom around ten last night and felt lightheaded… next thing, I was on the floor. I couldn\'t get up. I\'m so embarrassed.');radio('You','Lightheaded before the fall — and down about nine and a half hours.','bad');}
+    if(k==='head'){x.head=true;radio('You','Goose egg on her right forehead under her hair. Right leg is shorter and rolled outward — pain when it moves. Red pressure marks on her right hip and shoulder. No neck pain she can tell me about, but that hip hurts a lot.','bad');}
+    if(k==='meds'){x.meds=true;radio('Partner','Eliquis — that\'s a blood thinner — metoprolol, lisinopril, and something for her bladder.','bad');}
+    if(k==='vitals'){x.vitCount++;radio('Partner','Pulse 98, BP 104/62, resp 18, SpO₂ 95%. Skin cool.');}
+    if(k==='glu'){x.glu=true;radio('Partner','Glucose 108.');}
+    if(k==='neuro'){x.neuro++;radio('You',x.gcs>=15?'GCS 15 — alert, oriented. Pupils equal and reactive. Moves everything but the right leg because of pain.':`GCS ${x.gcs}. Repeating questions. Right pupil a bit larger.`);}
+    if(k==='load'){x.loaded=true;}}}
+  if(x.primary&&!x.warm&&S.t>300&&!x.coldDing){x.coldDing=true;ding(5,'Still uncovered on a cold floor after a long lie — older patients lose heat fast');}
+  if(!x.alsArr){x.eta-=dt;if(TIER===2&&!x.chaosEta&&S.t>150){x.chaosEta=true;x.eta+=120;radio('Dispatch','Medic 1 delayed — they\'re clearing another call. Plus two minutes.','bad');}if(x.eta<=0){x.alsArr=true;x.alsT=S.t;radio('Medic 1','Medic 1 — what have we got?','good');}}
+  if(S.mission===3&&!S.briefing){x.tx.t+=dt;
+    if(!x.tx.decline&&x.tx.t>(TIER===2?110:180)){x.tx.decline=true;x.gcs=TIER===2?13:14;if(TIER===2)radio('Patient','I feel sick… my head hurts so bad…','bad');x.declineT=S.t;radio('Patient','…Where are we going again, honey? … Where are we going again?','bad');x.tx.declinePending=true;}
+    if(x.tx.declinePending&&!DEC_OPEN){x.tx.declinePending=false;openDecision('flDecline',-1);}
+    if(x.tx.decline&&x.tx.t>360&&x.gcs===14)x.gcs=13;
+    if(!x.tx.arrived&&x.tx.t>=x.tx.total){x.tx.arrived=true;radio('EMT',x.tx.diverted?'Regional Medical Center — trauma bay. Neurosurgery is waiting.':'East Side Hospital — at the doors.','good');}}
+  checkMission(dt);renderFL();}
+function renderFL(){const x=S.f;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
+  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG).forEach(i=>$(i).classList.add('hidden'));
+  ['vitals-fl','fl-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.vitCount);$('fattrack').classList.add('hidden');
+  const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-fl-a',S.mission<=1);vis('g-fl-c',true);
+  $('eta-l').textContent=S.mission===3?(x.tx.diverted?'Regional Medical Center':'East Side Hospital'):'Medic 1';$('eta-v').textContent=S.mission===3?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
+  $('mon-name').textContent=x.vitCount?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!x.primary?'—':x.gcs<15?'Mental status changing':'Alert and talking';$('mon-mode').style.color=x.gcs<15?'#ff8f8a':'';
+  $('fv-hr').textContent=x.vitCount?'98':'—';$('fv-bp').textContent=x.vitCount?'104/62':'—';$('fv-spo2').textContent=x.vitCount?'95':'—';$('fv-gcs').textContent=(x.neuro||S.mission===3)?x.gcs:'—';
+  const f=[];if(x.why)f.push('down ~9½ h, lightheaded first');if(x.head)f.push('head bump, right hip');if(x.meds)f.push('on Eliquis');$('fv-find').textContent=f.length?f.join(' · '):(x.primary?'Looks fine. Look harder.':'Not assessed');
+  $('fv-age').textContent=x.glu?'glucose 108':'';$('who').textContent='';$('pause').textContent='';
+  for(const [id,on] of [['f-primary',x.primary],['f-why',x.why],['f-head',x.head],['f-meds',x.meds],['f-glu',x.glu],['f-warm',x.warm],['f-pad',x.pad],['f-load',x.loaded]])$(id).classList.toggle('on',on);
+  $('f-vitals').classList.toggle('on',x.vitCount>0);$('f-neuro').classList.toggle('on',x.neuro>0);
+  $('f-load').classList.toggle('hidden',S.mission!==2);$('f-reass').classList.toggle('hidden',S.mission!==3);$('f-warm').classList.toggle('hidden',S.mission>=2);$('f-pad').classList.toggle('hidden',S.mission>=2);
+  $('f-findtxt').textContent=[x.why?'Lightheaded getting up around 10 p.m.; down about 9½ hours.':'',x.head?'Forehead hematoma. Right leg shortened and externally rotated. Pressure redness on right hip and shoulder.':'',x.meds?'Eliquis (blood thinner), metoprolol, lisinopril.':''].filter(Boolean).join(' ');}
+const M_FL=[
+ {title:'Patient contact',sub:'She looks fine. That\'s the trap.',
+  brief:'82-year-old woman on her bedroom floor beside the bed. She\'s alert, polite, and embarrassed: "I\'m fine, I just need help up." Her daughter called 911 from Ohio when she didn\'t answer the phone this morning. Medic 1 is eight minutes out.',
+  skills:['lift','longlie','anticoag','hipfx','whyfall'],
+  steps:[{t:'Decision: "Just help me up, honey"',dec:'flLift',f:()=>true},
+   {t:'Primary: ABCs',f:()=>S.f.primary},
+   {t:'What happened — and why did she fall?',f:()=>S.f.why},
+   {t:'Head-to-toe exam',f:()=>S.f.head},
+   {t:'Medications',f:()=>S.f.meds},
+   {t:'Vitals',f:()=>S.f.vitCount>=1},{t:'Blood glucose',f:()=>S.f.glu},
+   {t:'Neuro check: GCS and pupils',f:()=>S.f.neuro>=1},
+   {t:'Blanket — warm her up',f:()=>S.f.warm},
+   {t:'Pad and support the hip where it lies',f:()=>S.f.pad},
+   {t:'Decision: what worries you most?',dec:'flRisk',f:()=>S.f.head&&S.f.meds}]},
+ {title:'Medic 1 — and the daughter',sub:'Now the hard conversation.',
+  brief:'Medic 1 is here. The daughter is on speakerphone, and your patient wants to stay home. Hand off, sort out the spine question, and figure out how to move her without making the hip worse.',
+  skills:['flrefusal','smrold','scoop','handoff'],
+  steps:[{t:'Decision: handoff to Medic 1',dec:'flHandoff',any:true,f:()=>S.f.alsArr},
+   {t:'Decision: "She doesn\'t want to go"',dec:'flRefuse',f:()=>S.f.alsArr},
+   {t:'Decision: spinal motion restriction?',dec:'flSMR',f:()=>S.f.alsArr},
+   {t:'Decision: how to move her',dec:'flMove',f:()=>S.f.alsArr}]},
+ {title:'Package and load',sub:'Gently.',
+  brief:'She\'s on the cot with her hip supported. The medic is taking her to East Side Hospital.',
+  skills:['scoop','cot'],
+  steps:[{t:'Power load into Medic 1',f:()=>S.f.loaded}]},
+ {title:'Transport — East Side Hospital',sub:'Keep checking her mind, not just her hip.',
+  brief:'You\'re in the back with the medic. She\'s chatting about her grandkids. Recheck her neuro status every few minutes — blood thinners plus a head strike means a bleed can show up hours later.',
+  skills:['anticoag','neurocheck'],
+  steps:[{t:'Neuro recheck on the way (twice)',wait:true,f:()=>S.f.tx.reass>=2},
+   {t:'Arrive at the hospital',wait:true,f:()=>S.f.tx.arrived},
+   {t:'Decision: ER handoff',dec:'flER',f:()=>S.f.tx.arrived}]}
+];
+Object.assign(DEC,{
+ flLift:{tag:'Lift assist',q:'You walk in. She\'s on the floor by the bed in her nightgown, smiling and apologizing. "I\'m fine, I just need help up, honey. Two strong boys like you can get me back in bed."',
+  opts:[{t:'Not yet — a full assessment first, right where she is',r:'good',why:'Every "lift assist" is a patient until proven otherwise. Older adults hide injuries, and lifting first can turn a hip fracture or a neck injury into a disaster.'},
+        {t:'Lift her into bed — she says she\'s fine and she knows her body',r:'bad',why:'She may not know about the fracture or the bleed yet. Moving her first is how injuries get worse — and how serious conditions get missed.'},
+        {t:'Help her sit up on the floor first and see how she feels',r:'partial',why:'Gentler than lifting, but you still don\'t know what\'s hurt. Assess before you move her at all.'}],
+  why:'Lift assists are among the most common calls — and a known source of missed injuries and repeat calls. Assess first: why she fell, how long she was down, what hurts, and what she takes.',g:'lift',after:()=>{S.f.lifted=S.lastChoice==='bad';if(S.lastChoice==='bad')radio('Patient','Ow — OW! My hip! Put me down!','bad');}},
+ flRisk:{tag:'The hidden danger',q:'Forehead bump, a hip that looks broken, nine hours on the floor, lightheaded before she fell — and Eliquis. She\'s alert and chatty. What worries you most?',
+  opts:[{t:'The head strike on a blood thinner — she needs a scan even if she seems fine',r:'good',why:'Anticoagulated older adults with any head strike are at high risk of bleeding in the brain, sometimes hours later. She looks fine now — that\'s the trap.'},
+        {t:'The hip — it\'s obviously broken and that\'s what hurts her most',r:'partial',why:'The hip is real and serious, but it\'s the obvious injury. The one that can kill her quietly is the bleed nobody can see yet.'},
+        {t:'Nothing urgent — she\'s alert, her vitals are okay, she just tripped',r:'bad',why:'She didn\'t trip — she was lightheaded. And alert now doesn\'t mean safe on a blood thinner with a head strike.'}],
+  why:'In older fall patients, look past the obvious: anticoagulants plus head strike, the cause of the fall, and the length of time down.',g:'anticoag',after:()=>{S.f.riskId=S.lastChoice;}},
+ flHandoff:{tag:'Fall handoff',q:'Medic 1 kneels next to her: "What do we have?"',
+  opts:[{t:'"82, lightheaded getting up around 10 last night, down about 9½ hours. Head strike with a forehead hematoma — on Eliquis. Right hip shortened and rotated. GCS 15, BP 104/62, sugar 108. Warmed, hip padded."',r:'good',why:'Why she fell, how long she was down, the anticoagulated head strike, the hip, and the vitals — everything that drives the plan.'},
+        {t:'"82, fell out of bed last night. Probable right hip fracture — leg is shortened and rotated. She\'s alert and oriented, vitals stable, sugar\'s normal. We padded the hip."',r:'partial',why:'Accurate, but it buries the two biggest risks: the blood thinner with a head strike, and nine and a half hours on the floor.'},
+        {t:'"She\'s fine — just a lift assist that turned into a hip. Her daughter really wants her to go in, so we figured we\'d call you guys."',r:'bad',why:'Framing it as a lift assist sets up the medic to underestimate her. Give findings, not a label.'}],
+  why:'The facts that change the plan: mechanism and cause, time down, anticoagulants, head strike, and neuro status.',g:'anticoag'},
+ flRefuse:{tag:'Elderly refusal',q:'The daughter, on speaker: "Mom, please go." Your patient: "I am NOT going to the hospital. I\'ll be fine once I\'m in bed." She\'s alert and oriented. What do you do?',
+  opts:[{t:'Explain plainly: the blood thinner and the bump mean a bleed can show up hours later, and the hip needs an x-ray. The medic leads the decision',r:'good',why:'Older adults often refuse out of embarrassment or fear of losing independence. Honest, specific risks — said kindly — usually work. The medic and medical control own the refusal.'},
+        {t:'Get her into bed, have her sign the refusal, and leave a fall-prevention handout',r:'bad',why:'You\'d be leaving an anticoagulated head strike and a likely hip fracture alone in bed. And moving her into bed means moving a broken hip.'},
+        {t:'Tell her the daughter will be upset with her if she doesn\'t go',r:'partial',why:'Pressure from family can work, but it isn\'t informed consent. Give her the real reasons.'}],
+  why:'Adults with capacity can refuse — but only after understanding the specific risks. Refusals follow your MCA process, led by the medic.',g:'flrefusal',after:()=>{S.f.refusal=S.lastChoice;radio('Patient',S.lastChoice==='good'?'…A bleed? On my brain? …All right. I\'ll go. Tell Karen I\'m going.':'Fine. Fine! I\'ll go. Just be careful with my leg.');}},
+ flSMR:{tag:'Spinal care in the elderly',q:'She denies neck pain, but she\'s 82, hit her head, and has a painful hip that could distract from other pain. Spinal motion restriction?',
+  opts:[{t:'Yes, per protocol — her age, head strike, and painful hip mean you can\'t clear her neck. Collar, padding, no hard board for the ride',r:'good',why:'Ground-level falls are a leading cause of neck fractures in older adults, and a distracting injury makes "no neck pain" unreliable. Padding matters: older skin breaks down fast.'},
+        {t:'No — she says her neck doesn\'t hurt, so it\'s cleared',r:'bad',why:'Her painful hip is a distracting injury, and older adults can have neck fractures with little pain. You can\'t clear her by asking.'},
+        {t:'Strap her tight to a long backboard for the whole ride',r:'partial',why:'Protecting the spine is right, but a hard board for a long ride causes pain and pressure injuries in older patients. Most protocols now limit long-board use.'}],
+  why:'Spinal motion restriction criteria vary by protocol, but older age, head strike, and distracting injuries commonly call for it. Avoid prolonged time on hard boards.',g:'smrold',after:()=>{S.f.smr=S.lastChoice;}},
+ flMove:{tag:'Moving a hip fracture',q:'She\'s on the floor between the bed and the dresser. How do you get her onto the cot?',
+  opts:[{t:'Scoop stretcher — split it, slide each half under her, lock it, and lift as a unit',r:'good',why:'A scoop moves her with almost no rolling or twisting of the hip, and you can take it off once she\'s on the cot.'},
+        {t:'Have her stand and pivot onto the cot with one of you on each side',r:'bad',why:'Weight-bearing on a fractured hip is extremely painful and can displace the fracture further.'},
+        {t:'Grab her under the arms and knees and lift her straight onto the cot',r:'partial',why:'Fast, but it twists and bends the hip and strains your back. Use the equipment.'}],
+  why:'Minimize movement of a suspected hip fracture. Tools like a scoop stretcher, padding, and plenty of hands make the move safer for the patient and the crew.',g:'scoop',after:()=>{S.f.moved=true;radio('You',S.lastChoice==='good'?'Scoop is locked — on three… easy… she\'s on the cot. Pillows back under that knee.':'…She\'s on the cot, but that hurt her a lot.',S.lastChoice==='good'?'good':'bad');}},
+ flDecline:{tag:'Decline in transport',q:'Ten minutes into the ride, she asks, "Where are we going again?" You tell her. A minute later she asks again — same words. She\'s drowsier. What do you do?',
+  opts:[{t:'Tell the medic now, with the time: new confusion and repeated questions on a blood thinner with a head strike',r:'good',why:'New confusion in an anticoagulated head injury is a red flag for a brain bleed. The medic may change the destination to a center with neurosurgery and alert them.'},
+        {t:'She\'s 82 and it\'s early in the morning — some confusion is normal',r:'bad',why:'She was sharp on scene. A change from her baseline is the warning sign, whatever her age.'},
+        {t:'Keep talking to her and recheck at the hospital',r:'partial',why:'Keeping her engaged is good, but the change has to be reported now — minutes matter for a bleed.'}],
+  why:'Compare against her own baseline. Any new confusion, repetition, drowsiness, headache, or vomiting after a head strike — especially on anticoagulants — gets reported immediately.',g:'neurocheck',
+  after:()=>{const x=S.f;x.declineReported=S.lastChoice;if(S.lastChoice!=='bad'){x.tx.diverted=true;x.tx.total+=240;radio('Medic 1','She\'s declining — I\'m calling medical control. We\'re going to Regional for neurosurgery.','good');radio('EMT','Turning south for I-75 — Regional, about four more minutes.');}else{radio('Medic 1','Wait — she\'s asking the same thing over and over? Why didn\'t you say something? Turning for Regional.','bad');x.tx.diverted=true;x.tx.total+=300;}}},
+ flER:{tag:'ER handoff',q:'The trauma team at Regional: "Give me the quick version."',
+  opts:[{t:'Anticoagulated head strike, down 9½ hours, new confusion en route at [time], probable right hip fracture',r:'good',why:'The bleed risk, the time of the change, the long lie, and the hip — in priority order.'},
+        {t:'"82-year-old fall, hip fracture — she\'s been pretty confused this morning."',r:'bad',why:'"Pretty confused this morning" hides the critical fact: she was normal on scene and changed in transport.'},
+        {t:'Let the medic give the report — she was their patient by then',r:'partial',why:'The medic leads, but you were there when she changed. Make sure the time is heard.'}],
+  why:'For a suspected bleed, the time the change happened is as important as the change itself.',g:'neurocheck'}
+});
+Object.assign(GUIDE,{
+ lift:{name:'Lift assists',what:'A request to help someone up after a fall. One of the most common calls, especially for older adults.',when:'Every fall call starts here — and every lift-assist patient deserves an assessment first.',wrong:'Lifting first, assessing never. Missed fractures, bleeds, and causes like strokes or heart rhythm problems.',tip:'Before anyone lifts: why did they fall, how long were they down, what hurts, what do they take, and did they hit their head?',mca:'Follow your MCA\'s lift-assist and refusal procedures.',rel:['whyfall','longlie','anticoag']},
+ whyfall:{name:'Why did they fall?',what:'The cause of a fall can be more dangerous than the injury: fainting, heart rhythms, low blood sugar, stroke, infection, or medication effects.',when:'Every fall.',wrong:'Accepting "I tripped" without asking what happened right before.',tip:'Ask: "What were you doing right before? Did you feel dizzy, lightheaded, or have chest pain?" Lightheaded before falling suggests a medical cause.',rel:['lift']},
+ longlie:{name:'The long lie',what:'Hours on the floor after a fall can cause dehydration, cold injury, pressure sores, and muscle breakdown that can damage the kidneys.',when:'Anyone who couldn\'t get up — especially overnight.',wrong:'Focusing only on the fall injuries and missing the effects of lying there for hours.',tip:'Establish how long they were down. Check skin over pressure points, warm them, and pass the time down along.',rel:['lift','hypo']},
+ anticoag:{name:'Blood thinners and head strikes',what:'Anticoagulants such as apixaban (Eliquis), rivaroxaban, and warfarin make bleeding in the brain more likely and more dangerous after even minor head trauma.',when:'Any fall or head strike in a patient on blood thinners.',wrong:'Being reassured because the patient looks fine. Symptoms of a bleed can appear hours later.',tip:'Always ask about blood thinners. Anticoagulated head strike = hospital evaluation, and repeated neuro checks.',rel:['neurocheck','strokemeds']},
+ hipfx:{name:'Suspected hip fracture',what:'Common in older adults after falls. Classic signs: hip or groin pain, a leg that is shortened and rotated outward, and inability to bear weight.',when:'Any fall with hip, groin, or thigh pain.',wrong:'Standing them up "to see if they can walk," or twisting the leg during moves.',tip:'Support the leg in the position found with pillows and padding. Move with a scoop stretcher and plenty of hands.',rel:['scoop']},
+ scoop:{name:'Scoop stretcher',what:'A stretcher that splits lengthwise, slides under the patient from both sides, and locks together.',when:'Moving patients with hip fractures or suspected spinal injuries from tight spaces.',wrong:'Rolling or twisting an injured hip, or leaving the patient on a hard device longer than needed.',tip:'Size it to the patient, slide each half in, lock the head end first, and lift as a unit with clear commands.',rel:['hipfx','smrold']},
+ smrold:{name:'Spinal care in older adults',what:'Older adults can break their necks in simple falls, sometimes with little pain.',when:'Falls with head strikes, neck pain, neuro changes, altered mental status, or distracting injuries.',wrong:'Clearing the neck by asking, or leaving a frail patient on a hard backboard for a long time.',tip:'Use padding generously. Many protocols favor a collar and cot over prolonged long-board use.',mca:'Spinal motion restriction criteria and equipment follow your MCA protocol.',rel:['smr','scoop']},
+ flrefusal:{name:'Older adults who refuse',what:'Older fall patients often refuse transport out of embarrassment, fear of the hospital, or fear of losing independence.',when:'Very common on fall calls.',wrong:'Accepting a refusal without explaining the specific risks — or using pressure instead of information.',tip:'Name the real risks plainly and kindly: "The blood thinner and the bump on your head mean you could be bleeding inside and not feel it yet." Involve family. The medic leads the refusal.',mca:'Refusal procedures follow your MCA protocol.',rel:['anticoag','refusal']},
+ neurocheck:{name:'Serial neuro checks',what:'Repeating mental status, pupils, and motor checks over time to catch changes early.',when:'Every head-injury patient, especially on blood thinners — on scene and throughout transport.',wrong:'One check on scene and never again, or blaming new confusion on age.',tip:'Write down the first exam as the baseline. Any change — confusion, repetition, drowsiness, a new pupil difference, headache, vomiting — gets reported immediately with the time.',rel:['anticoag']}
+});
+function flDebrief(){const x=S.f;const rows=[['Assessed before lifting',x.lifted?'no — lifted first':'yes'],['Found why she fell',x.why?'yes (lightheaded)':'no'],['Found the time down',x.why?'about 9½ hours':'no'],['Found the head strike',x.head?'yes':'no'],['Identified the blood thinner',x.meds?'yes (Eliquis)':'no'],['Kept her warm',x.warm?'yes':'no'],['Hip supported and scooped',x.pad?'padded':'not padded'],['Decline reported',x.declineReported==='good'?'immediately':x.declineReported==='partial'?'late':'not reported']];
+  const msg=x.lifted?'Lifting before assessing nearly turned a hip fracture into something worse. Every lift assist is a patient first.':x.declineReported!=='good'?'You found everything on scene — but the change in transport is the moment that mattered most. Report changes immediately, with the time.':'You found every hidden danger in a patient who looked fine, and you caught the decline the moment it happened. That\'s the hardest skill in EMS.';
+  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
+
 /* ===== balanced answer text: the right answer shouldn't be the longest one ===== */
 const OPT_TEXT={
  agonal:["Start compressions now — gasping isn't breathing","Roll him into the recovery position and watch his breathing closely","Put him on a non-rebreather at 15 and recheck in one minute"],
@@ -1256,6 +1410,14 @@ const OPT_TEXT={
  stHandoff:["\"68, last known well 9:40, found 10:05. BE-FAST positive: right droop, right arm drift, slurred, leaning right. Glucose 132. On Eliquis. BP 186/98.\"","\"68-year-old, found by her husband at 10:05. Right-sided weakness, facial droop, slurred speech. Sugar's normal, vitals are stable.\"","\"Her pressure is 186 over 98 and she takes blood pressure pills — should we treat that before we move her to the cot?\""],
  stDest:["Closest stroke-ready hospital, and her screen doesn't suggest a large clot","Protocol always sends strokes to the closest hospital, no matter what","It's the medic's preference — they like East Side's stroke team better"],
  stWorse:["Tell the medic right now — exactly what changed, and when","Make a note of it for the handoff at the hospital in ten minutes","Encourage her to keep trying to talk, and recheck in a few minutes"],
+ flLift:["Not yet — let's check you over right where you are","Lift her into bed — she says she's fine and knows her own body","Help her sit up on the floor first and see how she feels"],
+ flRisk:["Head strike on a blood thinner — scan needed even if she seems fine","The hip — it's clearly broken, and it's what's hurting her the most","Nothing urgent — she's alert, vitals are okay, she just tripped"],
+ flHandoff:["\"82, lightheaded at 10 last night, down 9½ hours. Head strike, forehead hematoma — on Eliquis. Right hip shortened, rotated. GCS 15, BP 104/62, sugar 108.\"","\"82, fell out of bed overnight. Probable right hip fracture — leg shortened and rotated. Alert and oriented, vitals stable, sugar 108. Hip is padded.\"","\"Lift assist that turned into a hip. She's alert, vitals are fine, and her daughter really wants her to go in, so we called you guys.\""],
+ flRefuse:["Name the real risk — a hidden bleed on Eliquis — and let the medic lead","Get her into bed, have her sign the refusal, and leave a fall-prevention handout","Tell her Karen will be upset with her if she doesn't go to the hospital"],
+ flSMR:["Yes, per protocol — collar and padding, but no hard board for the ride","No — she says her neck doesn't hurt, so you can clear it by asking","Yes — strap her tightly to a long backboard and leave her on it the whole ride"],
+ flMove:["Scoop stretcher — slide both halves under her and lift as a unit","Stand her up and pivot her onto the cot, one of you on each side","Lift her under the arms and knees straight onto the cot, on three"],
+ flDecline:["Tell the medic now — new confusion, with the time it started","She's 82 and it's early in the morning — some confusion is normal","Keep her talking and plan to mention it at the hospital handoff"],
+ flER:["Head strike on Eliquis, down 9½ hours, new confusion at [time], hip","\"82-year-old fall, broken hip — she's been pretty confused this morning.\"","Let the medic give the report — she was their patient by then"],
  stER:["\"9:40 — on the phone with their daughter. Found 10:05. Worse en route. On Eliquis.\"","\"This morning sometime — her husband found her slumped at the kitchen table.\"","\"Her husband is following us — he'll know the exact time better than I do.\""]
 };
 for(const k in OPT_TEXT){if(DEC[k]&&DEC[k].opts)DEC[k].opts.forEach((o,i)=>{if(OPT_TEXT[k][i])o.t=OPT_TEXT[k][i];});}
@@ -1269,10 +1431,11 @@ function record(){const p=load();p.runs.push({call:CALL,d:new Date().toISOString
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
 function showMenu(){S.running=false;$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
-$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
+$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
 $('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
 $('b-start').onclick=()=>{$('intro').classList.add('hidden');const p=load();p.seen=true;save(p);showMenu();};
-function snapshot(){if(CALL==='st'){const x=S.s;return [`Patient Contact report — v${APP_VERSION}`,`Call: stroke · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · BE-FAST ${Object.keys(x.bf).filter(k=>x.bf[k]).join('')} · LKW ${x.lkw||'—'} · glucose ${x.glu?'done':'no'}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+function snapshot(){if(CALL==='fl'){const x=S.f;return [`Patient Contact report — v${APP_VERSION}`,`Call: fall · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · found: head ${x.head} meds ${x.meds} why ${x.why} · GCS ${x.gcs} · lifted ${x.lifted}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+  if(CALL==='st'){const x=S.s;return [`Patient Contact report — v${APP_VERSION}`,`Call: stroke · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · BE-FAST ${Object.keys(x.bf).filter(k=>x.bf[k]).join('')} · LKW ${x.lkw||'—'} · glucose ${x.glu?'done':'no'}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='ep'){const e=S.e,v=epV();return [`Patient Contact report — v${APP_VERSION}`,`Call: anaphylaxis · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · sev ${v.sev.toFixed(2)} · HR ${v.hr} BP ${v.sbp} SpO2 ${v.spo2} · drawn ${e.vol.toFixed(2)} mL · doses ${e.doses.length}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='od'){const o=S.o;return [`Patient Contact report — v${APP_VERSION}`,`Call: overdose · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${Math.round(o.rr)} SpO2 ${Math.round(o.spo2)} GCS ${Math.round(o.gcs)} · doses ${o.doses} · pulse ${o.pulse}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='mva')return [`Patient Contact report — v${APP_VERSION}`,`Call: MVA · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · blood loss ${Math.round(S.m.lost)} mL · control ${S.m.ctrl} · extrication stage ${S.m.extr.stage} · ALS ${S.m.alsArr?'on scene':'ETA '+mmss(S.m.eta)}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');return [`Patient Contact report — v${APP_VERSION}`,`Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim time ${mmss(S.t)} · arrest ${S.arrest} · ROSC ${S.rosc} · CPR ${S.cpr.on?compressorNow():'off'} · CCF ${S.arrestT?Math.round(S.compT/S.arrestT*100):0}%`,`AED ${S.aed.state} shocks ${S.aed.shocks} · ALS ${S.als.arrived?'on scene':'ETA '+mmss(S.als.eta)} · LUCAS ${S.als.lucas} · O2 ${Math.round(S.o2psi)} psi`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
