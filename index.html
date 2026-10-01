@@ -140,6 +140,13 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="v y"><div class="l">GCS</div><div class="n" id="fv-gcs">—</div></div>
   </div>
   <div class="cprbar hidden" id="fl-line"><span id="fv-find">Not assessed</span><span id="fv-age"></span></div>
+  <div class="vitals hidden" id="vitals-cb">
+    <div class="v g"><div class="l">Baby HR</div><div class="n" id="cv-hr">—</div></div>
+    <div class="v y"><div class="l">Breathing</div><div class="n" id="cv-rr" style="font-size:20px">—</div></div>
+    <div class="v c"><div class="l">Color</div><div class="n" id="cv-col" style="font-size:20px">—</div></div>
+    <div class="v w"><div class="l">Tone</div><div class="n" id="cv-tone" style="font-size:20px">—</div></div>
+  </div>
+  <div class="cprbar hidden" id="cb-line"><span id="cv-mom">Mom: —</span><span id="cv-clock"></span></div>
   <div class="cprbar hidden" id="od-line"><span id="ov-air">—</span><span id="ov-age"></span></div>
   <div class="cprbar hidden" id="mva-line"><span id="mv-skin">No vitals yet</span><span id="mv-age"></span></div>
   <div class="cprbar"><span id="who">No compressions</span><div class="track" id="fattrack"><div id="fat"></div></div><span id="pause"></span></div>
@@ -186,6 +193,8 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="grp hidden" id="g-st-c"><h3>Moving and in the back</h3><div class="row three"><button id="s-cot">Onto the cot, weak side supported</button><button id="s-load">Power load</button><button id="s-reass">Recheck BE-FAST</button><button id="s-suct" class="hidden">Roll her, suction</button></div></div>
   <div class="grp hidden" id="g-fl-a"><h3>Assess</h3><div class="row three"><button id="f-primary">Primary: ABCs</button><button id="f-why">What happened — and why?</button><button id="f-head">Head-to-toe exam</button><button id="f-meds">Medications</button><button id="f-vitals">Vitals</button><button id="f-glu">Blood glucose</button><button id="f-neuro">Neuro: GCS and pupils</button></div><div class="stat" id="f-findtxt"></div></div>
   <div class="grp hidden" id="g-fl-c"><h3>Care</h3><div class="row three"><button id="f-warm">Blanket — warm her up</button><button id="f-pad">Pad and support the hip</button><button id="f-load">Power load</button><button id="f-reass">Neuro recheck</button></div></div>
+  <div class="grp hidden" id="g-cb-m"><h3>Mom</h3><div class="row three"><button id="c-hist">Due date, babies, contractions</button><button id="c-look">Check for crowning</button><button id="c-kit">OB kit, gloves, gown, eyes</button><button id="c-warm">Warm the room and towels</button><button id="c-pos">Position her</button><button id="c-push">Coach: push now</button><button id="c-head">Support the head</button><button id="c-shoulders">Guide the shoulders</button><button id="c-tob">Note time of birth</button><button id="c-massage">Fundal massage</button><button id="c-nurse">Baby to the breast</button><button id="c-mvitals">Mom's vitals</button><button id="c-reass">Reassess both</button></div><div class="stat" id="c-contr"></div></div>
+  <div class="grp hidden" id="g-cb-b"><h3>Baby</h3><div class="row three"><button id="b-dry">Dry and stimulate</button><button id="b-wrap">Dry towel and hat</button><button id="b-pos">Position airway</button><button id="b-suct">Suction: mouth, then nose</button><button id="b-hr">Check heart rate</button><button id="b-bvm">Infant BVM ready</button><button id="b-breath">Breath (40–60/min)</button><button id="b-sts">Skin-to-skin with mom</button></div><div class="stat" id="b-txt"></div></div>
   <div class="grp hidden" id="g-ride"><h3>In the back</h3><div class="row"><button id="a-reassess">Reassess with the medic</button><span></span></div></div>
 </div>
 
@@ -205,7 +214,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You are the medical first responder. You get there first, you work the patient until ALS arrives, then you work for the medic — on scene and in the back of the rig.</p>
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.6 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.7 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -219,6 +228,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call4"><b>Stung in the orchard</b><span>A yellow jacket sting, and now he can't catch his breath. No auto-injectors in Bay County — you draw up the epi. Medic 1 is eight minutes out.</span></button>
   <button class="scen" id="b-call5"><b>Something's wrong with Mom</b><span>10:07 a.m. Her husband found her slumped at the kitchen table, slurring and weak on one side. Medic 1 is six minutes out — and East Side Hospital is across the river.</span></button>
   <button class="scen" id="b-call6"><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
+  <button class="scen" id="b-call7"><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
   <button id="b-resume" class="go hidden" style="width:100%;margin-top:8px">Resume call</button>
 </div></div>
@@ -256,7 +266,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.6.0';
+const APP_VERSION='0.7.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -327,6 +337,7 @@ function tick(dtReal){
   if(CALL==='ep'){tickEP(dtReal);return;}
   if(CALL==='st'){tickST(dtReal);return;}
   if(CALL==='fl'){tickFL(dtReal);return;}
+  if(CALL==='cb'){tickCB(dtReal);return;}
   const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
   if(S.act){S.act.t-=dt;if(S.act.t<=0){const k=S.act.k;S.act=null;
     if(k==='breaths'||k==='suction'||k==='switch')startCPR();
@@ -470,9 +481,10 @@ const M_ARREST=[
    {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}
 ];
 let M=M_ARREST;
-function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:14*3600+41*60;fresh();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
-  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':'Cardiac arrest';
-  if(id==='fl')radio('Dispatch','Unit responding — 82-year-old female, fallen, unable to get up. Daughter calling from out of state; key is under the mat. Medic 1 responding, eight minutes.');
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:14*3600+41*60;fresh();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':id==='cb'?'Childbirth':'Cardiac arrest';
+  if(id==='cb')radio('Dispatch','Unit responding — 27-year-old female in active labor, says the baby is coming. Third pregnancy. Medic 1 responding from across the county, ten minutes, slick roads.');
+  else if(id==='fl')radio('Dispatch','Unit responding — 82-year-old female, fallen, unable to get up. Daughter calling from out of state; key is under the mat. Medic 1 responding, eight minutes.');
   else if(id==='st')radio('Dispatch','Unit responding — 68-year-old female, slurred speech and weakness, possible stroke. Husband is the caller. Medic 1 responding, six minutes.');
   else if(id==='ep')radio('Dispatch','Unit responding — 41-year-old male, stung by a bee, now short of breath and dizzy. Wife on the line. Medic 1 responding, eight minutes.');
   else if(id==='od')radio('Dispatch','Unit responding — 24-year-old male, unresponsive, breathing slow and snoring, possible overdose. Caller is his roommate. Medic 1 responding, eight minutes. PD notified.');
@@ -513,6 +525,7 @@ function finish(){const last=S.mission===M.length-1;$('done-t').textContent=M[S.
   else if(last&&CALL==='ep'){h+=epDebrief();record();}
   else if(last&&CALL==='st'){h+=stDebrief();record();}
   else if(last&&CALL==='fl'){h+=flDebrief();record();}
+  else if(last&&CALL==='cb'){h+=cbDebrief();record();}
   else if(last){const ccf=S.arrestT?Math.round(S.compT/S.arrestT*100):0,avg=S.rateN?Math.round(S.rateSum/S.rateN):0;
     h+=`<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Outcome',S.rosc?'ROSC at '+mmss(S.roscAt)+' — delivered with a pulse':'Delivered in arrest, CPR continuous']].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div>`;
     h+=`<p style="font-size:14px;color:var(--soft);margin-top:10px">${S.rosc?'High-quality, continuous compressions, early shocks, and steady ventilation are what make ROSC possible. You gave him the chance.':'This outcome is driven mostly by compression quality: rate, depth, compressor switches, and short pauses. Check the numbers above for where time was lost.'}</p>`;
@@ -523,8 +536,8 @@ $('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length
 
 /* ================= render ================= */
 let wave=[],phase=0;
-function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}
-  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
+function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}if(CALL==='cb'){renderCB();return;}
+  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
   ODG.forEach(i=>$(i).classList.add('hidden'));$('fattrack').classList.remove('hidden');$('mon-mode').style.color='';
   ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
   $('clock').textContent=clockStr();$('score').textContent=S.score;
@@ -560,7 +573,8 @@ function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD(
   $('g-assess').classList.toggle('hidden',S.mission>1&&!S.air.vomit);$('g-cpr').classList.toggle('hidden',S.mission>=2&&S.als.lucas>=2);
 }
 function drawWave(){if(!S.active){requestAnimationFrame(drawWave);return;}const run=S.running;if(run){phase+=1;
-  let y=42;if(CALL==='fl'){if(S.f&&S.f.vitCount){const N=Math.round(3600/98);const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
+  let y=42;if(CALL==='cb'){if(S.c&&S.c.born&&S.c.hrKnown){const N=Math.max(14,Math.round(3600/Math.max(40,S.c.hr)));const p=phase%N;y=p===0?14:p===1?70:p===2?36:42;}}
+  else if(CALL==='fl'){if(S.f&&S.f.vitCount){const N=Math.round(3600/98);const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
   else if(CALL==='st'){if(S.s&&S.s.ox){const N=Math.round(3600/88);const p=(phase+(Math.floor(phase/N)%3===1?7:0))%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
   else if(CALL==='ep'){if(S.e&&S.e.ox){const v=epV();const N=Math.max(18,Math.round(3600/v.hr));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(v.spo2/100);}}
   else if(CALL==='od'){if(S.o&&S.o.ox&&S.o.pulse){const N=Math.max(18,Math.round(3600/Math.max(30,S.o.hr)));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(S.o.spo2/100);}}
@@ -589,7 +603,7 @@ const GUIDE={
  rosc:{name:'Return of spontaneous circulation (ROSC)',what:'The heart has resumed an organized rhythm with a pulse.',when:'Recognized by the medic on a rhythm check — often signaled first by a jump in EtCO₂.',wrong:'Hyperventilating, relaxing, or forgetting that re-arrest is common.',tip:'Steady ventilation (one every 6 seconds), SpO₂ about 92–98%, and hands ready to restart compressions.',rel:['vent','etco2']},
  bridge:{name:'Transport delays: the river crossings',what:'Monitor Township is on the west side of the Saginaw River; East Side Hospital is across it. The four Bay City drawbridges open for river traffic.',when:'Any transport across the river, especially in boating season.',wrong:'Being surprised by an opening. A bridge going up for a freighter can add minutes.',tip:'Crews can request through dispatch that a bridge be held down for a priority patient. Commercial ships already committed may not be able to wait. Plan your oxygen and your arms for the longer ride.',rel:['o2math']}
 };
-function incidentKey(w){const R=[[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
+function incidentKey(w){const R=[[/golden minute/i,'golden'],[/newborn left uncovered|lose heat in minutes/i,'nwarm'],[/too fast for a newborn/i,'nppv'],[/head delivered fast/i,'deliver'],[/postpartum hemorrhage/i,'pph'],[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
   const d=w.match(/^Decision — (.*)$/);if(d){const k=Object.keys(DEC).find(x=>DEC[x].tag===d[1]);return k?DEC[k].g:null;}for(const [r,k] of R)if(r.test(w))return k;return null;}
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
@@ -661,7 +675,7 @@ function tickMVA(dtReal){const m=S.m;const F=S.mission===3?7:3;const dt=dtReal*F
 function renderMVA(){const m=S.m;if(!m)return;
   $('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals'].forEach(i=>$(i).classList.add('hidden'));
-  ODG.forEach(i=>$(i).classList.add('hidden'));EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
+  ODG.forEach(i=>$(i).classList.add('hidden'));EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
   $('eta-l').textContent=S.mission===3?'Regional Medical Center':'Medic 1';$('eta-v').textContent=S.mission===3?(m.tx.arrived?'Arrived':mmss(m.tx.total-m.tx.t)+' out'):m.alsArr?'On scene':mmss(m.eta)+' out';
   $('mon-name').textContent=m.alsMon?'Monitor':'Vitals — taken by hand';$('mon-mode').textContent=m.survey?(m.ctrl===2?'Bleeding controlled':m.ctrl===1?'Pressure on':'Arterial bleed!'):'—';
   const live=m.alsMon,v=live?mvaV():m.vit;
@@ -837,7 +851,7 @@ function tickOD(dtReal){const o=S.o;const F=S.mission===3?4:3;const dt=dtReal*F;
 function triggerWithdrawal(why){const o=S.o;o.withdrawal=true;o.vomit=true;o.gurgle=true;o.recov=false;ding(10,why);radio('You','He\'s up — vomiting, swinging his arms, ripping the mask off! Roll him, suction!','bad');}
 function renderOD(){const o=S.o;if(!o)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));
-  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
+  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-od-a',S.mission<=1);vis('g-od-b',S.mission<=1||S.mission===3);vis('g-od-n',S.mission<=1);vis('g-od-t',S.mission>=2);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(o.tx.arrived?'Arrived':mmss(o.tx.total-o.tx.t)+' out'):o.alsArr?'On scene':mmss(o.eta)+' out';
   $('mon-name').textContent=o.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!o.checked?'—':!o.pulse?'NO PULSE':o.withdrawal?'Agitated':o.rr<10?'Breathing inadequate':'Breathing on his own';$('mon-mode').style.color=!o.pulse||o.rr<10?'#ff8f8a':'';$('fattrack').classList.add('hidden');
@@ -1003,7 +1017,7 @@ function epSyr(){const v=S.e.vol;let g=`<rect x="20" y="16" width="230" height="
   g+=`<rect x="250" y="24" width="30" height="10" fill="#a9b7cc"/><rect x="${20+230*v-3}" y="10" width="6" height="38" fill="#e8eef6"/><line x1="0" y1="29" x2="20" y2="29" stroke="#e8eef6" stroke-width="2"/>`;$('syr').innerHTML=g;}
 function renderEP(){const e=S.e;if(!e)return;const v=epV();$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG).forEach(i=>$(i).classList.add('hidden'));
-  STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));['vitals-ep','ep-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!e.ox);$('fattrack').classList.add('hidden');
+  STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));['vitals-ep','ep-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!e.ox);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-ep-a',S.mission===0||S.mission===2);vis('g-ep-m',S.mission>=1);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(e.tx.arrived?'Arrived':mmss(e.tx.total-e.tx.t)+' out'):e.alsArr?'On scene':mmss(e.eta)+' out';
   $('mon-name').textContent=e.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!e.assessed?'—':v.sev>.55?'Worsening':v.sev>.35?'Reacting':'Improving';$('mon-mode').style.color=v.sev>.55?'#ff8f8a':v.sev>.35?'#ffc23d':'';
@@ -1144,7 +1158,7 @@ function tickST(dtReal){const x=S.s;const F=S.mission===3?4:3;const dt=dtReal*F;
   checkMission(dt);renderST();}
 function renderST(){const x=S.s;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG).forEach(i=>$(i).classList.add('hidden'));
-  FLG.forEach(i=>$(i).classList.add('hidden'));['vitals-st','st-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.ox);$('fattrack').classList.add('hidden');
+  FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));['vitals-st','st-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.ox);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-st-a',S.mission<=1);vis('g-st-b',S.mission<=1);vis('g-st-c',S.mission>=1);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
   $('mon-name').textContent=x.ox?'Pulse oximeter':'No monitor';const n=Object.values(x.bf).filter(Boolean).length;$('mon-mode').textContent=!x.abc?'—':`BE-FAST ${n}/5 checked`;$('mon-mode').style.color=x.sev>.5?'#ff8f8a':'';
@@ -1274,7 +1288,7 @@ function tickFL(dtReal){const x=S.f;const F=S.mission===3?4:3;const dt=dtReal*F;
   checkMission(dt);renderFL();}
 function renderFL(){const x=S.f;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG).forEach(i=>$(i).classList.add('hidden'));
-  ['vitals-fl','fl-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.vitCount);$('fattrack').classList.add('hidden');
+  CBG.forEach(i=>$(i).classList.add('hidden'));['vitals-fl','fl-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.vitCount);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-fl-a',S.mission<=1);vis('g-fl-c',true);
   $('eta-l').textContent=S.mission===3?(x.tx.diverted?'Regional Medical Center':'East Side Hospital'):'Medic 1';$('eta-v').textContent=S.mission===3?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
   $('mon-name').textContent=x.vitCount?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!x.primary?'—':x.gcs<15?'Mental status changing':'Alert and talking';$('mon-mode').style.color=x.gcs<15?'#ff8f8a':'';
@@ -1375,6 +1389,202 @@ function flDebrief(){const x=S.f;const rows=[['Assessed before lifting',x.lifted
   const msg=x.lifted?'Lifting before assessing nearly turned a hip fracture into something worse. Every lift assist is a patient first.':x.declineReported!=='good'?'You found everything on scene — but the change in transport is the moment that mattered most. Report changes immediately, with the time.':'You found every hidden danger in a patient who looked fine, and you caught the decline the moment it happened. That\'s the hardest skill in EMS.';
   return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
 
+/* ================= Childbirth call ================= */
+const CBG=['vitals-cb','cb-line','g-cb-m','g-cb-b'];
+function freshCB(){return {hist:false,look:false,kit:false,warm:false,pos:false,push:0,lastPushCyc:-1,cyc:0,crown:false,head:false,headOut:false,nuchal:null,born:false,birthRt:null,birthT:null,tob:false,uncontrolled:false,
+  dried:false,wrapped:false,posA:false,gurgly:true,bvm:false,hr:80,hrSeen:null,hrKnown:false,hrChecks:0,breath:'none',tone:'limp',color:'blue',good:0,hyper:0,lastBRt:-99,lastEffRt:-99,firstEffRt:null,ppvT:0,vigorous:false,vigRt:null,cold:0,coldDing:false,goldenDing:false,compr:false,comprAsked:false,sts:false,cut:false,apg1:null,apg5:null,
+  loss:250,placenta:false,pulled:null,massage:false,massT:null,nurse:false,mvit:0,pphDing:false,lossAtALS:null,
+  act:null,eta:540,alsArr:false,alsT:null,tx:{t:0,total:480,arrived:false,reass:0,lastReass:-999},chaos:{eta:false}};}
+const CX=k=>$(k);
+function inContr(){return S.mission===1&&(S.c.cyc%50)<22;}
+CX('c-hist').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(x.hist||x.act)return;x.act={k:'hist',t:12};radio('You','How far along are you? Is it just one baby? How far apart are the contractions — and has your water broken?');};
+CX('c-look').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(x.look||x.act)return;if(!x.hist){radio('You','Get the history first — then ask her permission to look.','bad');return;}x.act={k:'look',t:8};radio('You','Ma\'am, I need to check if the baby\'s head is showing. Is that okay?');};
+CX('c-kit').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(x.kit)return;x.kit=true;radio('Partner','OB kit is open — gloves, gown, face shield, clamps, bulb syringe, towels, baby hat.');};
+CX('c-warm').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(x.warm)return;x.warm=true;radio('Partner','Thermostat cranked up, towels in the dryer, infant BVM out and ready.');};
+CX('c-pos').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(x.pos)return;x.pos=true;radio('You','Let\'s get you on your back with your head and shoulders propped up, knees bent. Towels under you.');};
+CX('c-push').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(S.mission!==1||x.born)return;const c=Math.floor(x.cyc/50);
+  if(!inContr()){radio('You','Rest — breathe. We push with the next contraction.');return;}if(c===x.lastPushCyc)return;x.lastPushCyc=c;
+  if(!x.headOut){x.push++;if(x.push===1)radio('You','Here it comes — chin down, push, push, push! Good!');if(x.push>=2&&!x.crown){x.crown=true;radio('You','Head is crowning!','bad');}}
+  else radio('You','Push — I\'ve got the baby.');};
+CX('c-head').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.crown||x.head)return;x.head=true;x.headOut=true;radio('You','Gentle pressure — letting the head come slowly… head is out. Checking for the cord.');};
+CX('c-shoulders').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.headOut||x.born||x.nuchal===null)return;if(!inContr()){radio('You','Wait for the next contraction.');return;}
+  x.born=true;x.birthRt=S.rt;x.birthT=S.t;radio('You','Guiding down for the top shoulder… up for the bottom… baby\'s out! It\'s a girl!','good');radio('You','She\'s limp. Not crying. Blue.','bad');};
+CX('c-tob').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||x.tob)return;x.tob=true;radio('You',`Time of birth ${clockStr(x.birthT)}.`);};
+CX('b-dry').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||x.dried||x.act)return;x.act={k:'dry',t:4};radio('You','Drying her hard with the towel — rubbing her back, flicking her feet.');};
+CX('b-wrap').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.dried||x.wrapped)return;x.wrapped=true;radio('Partner','Wet towel off, warm dry towel on, hat on her head.');};
+CX('b-pos').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||x.posA)return;x.posA=true;radio('You','On her back, folded towel under her shoulders — head in the sniffing position.');};
+CX('b-suct').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born)return;if(!x.gurgly){radio('Partner','She\'s clear — don\'t keep suctioning.');return;}x.gurgly=false;radio('Partner','Bulb syringe — mouth first, then nose. Clear.');};
+CX('b-hr').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||x.act)return;x.act={k:'hr',t:6};radio('You','Counting her heart rate for six seconds…');};
+CX('b-bvm').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||x.bvm)return;x.bvm=true;radio('Partner','Infant BVM, newborn mask — covers the chin and nose, not the eyes.');};
+CX('b-breath').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||!x.bvm||x.vigorous)return;const iv=S.rt-x.lastBRt;x.lastBRt=S.rt;
+  if(!x.posA||x.gurgly){radio('You',x.gurgly?'No chest rise — gurgling. Suction mouth, then nose.':'No chest rise — fix her head position.','bad');return;}
+  x.lastEffRt=S.rt;if(x.firstEffRt===null)x.firstEffRt=S.rt;if(iv<.65){x.hyper++;if(x.hyper%6===1)ding(3,'Breaths too fast for a newborn — 40 to 60 a minute');}else if(iv<=2.2)x.good++;};
+CX('b-sts').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.vigorous||x.sts)return;x.sts=true;radio('You','Skin-to-skin on mom\'s chest, blanket over both of them. Look at her — she\'s pinking up.','good');};
+CX('c-massage').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(S.mission<3||x.massage)return;if(!x.placenta){radio('You','Placenta first — then feel for the uterus.','bad');return;}x.massage=true;x.massT=S.t;radio('You','Hand above her pubic bone — the uterus feels soft and boggy. Massaging firmly… it\'s firming up. I\'m sorry, I know this hurts.');};
+CX('c-nurse').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(S.mission<3||x.nurse||!x.sts)return;x.nurse=true;radio('You','Let\'s see if she\'ll nurse — it helps your uterus clamp down.');};
+CX('c-mvitals').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(S.mission<3||x.act)return;x.act={k:'mvit',t:14};};
+CX('c-reass').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(S.mission!==4)return;if(S.t-x.tx.lastReass<100){radio('Medic 1','Just checked — give it a couple minutes.');return;}x.tx.lastReass=S.t;x.tx.reass++;radio('You','Mom: uterus still firm, bleeding is light. Baby: pink, breathing fine, warm in the seat.','good');};
+function cbMomV(){const l=S.c.loss;return {hr:Math.round(92+Math.max(0,(l-500)/15)),sbp:Math.round(Math.max(70,118-Math.max(0,(l-700)/12)))};}
+function cbApgar(){const x=S.c;const A=x.color==='blue'?0:1,P=x.hr<1?0:x.hr<100?1:2,G=x.breath==='none'?0:x.breath==='gasping'?1:2,Ac=x.tone==='limp'?0:x.tone==='some flexion'?1:2,R=x.breath==='none'?0:x.breath==='gasping'?1:2;return {A,P,G,Ac,R,total:A+P+G+Ac+R};}
+function tickCB(dtReal){const x=S.c;const F=S.mission===0?3:S.mission===1?2:S.mission===2?(x.vigorous?3:1):S.mission===3?2:4;const dt=dtReal*F;S.t+=dt;
+  if(x.act){x.act.t-=dt;if(x.act.t<=0){const k=x.act.k;x.act=null;
+    if(k==='hist'){x.hist=true;radio('Patient','Thirty-nine weeks… just one… my last one came in forty minutes. Contractions every two minutes — my water broke an hour ago, it was clear. I feel like I have to push!','bad');}
+    if(k==='look'){x.look=true;radio('You','The top of the baby\'s head is showing with this contraction. She\'s crowning — this baby is coming now.','bad');}
+    if(k==='dry'){x.dried=true;if(x.breath==='none'){x.breath='gasping';x.tone='some flexion';}radio('You','She took a gasp… but she\'s not really breathing. Still floppy.','bad');}
+    if(k==='hr'){x.hrChecks++;x.hrKnown=true;x.hrSeen=Math.round(x.hr/6)*6;radio('You',`Heart rate about ${x.hrSeen}.`,x.hrSeen<100?'bad':'good');}
+    if(k==='mvit'){x.mvit++;const v=cbMomV();radio('Partner',`Mom: pulse ${v.hr}, BP ${v.sbp}/${Math.round(v.sbp*.62)}. Bleeding is ${x.massage?'slowing':'heavy — soaking the pads'}.`,x.massage?'':'bad');}}}
+  if(S.mission===1)x.cyc+=dt;
+  if(S.mission===1&&x.crown&&!x.head&&(x.cyc%50)>=22&&!x.uncontrolled){x.uncontrolled=true;x.head=true;x.headOut=true;ding(5,'The head delivered fast with no one supporting it — control the head with gentle pressure');radio('You','Head\'s out — fast! Checking for the cord.','bad');}
+  /* newborn */
+  if(x.born&&!x.vigorous){const ppv=S.rt-x.lastEffRt<2.4;if(ppv)x.ppvT+=dtReal;
+    if(ppv)x.hr=Math.min(150,x.hr+(x.compr?3.6:3)*dtReal);else x.hr=Math.max(40,x.hr-.7*dtReal);
+    if(x.hr>=100&&x.ppvT>=20){x.vigorous=true;x.vigRt=S.rt;x.breath='crying';x.tone='active';x.color='pink, hands blue';radio('Baby','WAAAH!','good');radio('You','She\'s crying! Heart rate over 100, good tone. Stop bagging — she\'s breathing on her own.','good');}
+    if(x.firstEffRt===null&&S.rt-x.birthRt>60&&!x.goldenDing&&S.mission===2){x.goldenDing=true;ding(10,'No effective breaths in the first minute — the golden minute');}
+    if(x.hr<60&&!x.comprAsked&&S.mission===2){x.comprAsked=true;openDecision('cbCompr',-1);}}
+  if(x.born&&S.mission===2&&!(x.dried&&x.wrapped)&&!x.sts){x.cold+=dtReal;if(x.cold>75&&!x.coldDing){x.coldDing=true;ding(5,'Wet newborn left uncovered — babies lose heat in minutes. Dry, wrap, and cover the head');}}
+  /* mom */
+  if(S.mission>=3&&x.placenta){const rate=x.massage?(x.nurse?.4:1):6;x.loss+=rate*dt;if(!x.massage&&x.loss>900&&!x.pphDing){x.pphDing=true;ding(10,'Postpartum hemorrhage from a boggy uterus — feel for the fundus and massage it');}}
+  if(!x.alsArr){x.eta-=dt;if(TIER===2&&!x.chaos.eta&&S.t>200){x.chaos.eta=true;x.eta+=120;radio('Dispatch','Medic 1 slid off the road — they\'re fine, back on their way. Plus two minutes.','bad');}if(x.eta<=0){x.alsArr=true;x.alsT=S.t;x.lossAtALS=x.loss;radio('Medic 1','Medic 1 — wow. Okay. Talk to me.','good');}}
+  if(S.mission===4&&!S.briefing){x.tx.t+=dt;if(!x.tx.arrived&&x.tx.t>=x.tx.total){x.tx.arrived=true;radio('EMT','East Side Hospital — labor and delivery is meeting us.','good');}}
+  checkMission(dt);renderCB();}
+function renderCB(){const x=S.c;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
+  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG,FLG).forEach(i=>$(i).classList.add('hidden'));
+  ['vitals-cb','cb-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(x.born&&x.hrKnown));$('fattrack').classList.add('hidden');
+  const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-cb-m',S.mission!==2);vis('g-cb-b',S.mission===2||(S.mission===3&&!x.sts));
+  for(const [id,ms] of [['c-hist',[0]],['c-look',[0]],['c-kit',[0]],['c-warm',[0]],['c-pos',[0]],['c-push',[1]],['c-head',[1]],['c-shoulders',[1]],['c-tob',[1]],['c-massage',[3]],['c-nurse',[3]],['c-mvitals',[3]],['c-reass',[4]]])vis(id,ms.includes(S.mission));
+  $('eta-l').textContent=S.mission===4?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===4?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
+  $('mon-name').textContent=x.born?'Newborn':'Mom in labor';$('mon-mode').textContent=!x.born?(S.mission===1?(inContr()?'CONTRACTION':'between contractions'):'—'):x.vigorous?'Crying, breathing well':'Not breathing well';$('mon-mode').style.color=(x.born&&!x.vigorous)||(S.mission===1&&inContr())?'#ff8f8a':'';
+  $('cv-hr').textContent=x.born&&x.hrKnown?x.hrSeen:'—';$('cv-rr').textContent=x.born?x.breath:'—';$('cv-col').textContent=x.born?x.color:'—';$('cv-tone').textContent=x.born?x.tone:'—';
+  const mv=cbMomV();$('cv-mom').textContent=S.mission>=3?`Mom: est. loss ${Math.round(x.loss/50)*50} mL · ${x.massage?'fundus firm':x.placenta?'fundus boggy':'awaiting placenta'}${x.mvit?` · HR ${mv.hr} BP ${mv.sbp}`:''}`:x.born?'Mom: doing okay':'Mom: '+(x.hist?'39 weeks, contractions 2 min apart':'—');
+  $('who').textContent='';$('pause').textContent='';
+  $('cv-clock').textContent=x.born&&S.mission===2?`${Math.floor(S.rt-x.birthRt)} s since birth`:'';
+  for(const [id,on] of [['c-hist',x.hist],['c-look',x.look],['c-kit',x.kit],['c-warm',x.warm],['c-pos',x.pos],['c-head',x.head],['c-shoulders',x.born],['c-tob',x.tob],['c-massage',x.massage],['c-nurse',x.nurse],['b-dry',x.dried],['b-wrap',x.wrapped],['b-pos',x.posA],['b-suct',!x.gurgly],['b-bvm',x.bvm],['b-sts',x.sts]])$(id).classList.toggle('on',on);
+  $('c-push').classList.toggle('hot',S.mission===1&&inContr()&&!x.born&&Math.floor(x.cyc/50)!==x.lastPushCyc);$('c-head').classList.toggle('hot',x.crown&&!x.head);$('c-shoulders').classList.toggle('hot',x.headOut&&!x.born&&x.nuchal!==null&&inContr());
+  $('b-breath').classList.toggle('hot',x.bvm&&!x.vigorous&&S.rt-x.lastBRt>=1.2);$('b-breath').classList.toggle('hidden',x.vigorous);$('b-hr').textContent=x.act&&x.act.k==='hr'?'Counting…':'Check heart rate';
+  $('c-contr').textContent=S.mission===1&&!x.born?(inContr()?'Contraction — coach her to push!':'Between contractions — let her rest and breathe.'):'';
+  $('b-txt').textContent=x.born&&!x.vigorous?(x.bvm?`${x.good} good breaths${x.hyper?` · ${x.hyper} too fast`:''} · last ${x.lastBRt>0?Math.round((S.rt-x.lastBRt)*10)/10+'s ago':'—'}`:'Golden minute: warm, dry, stimulate, position, clear if needed — then breathe for her.'):x.vigorous?'Breathing on her own. Keep her warm.':'';}
+const M_CB=[
+ {title:'Is the baby coming now?',sub:'Medic 1 is ten minutes out on icy roads.',
+  brief:'27-year-old woman in her bedroom, on her hands and knees between contractions. Her husband is pacing. Her last labor was fast. Your OB kit has gloves, a gown, a face shield, cord clamps, a bulb syringe, towels, a baby hat, and an infant BVM.',
+  skills:['imminent','obkit','deliver'],
+  steps:[{t:'History: due date, how many babies, contractions, water',f:()=>S.c.hist},
+   {t:'Check for crowning (with her permission)',f:()=>S.c.look},
+   {t:'Decision: deliver here, or go?',dec:'cbWhere',f:()=>S.c.look},
+   {t:'OB kit open — gloves, gown, eye protection',f:()=>S.c.kit},
+   {t:'Warm the room and the towels',f:()=>S.c.warm},{t:'Position her',f:()=>S.c.pos}]},
+ {title:'Delivery',sub:'Push with the contractions. Control the head.',
+  brief:'She\'s crowning. Coach her to push only during contractions, support the head as it delivers, check for the cord, then guide the shoulders.',
+  skills:['deliver','nuchal'],
+  steps:[{t:'Coach her to push with the contractions',wait:true,f:()=>S.c.push>=2},
+   {t:'Support the head as it delivers',f:()=>S.c.headOut},
+   {t:'Decision: the cord',dec:'cbNuchal',f:()=>S.c.headOut},
+   {t:'Guide the shoulders — down, then up',wait:true,f:()=>S.c.born},
+   {t:'Note the time of birth',f:()=>S.c.tob}]},
+ {title:'The golden minute',sub:'She\'s limp and not crying. This part runs in real time.',
+  brief:'The baby is out but limp, blue, and not crying. You have about a minute to warm, dry, stimulate, position, and clear her airway — and if she still isn\'t breathing well, to start breathing for her. This mission runs at real speed: one breath every 1 to 1½ seconds.',
+  skills:['golden','cord','nppv','apgar','nwarm'],
+  steps:[{t:'Decision: the cord',dec:'cbCord',f:()=>true},
+   {t:'Dry and stimulate',f:()=>S.c.dried},{t:'Wet towel off — dry towel and hat',f:()=>S.c.wrapped},
+   {t:'Position the airway',f:()=>S.c.posA},{t:'Suction: mouth, then nose',f:()=>!S.c.gurgly},
+   {t:'Check her heart rate',f:()=>S.c.hrChecks>=1},
+   {t:'Decision: she\'s gasping, heart rate 80',dec:'cbPPV',f:()=>S.c.hrChecks>=1},
+   {t:'Infant BVM — breathe for her at 40–60 a minute',wait:true,f:()=>S.c.good>=10||S.c.vigorous},
+   {t:'Decision: 1-minute APGAR',dec:'cbApgar1',any:true,f:()=>S.c.born&&S.rt-S.c.birthRt>=60},
+   {t:'Keep going until she breathes on her own',wait:true,f:()=>S.c.vigorous},
+   {t:'Skin-to-skin with mom',f:()=>S.c.sts},
+   {t:'Decision: 5-minute APGAR',dec:'cbApgar5',f:()=>S.c.vigorous&&S.t-S.c.birthT>=300}]},
+ {title:'Mom',sub:'The placenta, and the bleeding.',
+  brief:'Baby is crying on mom\'s chest. Now watch mom: the placenta usually delivers on its own within about 30 minutes, and afterward the uterus needs to clamp down. A soft, boggy uterus bleeds.',
+  skills:['placenta','pph','handoff'],
+  steps:[{t:'Decision: the cord is lengthening',dec:'cbPlacenta',f:()=>S.t-S.mStart>30},
+   {t:'Feel for the fundus — massage until firm',f:()=>S.c.massage},
+   {t:'Baby to the breast',f:()=>S.c.nurse},{t:'Mom\'s vitals',f:()=>S.c.mvit>=1},
+   {t:'Decision: handoff — two patients',dec:'cbHandoff',any:true,f:()=>S.c.alsArr},
+   {t:'Medic 1 takes over',wait:true,f:()=>S.c.alsArr&&S.t-S.c.alsT>20}]},
+ {title:'Transport — East Side Hospital',sub:'Two patients now.',
+  brief:'Mom and baby are going to East Side, where labor and delivery is expecting them. You\'re in the back with the medic.',
+  skills:['nseat','pph','nwarm'],
+  steps:[{t:'Decision: how does the baby ride?',dec:'cbSeat',f:()=>true},
+   {t:'Reassess both — mom\'s fundus and bleeding, baby\'s breathing and color (twice)',wait:true,f:()=>S.c.tx.reass>=2},
+   {t:'Arrive at East Side Hospital',wait:true,f:()=>S.c.tx.arrived},
+   {t:'Decision: handoff to labor and delivery',dec:'cbER',f:()=>S.c.tx.arrived}]}
+];
+function apgarOpts(){const a=cbApgar(),t=a.total;const lo=Math.max(0,t-2),hi=Math.min(10,t+2);const alts=[lo===t?Math.min(10,t+3):lo,hi===t?Math.max(0,t-3):hi];
+  return [{t:`${t}`,r:'good',why:`Appearance ${a.A}, Pulse ${a.P}, Grimace ${a.G}, Activity ${a.Ac}, Respiration ${a.R} — total ${t}.`},{t:`${alts[0]}`,r:'bad',why:`Recount: Appearance ${a.A}, Pulse ${a.P}, Grimace ${a.G}, Activity ${a.Ac}, Respiration ${a.R} = ${t}.`},{t:`${alts[1]}`,r:'bad',why:`Recount: Appearance ${a.A}, Pulse ${a.P}, Grimace ${a.G}, Activity ${a.Ac}, Respiration ${a.R} = ${t}.`}];}
+Object.assign(DEC,{
+ cbWhere:{tag:'Deliver or transport',q:'Thirty-nine weeks, contractions two minutes apart, she feels like she has to push, and the baby\'s head is showing. Medic 1 is still minutes away. What\'s the plan?',
+  opts:[{t:'Deliver here — get set up now',r:'good',why:'Crowning means delivery is imminent. A controlled delivery in a warm bedroom beats one in a moving vehicle or the back of a car.'},
+        {t:'Get her into the car — the hospital is only fifteen minutes away',r:'bad',why:'She\'ll deliver on the way, in a cramped, cold, moving space with no one free to help. Crowning means stay and deliver.'},
+        {t:'Have her cross her legs and breathe through it until Medic 1 arrives',r:'bad',why:'Trying to hold a baby in is dangerous for both of them. Never delay a delivery that\'s happening.'}],
+  why:'Signs of imminent delivery: crowning, strong urge to push or bear down, contractions about two minutes apart or less. When delivery is imminent, prepare to deliver on scene.',g:'imminent'},
+ cbNuchal:{tag:'Cord around the neck',q:()=>`The head is out. You slide a finger along the baby\'s neck — the umbilical cord is wrapped around it once${TIER===2?', and it\'s tight. It won\'t slip over the head':''}. What do you do?`,
+  optsFn:()=>TIER===2?[
+    {t:'Two clamps a couple of inches apart, cut between them, unwrap',r:'good',why:'A tight cord that can\'t be slipped over the head can be clamped twice and cut so the baby can deliver.'},
+    {t:'Pull the baby out quickly before the cord tightens more',r:'bad',why:'Pulling can tear the cord or injure the baby. Fix the cord first.'},
+    {t:'Keep trying to slip it over the head, even though it won\'t budge',r:'partial',why:'Slipping it is first choice, but when it\'s too tight, clamp and cut.'}]:[
+    {t:'Gently slip the loop over the baby\'s head',r:'good',why:'Most nuchal cords are loose and can simply be slipped over the head.'},
+    {t:'Clamp twice and cut it right away',r:'partial',why:'That\'s for a cord too tight to slip. A loose cord just goes over the head.'},
+    {t:'Ignore it — the baby will come out anyway',r:'bad',why:'A cord around the neck can tighten as the baby delivers. Always check and fix it.'}],
+  why:'Always check for a nuchal cord after the head delivers. Loose: slip it over the head. Too tight to slip: two clamps, cut between.',g:'nuchal',after:()=>{S.c.nuchal=S.lastChoice;radio('You',TIER===2?'Clamped, cut, unwrapped. Next contraction — shoulders.':'Slipped it over her head. Next contraction — shoulders.');}},
+ cbCord:{tag:'Clamping the cord',q:'She\'s out — limp, blue, not crying. The cord is still attached to mom. What about the cord?',
+  opts:[{t:'Clamp twice and cut, so you can work on her on a warm, flat surface',r:'good',why:'A baby who needs resuscitation needs a firm, warm surface and your full attention.'},
+        {t:'Wait for the cord to stop pulsing before you clamp it',r:'partial',why:'Delayed clamping is recommended for vigorous babies. This one isn\'t vigorous — she needs your help now.'},
+        {t:'Leave the cord and the placenta attached until the hospital',r:'bad',why:'You can\'t effectively resuscitate a limp newborn tethered to mom.'}],
+  why:'For vigorous newborns, guidelines favor delaying cord clamping. A non-vigorous newborn who needs resuscitation should not wait.',g:'cord',after:()=>{S.c.cut=true;radio('Partner','Clamps on, cut between — she\'s on the warm towels.');}},
+ cbPPV:{tag:'Start breathing for her',q:'You\'ve dried, stimulated, positioned, and suctioned. She\'s still limp, with occasional gasps. Heart rate about 80. What now?',
+  opts:[{t:'Start breathing for her with the infant BVM',r:'good',why:'Apnea or gasping, or a heart rate under 100 after the initial steps, means positive-pressure ventilation now. Ventilation is the most important action in newborn resuscitation.'},
+        {t:'Keep rubbing her back harder until she cries',r:'bad',why:'Stimulation has already failed. More rubbing wastes the golden minute.'},
+        {t:'Hold oxygen tubing near her face and keep watching',r:'partial',why:'Blow-by oxygen doesn\'t help a baby who isn\'t breathing. She needs breaths delivered.'}],
+  why:'If a newborn is apneic or gasping, or the heart rate is below 100 after the initial steps, start positive-pressure ventilation within the first minute.',g:'nppv'},
+ cbCompr:{tag:'Heart rate under 60',q:'Despite your breaths, her heart rate is now under 60. Your partner is free. What do you do?',
+  opts:[{t:'Check mask seal and position — then compressions 3:1 with breaths',r:'good',why:'First make sure ventilation is effective. If the heart rate stays under 60, start compressions coordinated with breaths: 3 compressions to 1 breath.'},
+        {t:'Stop ventilating and focus on compressions only',r:'bad',why:'Newborn arrests are almost always breathing problems. Ventilation remains essential.'},
+        {t:'Keep going exactly as you are and hope the heart rate climbs',r:'partial',why:'Something isn\'t working. Fix the ventilation — and if the rate stays under 60, add compressions.'}],
+  why:'Newborn heart rate under 60 despite effective ventilation calls for chest compressions coordinated with ventilations (3:1).',g:'nppv',after:()=>{if(S.lastChoice==='good'){S.c.compr=true;S.c.posA=true;S.c.gurgly=false;radio('Partner','Two thumbs on the lower sternum — one, two, three, breathe…','good');}}},
+ cbApgar1:{tag:'1-minute APGAR',q:()=>{const x=S.c;return `One minute old. Color: ${x.color}. Heart rate ${x.hr>=100?'over 100':x.hr<60?'under 60':'under 100'}. Breathing: ${x.breath}. Tone: ${x.tone}. Reflex: ${x.breath==='crying'?'cries':x.breath==='gasping'?'grimaces':'no response'}. What\'s her APGAR?`;},
+  optsFn:apgarOpts,why:'APGAR: Appearance, Pulse, Grimace, Activity, Respiration — 0 to 2 each, at 1 and 5 minutes. It records how she\'s doing; it never delays resuscitation.',g:'apgar',after:()=>{S.c.apg1=S.lastChoice;}},
+ cbApgar5:{tag:'5-minute APGAR',q:()=>{const x=S.c;return `Five minutes old. Color: ${x.color}. Heart rate about 140. Breathing: strong cry. Tone: active, moving all four limbs. Reflex: cries when you flick her foot. What\'s her APGAR?`;},
+  optsFn:()=>{const x=S.c;x.hr=140;return apgarOpts();},why:'Most babies are not fully pink at 5 minutes — blue hands and feet are normal and score 1.',g:'apgar',after:()=>{S.c.apg5=S.lastChoice;}},
+ cbPlacenta:{tag:'The placenta',q:'A few minutes after the birth, mom has a small gush of blood and the cord gets longer. Your partner reaches for the cord: "Should I pull it out?"',
+  opts:[{t:'No — let it deliver on its own, and catch it in a bag',r:'good',why:'Pulling on the cord can tear it or turn the uterus inside out. A small gush and a lengthening cord mean the placenta is separating naturally.'},
+        {t:'Yes — a firm, steady pull to get it over with',r:'bad',why:'Traction on the cord can cause uterine inversion or hemorrhage. Never pull.'},
+        {t:'Don\'t worry about it — the hospital will deliver the placenta',r:'partial',why:'It may come before you leave. Be ready to catch it and bring it along.'}],
+  why:'The placenta usually delivers within about 30 minutes. Don\'t pull the cord. Keep the placenta with mom so the hospital can check that it\'s complete.',g:'placenta',after:()=>{S.c.placenta=true;S.c.pulled=S.lastChoice;radio('You','Placenta delivered — looks complete. In the bag, coming with us.');if(S.lastChoice==='bad')radio('Patient','Ahh — that really hurt!','bad');}},
+ cbHandoff:{tag:'Two-patient handoff',q:'Medic 1 walks into the bedroom: "Talk to me."',
+  opts:[{t:'"Girl born 2:31, nuchal cord, limp at birth — PPV, crying by about 90 seconds. APGARs [1-min], [5-min]. Placenta out, intact. Mom bled heavily — fundus firm now, nursing."',r:'good',why:'Both patients: birth time, what the baby needed and how she responded, the APGARs, the placenta, and mom\'s bleeding.'},
+        {t:'"Healthy baby girl, came fast! Mom\'s doing great. The placenta came out, and we massaged her belly a little bit."',r:'bad',why:'"Healthy" hides a baby who needed resuscitation, and "a little bit" hides a hemorrhage.'},
+        {t:'"Baby girl, born about ten minutes ago. Mom\'s bleeding a lot. Placenta is out. Baby\'s on mom\'s chest now, crying, and she seems okay."',r:'partial',why:'True, but it leaves out that the baby needed breaths and the APGARs — both matter to the receiving team.'}],
+  why:'Newborn: time of birth, resuscitation needed, response, APGARs. Mom: placenta, blood loss, fundus, interventions.',g:'golden'},
+ cbSeat:{tag:'Transporting the newborn',q:'Mom wants to hold the baby on her chest for the ride. How does the baby ride?',
+  opts:[{t:'In an approved newborn restraint device, secured per protocol',r:'good',why:'In a crash, an unrestrained baby in someone\'s arms can be thrown with enormous force. Skin-to-skin is wonderful — but not in a moving ambulance.'},
+        {t:'On mom\'s chest under a blanket — skin-to-skin keeps her warm',r:'bad',why:'Warmth matters, but an unsecured newborn in a moving vehicle is a serious crash risk.'},
+        {t:'In your arms on the bench seat, so you can watch her breathing',r:'bad',why:'Your arms can\'t hold a baby in a collision. Use the restraint device and watch her from your seat.'}],
+  why:'Newborns are transported in approved restraint systems. Keep them warm with blankets and a hat, and check on them often.',g:'nseat'},
+ cbER:{tag:'Labor and delivery handoff',q:'The labor and delivery nurse: "What do I need to know?"',
+  opts:[{t:'Born at 2:31 with a nuchal cord, needed breaths, APGARs [1-min] and [5-min]; mom bled heavily',r:'good',why:'Time, the resuscitation, the APGARs, and mom\'s bleeding — the facts both teams need.'},
+        {t:'"Healthy baby girl, mom did great. A really fast delivery in the bedroom."',r:'bad',why:'Leaves out the resuscitation and the hemorrhage.'},
+        {t:'Let the medic answer — you just want to get the baby in the warmer',r:'partial',why:'The medic leads, but you delivered her. Make sure the resuscitation and APGARs are heard.'}],
+  why:'Handoffs for mom and baby include birth time, resuscitation, APGARs, placenta, and blood loss.',g:'golden'}
+});
+Object.assign(GUIDE,{
+ imminent:{name:'Imminent delivery',what:'Signs the baby is coming before you can safely transport: crowning, a strong urge to push or bear down, contractions about two minutes apart or closer, and a history of fast labors.',when:'Every labor call — check with permission.',wrong:'Loading up a crowning mother, or trying to delay the birth.',tip:'Ask: how far along, how many babies, how far apart the contractions are, has the water broken (and what color), any complications, how fast her past labors were.',mca:'Follow your MCA\'s obstetric protocol.',rel:['obkit','deliver']},
+ obkit:{name:'OB kit and setup',what:'Gloves, gown, face and eye protection, cord clamps, scissors or scalpel, bulb syringe, towels, a baby hat, and a bag for the placenta. Have the infant BVM ready.',when:'As soon as delivery looks imminent.',wrong:'Hunting for supplies with the head crowning, and forgetting how fast a wet newborn gets cold.',tip:'Warm the room, warm the towels, and set out the infant BVM before the baby arrives.',rel:['imminent','nwarm']},
+ deliver:{name:'Delivering the baby',what:'Coaching pushes with contractions, controlling the head, checking for the cord, and guiding the shoulders.',when:'Once the head is crowning.',wrong:'Pulling on the baby, letting the head pop out uncontrolled, or pushing between contractions.',tip:'Gentle pressure on the head to prevent an explosive delivery. Head out → check for cord → top shoulder down → bottom shoulder up. Babies are slippery — use a towel.',rel:['nuchal','golden']},
+ nuchal:{name:'Cord around the neck',what:'The umbilical cord looped around the baby\'s neck — common and usually loose.',when:'Check after every head delivery.',wrong:'Ignoring it, or pulling the baby through a tight cord.',tip:'Loose: slip it over the head. Too tight: two clamps, cut between, unwrap.',rel:['deliver','cord']},
+ golden:{name:'The golden minute',what:'The first minute after birth. Most newborns need only warmth, drying, and stimulation. A few need breathing support — and it should start within the first minute.',when:'Every birth. Ask: term? good tone? breathing or crying?',wrong:'Spending the first minute on the wrong things, or waiting for the baby to "come around."',tip:'Warm, dry, stimulate, position the airway, clear secretions if needed. Still apneic, gasping, or heart rate under 100? Start breaths.',mca:'Newborn resuscitation follows current neonatal guidelines and your MCA protocol.',rel:['nppv','nwarm','apgar']},
+ nppv:{name:'Breathing for a newborn',what:'Positive-pressure ventilation with an infant BVM — the single most important skill in newborn resuscitation.',when:'Apnea, gasping, or a heart rate under 100 after the initial steps.',wrong:'Too fast, too forceful, a poor mask seal, or skipping it in favor of blow-by oxygen.',tip:'40 to 60 breaths a minute — "breathe, two, three." Just enough for gentle chest rise. Term babies start on room air. Check heart rate after about 30 seconds of effective breaths. Under 60 despite good ventilation: compressions 3:1.',mca:'Device, oxygen use, and compression guidance follow your MCA protocol.',rel:['golden','apgar']},
+ nwarm:{name:'Keeping a newborn warm',what:'Newborns lose heat fast — especially wet ones.',when:'From the second they\'re born.',wrong:'Leaving a wet towel on the baby or leaving the head uncovered.',tip:'Dry, remove the wet towel, wrap in a dry warm one, put on a hat, then skin-to-skin with mom when the baby is stable.',rel:['golden']},
+ cord:{name:'Clamping and cutting the cord',what:'Two clamps a few inches from the baby, cut between them.',when:'For vigorous babies, guidelines favor waiting at least 30–60 seconds. For babies who need resuscitation, clamp and cut so you can work.',wrong:'Pulling on the cord, or cutting without two clamps.',tip:'First clamp about 4 inches from the baby, second a couple inches farther. Check the cut ends for bleeding.',mca:'Cord timing follows your MCA protocol.',rel:['nuchal','placenta']},
+ apgar:{name:'APGAR score',what:'Appearance, Pulse, Grimace, Activity, Respiration — 0, 1, or 2 each, scored at 1 and 5 minutes.',when:'At 1 minute and 5 minutes after birth.',wrong:'Waiting for the APGAR before starting resuscitation. The score records; it doesn\'t decide.',tip:'Appearance: blue/pale 0, body pink with blue hands 1, all pink 2. Pulse: none 0, under 100 1, over 100 2. Grimace: none 0, grimace 1, cry 2. Activity: limp 0, some flexion 1, active 2. Respiration: none 0, weak or gasping 1, strong cry 2.',rel:['golden']},
+ placenta:{name:'The placenta',what:'Delivers on its own, usually within about 30 minutes — often with a small gush of blood and a lengthening cord.',when:'After every birth.',wrong:'Pulling on the cord. It can tear the cord or invert the uterus.',tip:'Let it come, catch it in a bag, and bring it to the hospital so they can check that it\'s complete.',rel:['pph']},
+ pph:{name:'Postpartum hemorrhage',what:'Heavy bleeding after birth, most often from a uterus that hasn\'t clamped down (a soft, "boggy" uterus).',when:'Watch for it after every birth.',wrong:'Underestimating blood loss or waiting for the hospital.',tip:'Fundal massage: firm, circular massage just above the pubic bone until the uterus feels firm. Breastfeeding helps the uterus contract. Treat for shock and update the medic.',mca:'Medications and blood-loss thresholds follow your MCA protocol.',rel:['placenta']},
+ nseat:{name:'Transporting a newborn',what:'Newborns ride in an approved restraint device — not in anyone\'s arms.',when:'Every transport.',wrong:'A baby held on a chest or in arms in a moving vehicle.',tip:'Warm blankets and a hat, secured in the device, and frequent checks of breathing and color.',mca:'Use your agency\'s approved newborn transport device.',rel:['nwarm']}
+});
+function cbDebrief(){const x=S.c;const first=x.firstEffRt!==null?Math.round(x.firstEffRt-x.birthRt):null,vig=x.vigRt?Math.round(x.vigRt-x.birthRt):null;
+  const rows=[['Head delivery',x.uncontrolled?'uncontrolled':'controlled'],['Nuchal cord',x.nuchal==='good'?'handled correctly':'handled poorly'],['First effective breath',first!==null?first+' s after birth (goal: under 60)':'—'],['Crying on her own',vig!==null?vig+' s after birth':'—'],['Kept warm',x.coldDing?'got cold':'yes'],['1-minute APGAR',x.apg1==='good'?'scored correctly':'miscounted'],['5-minute APGAR',x.apg5==='good'?'scored correctly':'miscounted'],['Placenta',x.pulled==='good'?'delivered on its own':x.pulled==='bad'?'pulled — injury risk':'—'],['Mom\'s blood loss',`about ${Math.round(x.loss/50)*50} mL`]];
+  const msg=first===null||first>60?'Breaths came late. In a limp newborn, the most important thing you can do is breathe for her within the first minute.':x.loss>1000?'The baby did great, but mom bled heavily before the fundal massage. After the placenta, feel for the uterus right away.':'Controlled delivery, breaths inside the golden minute, a warm crying baby, and a firm fundus. That\'s a delivery most firefighters never get to practice.';
+  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
+
 /* ===== balanced answer text: the right answer shouldn't be the longest one ===== */
 const OPT_TEXT={
  agonal:["Start compressions now — gasping isn't breathing","Roll him into the recovery position and watch his breathing closely","Put him on a non-rebreather at 15 and recheck in one minute"],
@@ -1418,6 +1628,10 @@ const OPT_TEXT={
  flMove:["Scoop stretcher — slide both halves under her and lift as a unit","Stand her up and pivot her onto the cot, one of you on each side","Lift her under the arms and knees straight onto the cot, on three"],
  flDecline:["Tell the medic now — new confusion, with the time it started","She's 82 and it's early in the morning — some confusion is normal","Keep her talking and plan to mention it at the hospital handoff"],
  flER:["Head strike on Eliquis, down 9½ hours, new confusion at [time], hip","\"82-year-old fall, broken hip — she's been pretty confused this morning.\"","Let the medic give the report — she was their patient by then"],
+ cbCord:["Clamp twice and cut, so you can work on her on a warm surface","Wait for the cord to stop pulsing before you clamp — that's best for babies","Leave the cord and the placenta attached all the way to the hospital"],
+ cbCompr:["Fix the mask seal and position — then compressions 3:1 with breaths","Stop the breaths and put all your effort into chest compressions instead","Keep going exactly as you are and hope her heart rate starts to climb"],
+ cbHandoff:["\"Girl born at [time], nuchal cord, limp — we bagged her, crying by about 90 seconds. APGARs at 1 and 5 minutes. Placenta intact. Mom bled heavily; fundus firm now.\"","\"Healthy baby girl, and she came fast! Mom's doing great. The placenta came out on its own, and we massaged her belly a little bit after that.\"","\"Baby girl, born about ten minutes ago. Mom's been bleeding a lot. Placenta is out. Baby's on mom's chest now, crying, and she seems okay.\""],
+ cbER:["Birth time, nuchal cord, needed breaths, both APGARs; mom bled heavily","\"Healthy baby girl, mom did great — a really fast delivery in the bedroom.\"","Let the medic answer — you just want to get the baby into the warmer"],
  stER:["\"9:40 — on the phone with their daughter. Found 10:05. Worse en route. On Eliquis.\"","\"This morning sometime — her husband found her slumped at the kitchen table.\"","\"Her husband is following us — he'll know the exact time better than I do.\""]
 };
 for(const k in OPT_TEXT){if(DEC[k]&&DEC[k].opts)DEC[k].opts.forEach((o,i)=>{if(OPT_TEXT[k][i])o.t=OPT_TEXT[k][i];});}
@@ -1431,10 +1645,11 @@ function record(){const p=load();p.runs.push({call:CALL,d:new Date().toISOString
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
 function showMenu(){S.running=false;$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
-$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
+$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-call7').onclick=()=>loadCall('cb');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
 $('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
 $('b-start').onclick=()=>{$('intro').classList.add('hidden');const p=load();p.seen=true;save(p);showMenu();};
-function snapshot(){if(CALL==='fl'){const x=S.f;return [`Patient Contact report — v${APP_VERSION}`,`Call: fall · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · found: head ${x.head} meds ${x.meds} why ${x.why} · GCS ${x.gcs} · lifted ${x.lifted}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+function snapshot(){if(CALL==='cb'){const x=S.c;return [`Patient Contact report — v${APP_VERSION}`,`Call: childbirth · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · born ${x.born} · baby HR ${Math.round(x.hr)} ${x.breath} · good breaths ${x.good} · mom loss ${Math.round(x.loss)} mL`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+  if(CALL==='fl'){const x=S.f;return [`Patient Contact report — v${APP_VERSION}`,`Call: fall · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · found: head ${x.head} meds ${x.meds} why ${x.why} · GCS ${x.gcs} · lifted ${x.lifted}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='st'){const x=S.s;return [`Patient Contact report — v${APP_VERSION}`,`Call: stroke · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · BE-FAST ${Object.keys(x.bf).filter(k=>x.bf[k]).join('')} · LKW ${x.lkw||'—'} · glucose ${x.glu?'done':'no'}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='ep'){const e=S.e,v=epV();return [`Patient Contact report — v${APP_VERSION}`,`Call: anaphylaxis · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · sev ${v.sev.toFixed(2)} · HR ${v.hr} BP ${v.sbp} SpO2 ${v.spo2} · drawn ${e.vol.toFixed(2)} mL · doses ${e.doses.length}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='od'){const o=S.o;return [`Patient Contact report — v${APP_VERSION}`,`Call: overdose · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${Math.round(o.rr)} SpO2 ${Math.round(o.spo2)} GCS ${Math.round(o.gcs)} · doses ${o.doses} · pulse ${o.pulse}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
