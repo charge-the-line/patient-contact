@@ -90,7 +90,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <body>
 
 <div class="top">
-  <div><div class="brand">PATIENT CONTACT</div><h1 id="title">Cardiac arrest</h1></div>
+  <div><div class="brand">PATIENT CONTACT</div><h1 id="title">Patient Contact</h1></div>
   <div class="meta"><button id="b-guide" class="guidebtn">Protocol guide</button><div style="margin-top:4px">Score <b id="score">100</b></div><div id="clock">14:41</div></div>
 </div>
 
@@ -106,6 +106,13 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="v c"><div class="l">EtCO₂</div><div class="n" id="v-etco2">—</div></div>
     <div class="v y"><div class="l">CCF</div><div class="n" id="v-ccf">—</div></div>
   </div>
+  <div class="vitals hidden" id="vitals-mva">
+    <div class="v g"><div class="l">Pulse</div><div class="n" id="mv-hr">—</div></div>
+    <div class="v w"><div class="l">BP</div><div class="n" id="mv-bp" style="font-size:26px">—</div></div>
+    <div class="v c"><div class="l">SpO₂</div><div class="n" id="mv-spo2">—</div></div>
+    <div class="v y"><div class="l">GCS</div><div class="n" id="mv-gcs">—</div></div>
+  </div>
+  <div class="cprbar hidden" id="mva-line"><span id="mv-skin">No vitals yet</span><span id="mv-age"></span></div>
   <div class="cprbar"><span id="who">No compressions</span><div class="track"><div id="fat"></div></div><span id="pause"></span></div>
 </div>
 
@@ -123,6 +130,16 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="row" style="margin-top:6px"><button id="a-shock">Shock</button><span></span></div></div>
   <div class="grp hidden" id="g-als"><h3>With Medic 1</h3><div class="row"><button id="a-zoll">Move pads to the monitor</button><button id="a-hands">Hands off</button><button id="a-lucas1">LUCAS: back plate</button><button id="a-lucas2">LUCAS: upper part, start</button></div></div>
   <div class="grp hidden" id="g-move"><h3>Packaging</h3><div class="row three"><button id="a-cot">Onto the cot</button><button id="a-straps">Straps secured</button><button id="a-load">Power load</button></div></div>
+  <div class="grp hidden" id="g-scene"><h3>Scene</h3><div class="row"><button id="m-size">Size up the scene</button><button id="m-enter">Get in with her (rear door)</button></div></div>
+  <div class="grp hidden" id="g-pt"><h3>Patient</h3>
+    <div class="row three"><button id="m-cspine">Hold her head still</button><button id="m-survey">Primary survey</button><button id="m-press">Direct pressure</button>
+    <button id="m-tq">Tourniquet</button><button id="m-mark">Mark TQ time</button><button id="m-o2">O₂ NRB 15</button>
+    <button id="m-warm">Blanket — keep warm</button><button id="m-vitals">Take vitals</button><button id="m-protect">Protect her</button></div>
+    <div class="stat" id="m-bleed"></div></div>
+  <div class="grp hidden" id="g-extr"><h3>Extrication — engine crew</h3>
+    <div class="o2"><span id="x-stage">Waiting</span><div class="track"><div id="x-bar" style="background:var(--orange)"></div></div><span id="x-left"></span></div>
+    <div class="row" style="margin-top:6px"><button id="m-move">On your count: out to the cot</button><button id="m-load">Power load</button></div></div>
+  <div class="grp hidden" id="g-mtx"><h3>In the back</h3><div class="row"><button id="m-reass">Reassess vitals</button><button id="m-tqcheck">Check tourniquet and below it</button></div></div>
   <div class="grp hidden" id="g-ride"><h3>In the back</h3><div class="row"><button id="a-reassess">Reassess with the medic</button><span></span></div></div>
 </div>
 
@@ -142,7 +159,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You are the medical first responder. You get there first, you work the patient until ALS arrives, then you work for the medic — on scene and in the back of the rig.</p>
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.1 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.2 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -151,6 +168,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="tiers"><button data-tier="0">Guided</button><button data-tier="1">Recall</button><button data-tier="2">Chaos</button></div>
   <p class="stat" id="tierhelp" style="margin:0 0 10px"></p>
   <button class="scen" id="b-call1"><b>62-year-old man down</b><span>Witnessed collapse at home. His wife is doing CPR. Medic 1 is nine minutes out.</span></button>
+  <button class="scen" id="b-call2"><b>Car versus tree, driver pinned</b><span>Single-vehicle crash on a county road, early morning, 41°F. Driver trapped, bleeding. Your engine crew is cutting. Medic 1 is seven minutes out.</span></button>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
   <button id="b-resume" class="go hidden" style="width:100%;margin-top:8px">Resume call</button>
 </div></div>
@@ -188,10 +206,10 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.1.0';
+const APP_VERSION='0.2.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-let TIER=0,S={},stepsDone=[];
+let TIER=0,S={},stepsDone=[],CALL='arrest';
 function fresh(){S={t:0,mStart:0,mission:0,running:false,active:false,briefing:false,score:100,incidents:[],decisions:[],lastChoice:null,
   checked:false,arrest:true,rosc:false,roscAt:null,Q:0,
   cpr:{on:false,who:'Wife',met:false,count:0,rate:0,depth:0},fat:{You:0,Partner:0,Wife:.55},switches:0,sinceSwitch:0,
@@ -206,7 +224,7 @@ function fresh(){S={t:0,mStart:0,mission:0,running:false,active:false,briefing:f
 function radio(who,msg,cls=''){const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">${esc(who)}:</span> <span class="${cls}">${esc(msg)}</span>`;r.prepend(d);while(r.children.length>18)r.lastChild.remove();}
 function ding(p,why){S.score=Math.max(0,S.score-p);S.incidents.push(why);radio('Feedback',`${why} (−${p})`,'bad');if(TIER===0){const k=incidentKey(why);if(k)radio('Guide',`Why it matters: Protocol guide → ${GUIDE[k].name}`);}}
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
-const CALL0=14*3600+41*60;
+let CALL0=14*3600+41*60;
 function clockStr(){const s=CALL0+S.t;const h=Math.floor(s/3600)%24,m=Math.floor(s%3600/60);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
 
 /* ================= compressions ================= */
@@ -253,6 +271,7 @@ $('a-reassess').onclick=()=>{if(S.mission!==3)return;if(S.t-S.tx.lastReass<40){r
 
 /* ================= tick ================= */
 function tick(dtReal){
+  if(CALL==='mva'){tickMVA(dtReal);return;}
   const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
   if(S.act){S.act.t-=dt;if(S.act.t<=0){const k=S.act.k;S.act=null;
     if(k==='breaths'||k==='suction'||k==='switch')startCPR();
@@ -355,7 +374,7 @@ const DEC={
         {t:'Tell the story from the moment you got the page',r:'bad',why:'The receiving team needs the key facts fast while they take over care.'}],
   why:'Handoffs at the ER follow the same rule as on scene: short, structured, complete.',g:'handoff'}
 };
-const M=[
+const M_ARREST=[
  {title:'Patient contact',sub:'Medic 1 is nine minutes out. The first minutes are yours.',
   brief:'62-year-old man collapsed in his living room. His wife called 911 and is doing CPR the way dispatch told her. You and your partner are first on scene with an AED, a BVM, and a D cylinder of oxygen.',
   skills:['cpr','agonal','aed','pause','bvm','o2math','rotate'],
@@ -368,20 +387,20 @@ const M=[
    {t:'Back on the chest within 5 seconds of the shock',f:()=>S.aed.resumeAfterShock!==null},
    {t:'Partner: OPA and BVM ready',f:()=>S.air.opa&&S.air.bvm},{t:'Oxygen on the bag at 15 LPM',f:()=>S.air.o2},
    {t:'Decision: how long will the oxygen last?',dec:'o2',f:()=>S.air.o2},
-   {t:'30:2 — give two breaths at each 30 (three cycles)',f:()=>S.vent.cycles>=3},
-   {t:'Switch compressors at about two minutes',f:()=>S.switches>=1},
-   {t:'Rhythm check at two minutes: analyze, clear, shock',f:()=>S.aed.shocks>=2},
-   {t:'Keep quality CPR until Medic 1 is on scene',f:()=>S.als.arrived}]},
+   {t:'30:2 — give two breaths at each 30 (three cycles)',wait:true,f:()=>S.vent.cycles>=3},
+   {t:'Switch compressors at about two minutes',wait:true,f:()=>S.switches>=1},
+   {t:'Rhythm check at two minutes: analyze, clear, shock',wait:true,f:()=>S.aed.shocks>=2},
+   {t:'Keep quality CPR until Medic 1 is on scene',wait:true,f:()=>S.als.arrived}]},
  {title:'Medic 1 on scene',sub:'Now you work for the medic. Keep the compressions going.',
   brief:'Medic 1 is through the door with the monitor, airway kit, and a LUCAS. Hand off without stopping compressions, then work the medic\'s plan: monitor pads, rhythm checks on the medic\'s call, and the LUCAS.',
   skills:['handoff','zoll','vent','etco2','lucas','pause'],
   steps:[{t:'Decision: your handoff',dec:'handoff',f:()=>true},
    {t:'Move pads to the monitor — keep the pause short',f:()=>S.als.zoll},
-   {t:'Airway is in: one breath every 6 seconds (5 good breaths)',f:()=>S.air.adv&&S.vent.good>=5},
-   {t:'Rhythm check: hands off on the call, back on when told',f:()=>S.als.rcDone>=1||S.als.lucas>=1},
+   {t:'Airway is in: one breath every 6 seconds (5 good breaths)',wait:true,f:()=>S.air.adv&&S.vent.good>=5},
+   {t:'Rhythm check: hands off on the call, back on when told',wait:true,f:()=>S.als.rcDone>=1||S.als.lucas>=1},
    {t:'LUCAS: back plate in during a rhythm-check pause',f:()=>S.als.lucas>=1},
    {t:'LUCAS: upper part on and running',f:()=>S.als.lucas>=2},
-   {t:'Medic gives epinephrine — keep the airway going',f:()=>S.als.epi>=1}]},
+   {t:'Medic gives epinephrine — keep the airway going',wait:true,f:()=>S.als.epi>=1}]},
  {title:'Package and load',sub:'LUCAS running. Get him to the rig without losing compressions.',
   brief:'Medic 1 is ready to move. The cot is in the living room, the rig is in the driveway, and the LUCAS keeps compressions going the whole way.',
   skills:['crew','lucas','cot'],
@@ -389,14 +408,17 @@ const M=[
  {title:'Transport — East Side Hospital',sub:'Across the river. About ten minutes if the bridge is down.',
   brief:'You are in the back with the medic. The EMT is driving to East Side Hospital, across the Saginaw River. Keep ventilating, reassess with the medic, and be ready for anything.',
   skills:['vent','etco2','rosc','bridge','lucas'],
-  steps:[{t:'Ventilate one breath every 6 seconds (10 more good breaths)',f:()=>S.vent.good>=15},
-   {t:'Reassess with the medic (twice)',f:()=>S.tx.reassess>=2},
+  steps:[{t:'Ventilate one breath every 6 seconds (10 more good breaths)',wait:true,f:()=>S.vent.good>=15},
+   {t:'Reassess with the medic (twice)',wait:true,f:()=>S.tx.reassess>=2},
    {t:'Decision point on the way in',get dec(){return S.rosc?'rosc':'noRosc';},f:()=>S.rosc||S.tx.arrived},
-   {t:'Arrive at East Side Hospital',f:()=>S.tx.arrived},
+   {t:'Arrive at East Side Hospital',wait:true,f:()=>S.tx.arrived},
    {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}
 ];
-function loadCall(){fresh();S.active=true;S.running=true;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';
-  radio('Dispatch','Unit responding — 62-year-old male, unresponsive, CPR in progress by caller. Medic 1 responding, nine minutes.');loadMission(0);}
+let M=M_ARREST;
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:M_ARREST;CALL0=id==='mva'?6*3600+12*60:14*3600+41*60;fresh();if(id==='mva')S.m=freshMVA();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+  $('title').textContent=id==='mva'?'Car versus tree':'Cardiac arrest';
+  if(id==='mva')radio('Dispatch','Single-vehicle crash into a tree, county road. Caller reports the driver is trapped and bleeding. Medic 1 responding, seven minutes. Engine responding for extrication.');
+  else radio('Dispatch','Unit responding — 62-year-old male, unresponsive, CPR in progress by caller. Medic 1 responding, nine minutes.');loadMission(0);}
 function loadMission(i){S.mission=i;S.mStart=S.t;stepsDone=M[i].steps.map(()=>false);const m=M[i];
   $('m-title').textContent=`${i+1}/${M.length} · ${m.title}`;$('m-sub').textContent=m.sub;
   $('steps').innerHTML=TIER===0?m.steps.map((s,j)=>`<li id="st-${j}"><span class="box"></span><span>${esc(s.t)}</span></li>`).join(''):`<li id="rc"><span class="box"></span><span>Checklist hidden — ${m.steps.length} steps. <span id="rcn"></span></span></li>`;
@@ -407,27 +429,28 @@ $('brief-chips').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(
 $('brief-go').onclick=()=>{$('briefov').classList.add('hidden');S.briefing=false;S.running=true;};
 function checkMission(dt){const m=M[S.mission];let all=true,done=0;
   m.steps.forEach((s,j)=>{if(stepsDone[j]){done++;return;}const prev=j===0||stepsDone[j-1];
-    if(s.dec){if(!DEC_OPEN&&prev&&s.f())openDecision(s.dec,j);all=false;return;}
+    if(s.dec){if(!DEC_OPEN&&(prev||s.any)&&s.f())openDecision(s.dec,j);all=false;return;}
     if(prev&&s.f()){stepsDone[j]=true;done++;const el=$('st-'+j);if(el)el.classList.add('done');}else all=false;});
   if($('rcn'))$('rcn').textContent=`${done} of ${m.steps.length} done`;
-  if(done!==S.lastDone){S.lastDone=done;S.stallT=0;}else if(TIER>0&&!DEC_OPEN){S.stallT=(S.stallT||0)+dt;if(S.stallT>45){S.stallT=-60;const nx=m.steps.find((s,j)=>!stepsDone[j]);if(nx){S.score=Math.max(0,S.score-2);S.incidents.push('Hint used');radio('Guide',`Stuck? Next: ${nx.t} (−2)`);}}}
+  if(done!==S.lastDone){S.lastDone=done;S.stallT=0;}else if(TIER>0&&!DEC_OPEN){S.stallT=(S.stallT||0)+dt;if(S.stallT>45){S.stallT=-60;const nx=m.steps.find((s,j)=>!stepsDone[j]);if(nx&&nx.wait){S.stallT=0;}else if(nx){S.score=Math.max(0,S.score-2);S.incidents.push('Hint used');radio('Guide',`Stuck? Next: ${nx.t} (−2)`);}}}
   if(all&&S.running){S.running=false;finish();}}
 let DEC_OPEN=null;
-function openDecision(key,j){const d=DEC[key];DEC_OPEN={key,j};S.running=false;
-  let q=d.q;$('dec-q').textContent=q;const ord=d.opts.map((_,i)=>i).sort(()=>Math.random()-.5);$('dec-opts').innerHTML=ord.map(i=>[d.opts[i],i]).map(([o,i])=>`<button class="opt" data-i="${i}">${esc(o.t.replace('{shocks}',S.aed.shocks===1?'One':S.aed.shocks===2?'Two':String(S.aed.shocks)).replace(/about 0:00 … /,'about '+mmss(S.t+60)+' ago — '))}</button>`).join('');
+function openDecision(key,j){const d=DEC[key];const opts=typeof d.optsFn==='function'?d.optsFn():d.opts;DEC_OPEN={key,j,opts};S.running=false;
+  let q=typeof d.q==='function'?d.q():d.q;$('dec-q').textContent=q;const ord=opts.map((_,i)=>i).sort(()=>Math.random()-.5);$('dec-opts').innerHTML=ord.map(i=>[opts[i],i]).map(([o,i])=>`<button class="opt" data-i="${i}">${esc(o.t.replace('{shocks}',S.aed.shocks===1?'One':S.aed.shocks===2?'Two':String(S.aed.shocks)).replace(/about 0:00 … /,'about '+mmss(S.t+60)+' ago — '))}</button>`).join('');
   $('dec-opts').classList.remove('hidden');$('dec-fb').classList.add('hidden');$('decov').classList.remove('hidden');$('decov').scrollTop=0;}
-$('dec-opts').onclick=e=>{const b=e.target.closest('[data-i]');if(!b||!DEC_OPEN)return;const d=DEC[DEC_OPEN.key],o=d.opts[+b.dataset.i];
-  const col={good:'#7fe3a4',partial:'#ffc23d',bad:'#ff8f8a'}[o.r],lab={good:'Right call.',partial:'Workable — not the best call.',bad:'That would hurt him.'}[o.r];
+$('dec-opts').onclick=e=>{const b=e.target.closest('[data-i]');if(!b||!DEC_OPEN)return;const d=DEC[DEC_OPEN.key],o=DEC_OPEN.opts[+b.dataset.i];
+  const col={good:'#7fe3a4',partial:'#ffc23d',bad:'#ff8f8a'}[o.r],lab={good:'Right call.',partial:'Workable — not the best call.',bad:'That would hurt your patient.'}[o.r];
   $('dec-res').innerHTML=`<b style="color:${col}">${lab}</b> ${esc(o.why)}`;$('dec-why').textContent=d.why;
   $('dec-chips').innerHTML=d.g?`<button class="chip" data-k="${d.g}">Learn more: ${esc(GUIDE[d.g].name)}</button>`:'';
   if(o.r==='bad')ding(10,'Decision — '+d.tag);else if(o.r==='partial')ding(5,'Decision — '+d.tag);S.decisions.push({tag:d.tag,r:o.r});S.lastChoice=o.r;
   $('dec-opts').classList.add('hidden');$('dec-fb').classList.remove('hidden');};
 $('dec-chips').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
-$('dec-go').onclick=()=>{if(!DEC_OPEN)return;const d=DEC[DEC_OPEN.key];$('decov').classList.add('hidden');stepsDone[DEC_OPEN.j]=true;const el=$('st-'+DEC_OPEN.j);if(el)el.classList.add('done');if(d.after)d.after();DEC_OPEN=null;S.running=true;};
+$('dec-go').onclick=()=>{if(!DEC_OPEN)return;const d=DEC[DEC_OPEN.key];$('decov').classList.add('hidden');if(DEC_OPEN.j>=0)stepsDone[DEC_OPEN.j]=true;const el=$('st-'+DEC_OPEN.j);if(el)el.classList.add('done');if(d.after)d.after();DEC_OPEN=null;S.running=true;};
 function finish(){const last=S.mission===M.length-1;$('done-t').textContent=M[S.mission].title+(last?' — call complete':' — complete');$('done-s').textContent=S.score;
   const keys=[...new Set(S.incidents.map(incidentKey).filter(Boolean))];
   let h=S.incidents.length?`<p><b>Feedback:</b> ${S.incidents.map(esc).join(' · ')}</p>`+(keys.length?`<div class="chips">${keys.map(k=>`<button class="chip warn" data-k="${k}">${esc(GUIDE[k].name)}</button>`).join('')}</div>`:''):'<p>Clean — no feedback items.</p>';
-  if(last){const ccf=S.arrestT?Math.round(S.compT/S.arrestT*100):0,avg=S.rateN?Math.round(S.rateSum/S.rateN):0;
+  if(last&&CALL==='mva'){h+=mvaDebrief();record();}
+  else if(last){const ccf=S.arrestT?Math.round(S.compT/S.arrestT*100):0,avg=S.rateN?Math.round(S.rateSum/S.rateN):0;
     h+=`<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Outcome',S.rosc?'ROSC at '+mmss(S.roscAt)+' — delivered with a pulse':'Delivered in arrest, CPR continuous']].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div>`;
     h+=`<p style="font-size:14px;color:var(--soft);margin-top:10px">${S.rosc?'High-quality, continuous compressions, early shocks, and steady ventilation are what make ROSC possible. You gave him the chance.':'This outcome is driven mostly by compression quality: rate, depth, compressor switches, and short pauses. Check the numbers above for where time was lost.'}</p>`;
     record();}
@@ -437,7 +460,8 @@ $('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length
 
 /* ================= render ================= */
 let wave=[],phase=0;
-function render(){const A=S.aed;
+function render(){if(CALL==='mva'){renderMVA();return;}const A=S.aed;
+  ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
   $('clock').textContent=clockStr();$('score').textContent=S.score;
   $('eta-l').textContent=S.mission===3?'East Side Hospital':S.als.arrived?'Medic 1':'Medic 1';
   $('eta-v').textContent=S.mission===3?(S.tx.arrived?'Arrived':mmss((S.tx.total-S.tx.t))+' out'):S.als.arrived?'On scene':mmss(S.als.eta)+' out';
@@ -471,7 +495,8 @@ function render(){const A=S.aed;
   $('g-assess').classList.toggle('hidden',S.mission>1&&!S.air.vomit);$('g-cpr').classList.toggle('hidden',S.mission>=2&&S.als.lucas>=2);
 }
 function drawWave(){if(!S.active){requestAnimationFrame(drawWave);return;}const run=S.running;if(run){phase+=1;
-  let y=42;if(!S.checked)y=42;else if(S.rosc){const p=phase%40;y=p===0?14:p===1?70:p===2?36:p<6?40+Math.sin(p)*2:(p>18&&p<24)?36:42;}
+  let y=42;if(CALL==='mva'){if(S.m&&S.m.alsMon){const N=Math.max(18,Math.round(3600/mvaV().hr));const p=phase%N;y=p===0?12:p===1?72:p===2?36:p<6?40:(p>N*.45&&p<N*.6)?36:42;}}
+  else if(!S.checked)y=42;else if(S.rosc){const p=phase%40;y=p===0?14:p===1?70:p===2?36:p<6?40+Math.sin(p)*2:(p>18&&p<24)?36:42;}
   else if(S.cpr.on){y=42+Math.sin(phase*S.cpr.rate/60*0.105*Math.PI)*24*S.cpr.depth;}else if(S.arrest&&S.aed.pads){y=42+Math.sin(phase*.7)*9+Math.sin(phase*1.9)*6+(Math.random()-.5)*6;}
   wave.push(y);if(wave.length>150)wave.shift();}
   $('ecg').setAttribute('d',wave.map((v,i)=>(i?'L':'M')+(i*2)+' '+v.toFixed(1)).join(' '));requestAnimationFrame(drawWave);}
@@ -495,7 +520,7 @@ const GUIDE={
  rosc:{name:'Return of spontaneous circulation (ROSC)',what:'The heart has resumed an organized rhythm with a pulse.',when:'Recognized by the medic on a rhythm check — often signaled first by a jump in EtCO₂.',wrong:'Hyperventilating, relaxing, or forgetting that re-arrest is common.',tip:'Steady ventilation (one every 6 seconds), SpO₂ about 92–98%, and hands ready to restart compressions.',rel:['vent','etco2']},
  bridge:{name:'Transport delays: the river crossings',what:'Monitor Township is on the west side of the Saginaw River; East Side Hospital is across it. The four Bay City drawbridges open for river traffic.',when:'Any transport across the river, especially in boating season.',wrong:'Being surprised by an opening. A bridge going up for a freighter can add minutes.',tip:'Crews can request through dispatch that a bridge be held down for a priority patient. Commercial ships already committed may not be able to wait. Plan your oxygen and your arms for the longer ride.',rel:['o2math']}
 };
-function incidentKey(w){const R=[[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
+function incidentKey(w){const R=[[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
   const d=w.match(/^Decision — (.*)$/);if(d){const k=Object.keys(DEC).find(x=>DEC[x].tag===d[1]);return k?DEC[k].g:null;}for(const [r,k] of R)if(r.test(w))return k;return null;}
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
@@ -510,18 +535,188 @@ let guideResume=false;
 $('b-guide').onclick=()=>{if(TIER===2&&S.active){radio('Guide','The Protocol guide is locked in Chaos.','bad');return;}guideResume=S.running;S.running=false;openIndex();};
 $('b-gindex').onclick=()=>openIndex();
 
+/* ================= MVA call ================= */
+function freshMVA(){return {sized:false,inside:false,cspine:false,survey:false,ctrl:0,ctrlT:null,tqT:null,marked:false,o2:false,warm:false,warmT:null,protected:false,
+  lost:300,vol:4500,vit:null,vitT:-999,vitCount:0,vitExtr:0,act:null,eta:420,alsArr:false,alsT:null,alsMon:false,coldDing:false,bleedDing:false,
+  extr:{stage:0,t:0,rapid:null,done:false,hold:0,dur:[90,45,180,0,0]},moved:false,loaded:false,txStart:null,
+  tx:{t:0,total:1320,arrived:false,reass:0,lastReass:-999,tqChecks:0,loosenAsked:false,gapDing:false},chaos:{fuel:false,eta:false}};}
+function mvaV(){const m=S.m,loss=m.lost/m.vol;return {loss,hr:Math.round(Math.min(165,88+170*Math.max(0,loss-.05))),sbp:Math.round(Math.max(50,124-Math.max(0,loss-.15)*260)),
+  dbp:Math.round(Math.max(30,78-Math.max(0,loss-.15)*150)),rr:Math.round(18+30*loss),spo2:Math.round(Math.min(100,97-Math.max(0,loss-.2)*20+(m.o2?3:0))),
+  gcs:loss<.3?14:loss<.38?13:loss<.45?11:8,skin:loss>.15?'pale, cool, sweaty':'warm, pink'};}
+function shockClass(l){return l<.15?'Class I (<15%)':l<.3?'Class II (15–30%)':l<.4?'Class III (30–40%)':'Class IV (>40%)';}
+const MX=k=>$(k);
+function needInside(){if(!S.m.inside){radio('You','I need to get in there with her first.','bad');return true;}return false;}
+MX('m-size').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(m.sized)return;m.sized=true;radio('You','Size-up: one car into a tree, driver only, pinned. No fire. Traffic is blocked by our engine. Checking for fuel, power, airbags.');};
+MX('m-enter').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(m.inside)return;if(!m.sized){radio('Officer','Size it up first — what are we walking into?','bad');return;}
+  if(m.extr.stage<1){ding(10,'Entered the car before it was stabilized');}m.inside=true;radio('You','I\'m in through the rear door, right behind her. Ma\'am, I\'m with the fire department. Don\'t move your head.');};
+MX('m-cspine').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(needInside()||m.cspine)return;m.cspine=true;radio('You','I\'ve got manual stabilization of her head from the back seat.');};
+MX('m-survey').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(needInside()||m.survey)return;if(m.act)return;m.act={k:'survey',t:8};radio('You','Checking for major bleeding first…');};
+MX('m-press').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(needInside())return;if(!m.survey){radio('You','Find it first — primary survey.','bad');return;}if(m.ctrl>=1)return;m.ctrl=1;m.ctrlT=S.t;radio('Partner','Direct pressure on her left arm — it\'s soaking through fast.');};
+MX('m-tq').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(needInside())return;if(!m.survey)return;if(m.ctrl>=2||m.tqAsked)return;m.tqAsked=true;};
+MX('m-mark').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(m.ctrl<2||m.marked)return;m.marked=true;radio('You',`Tourniquet time ${clockStr()} — written on the tourniquet and her forehead.`);};
+MX('m-o2').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(needInside()||m.o2)return;m.o2=true;radio('Partner','Non-rebreather on at 15.');};
+MX('m-warm').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(m.warm)return;if(!m.inside){radio('You','Get in with her first.','bad');return;}m.warm=true;m.warmT=S.t;radio('You','Wool blanket over her — she\'s shivering.');};
+MX('m-vitals').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(needInside()||m.act)return;m.act={k:'vitals',t:20};radio('Partner','Getting a set — pulse, BP, SpO₂, mental status.');};
+MX('m-protect').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(needInside()||m.protected)return;m.protected=true;radio('You','Hard protection between her and the window, blanket over both of us. Go ahead.');};
+MX('m-move').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(!m.extr.done||m.moved||m.act)return;if(!m.cspine)ding(5,'Moved her without anyone controlling her head and neck');m.act={k:'move',t:30};radio('You','Everybody ready? On my count — one, two, three. Slide… slide… onto the cot.');};
+MX('m-load').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(!m.moved||m.loaded||m.act||S.mission!==2||S.briefing)return;m.act={k:'load',t:10};radio('EMT','Power load engaged — cot is locked in.');};
+MX('m-reass').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(S.mission!==3)return;const since=S.t-m.tx.lastReass;if(since<150){radio('Medic 1','Just did one — next one in a few minutes.');return;}m.tx.lastReass=S.t;m.tx.reass++;m.vit=mvaV();m.vitT=S.t;const v=m.vit;radio('You',`Pulse ${v.hr}, BP ${v.sbp}/${v.dbp}, SpO₂ ${v.spo2}%, GCS ${v.gcs}, skin ${v.skin}.`);};
+MX('m-tqcheck').onclick=()=>{if(CALL!=='mva'||!S.m)return;const m=S.m;if(S.mission!==3)return;m.tx.tqChecks++;radio('You',m.ctrl>=2?'Tourniquet is tight, no bleeding below it, no distal pulse — that\'s what we want.':'Pressure dressing is holding — no new bleeding.');};
+function tickMVA(dtReal){const m=S.m;const F=S.mission===3?5:3;const dt=dtReal*F;S.t+=dt;
+  if(m.act){m.act.t-=dt;if(m.act.t<=0){const k=m.act.k;m.act=null;
+    if(k==='survey'){m.survey=true;radio('You','Bright red blood spurting from a deep cut on her left forearm — that\'s the X. Airway open, she\'s talking. Breathing fast. Left thigh is deformed — she\'s pinned at the legs.','bad');}
+    if(k==='vitals'){m.vit=mvaV();m.vitT=S.t;m.vitCount++;if(S.mission===1)m.vitExtr++;const v=m.vit;radio('Partner',`Pulse ${v.hr}, BP ${v.sbp}/${v.dbp}, resp ${v.rr}, SpO₂ ${v.spo2}%, GCS ${v.gcs}. Skin ${v.skin}.`);}
+    if(k==='move'){m.moved=true;radio('Medic 1','Good move. Let\'s get her in the rig.','good');}
+    if(k==='load'){m.loaded=true;}}}
+  /* bleeding */
+  const ext=m.ctrl===0?4:m.ctrl===1?1.1:0;let intl=.25;if(!m.warm&&S.t>300)intl*=1.4;m.lost=Math.min(m.vol*.6,m.lost+(ext+intl)*dt);
+  if(m.ctrl===0&&m.lost>1100&&!m.bleedDing){m.bleedDing=true;ding(10,'Arterial bleeding went uncontrolled too long — find and stop the X first');}
+  if(!m.warm&&S.t>300&&!m.coldDing){m.coldDing=true;ding(5,'She is getting cold — trauma patients lose heat fast, and cold blood doesn\'t clot');}
+  /* extrication (engine crew) */
+  const x=m.extr;if(m.sized&&!x.done&&S.mission<=1){
+    if(TIER===2&&!m.chaos.fuel&&x.stage===2&&x.t>60){m.chaos.fuel=true;x.hold=60;radio('Engine Officer','Fuel leaking under the car — stop cutting! Laying a foam blanket.','bad');}
+    if(x.hold>0)x.hold-=dt;else if(x.stage!==3||x.rapid!==null){x.t+=dt;const dur=x.stage===3?(x.rapid?100:300):x.dur[x.stage];
+      if(x.stage===1&&!m.protected&&x.t>=dur-3&&!m.glassDing){m.glassDing=true;ding(10,'Glass came in on her — protect the patient before they break it');}
+      if(x.t>=dur){x.stage++;x.t=0;const msg=['','Car is stabilized — cribbed and strutted. You can get in.','Glass is out.','Door is off.','',''][x.stage];if(msg)radio('Engine Officer',msg);
+        if(x.stage===4){x.done=true;radio('Engine Officer',x.rapid?'Roof is flapped, she\'s free — move her when you\'re ready.':'Dash is rolled — her legs are free. Your call to move her.','good');}}}}
+  /* ALS */
+  if(!m.alsArr){m.eta-=dt;if(TIER===2&&!m.chaos.eta&&S.t>150){m.chaos.eta=true;m.eta+=120;radio('Dispatch','Medic 1 delayed — new ETA plus two minutes.','bad');}
+    if(m.eta<=0){m.alsArr=true;m.alsT=S.t;radio('Medic 1','Medic 1 on scene — what have we got?','good');}}
+  if(m.alsArr&&!m.alsMon&&S.t-m.alsT>40){m.alsMon=true;radio('Medic 1','Monitor\'s on. I\'m calling a trauma alert.');}
+  /* transport */
+  if(S.mission===3&&!S.briefing){if(m.txStart===null)m.txStart=S.t;m.tx.t+=dt;
+    if(!m.tx.loosenAsked&&m.tx.t>420){m.tx.loosenAsked=true;openDecision('loosen',-1);}
+    if(S.t-Math.max(m.tx.lastReass,m.txStart)>420&&!m.tx.gapDing){m.tx.gapDing=true;ding(3,'Went more than 5 minutes without reassessing an unstable patient');}
+    if(!m.tx.arrived&&m.tx.t>=m.tx.total){m.tx.arrived=true;radio('EMT','Regional Medical Center — trauma bay.','good');}}
+  checkMission(dt);renderMVA();}
+function renderMVA(){const m=S.m;if(!m)return;
+  $('clock').textContent=clockStr();$('score').textContent=S.score;
+  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals'].forEach(i=>$(i).classList.add('hidden'));
+  ['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
+  $('eta-l').textContent=S.mission===3?'Regional Medical Center':'Medic 1';$('eta-v').textContent=S.mission===3?(m.tx.arrived?'Arrived':mmss(m.tx.total-m.tx.t)+' out'):m.alsArr?'On scene':mmss(m.eta)+' out';
+  $('mon-name').textContent=m.alsMon?'Monitor':'Vitals — taken by hand';$('mon-mode').textContent=m.survey?(m.ctrl===2?'Bleeding controlled':m.ctrl===1?'Pressure on':'Arterial bleed!'):'—';
+  const live=m.alsMon,v=live?mvaV():m.vit;
+  $('mv-hr').textContent=v?v.hr:'—';$('mv-bp').textContent=v?`${v.sbp}/${v.dbp}`:'—';$('mv-spo2').textContent=v?v.spo2:'—';$('mv-gcs').textContent=v?v.gcs:'—';
+  $('mv-skin').textContent=v?`Skin ${v.skin}`:'No vitals yet';$('mv-age').textContent=live?'live':m.vitT>0?`taken ${mmss(S.t-m.vitT)} ago`:'';
+  $('who').textContent=m.inside?(m.cspine?'You: holding c-spine':'You: inside with her'):'Outside the car';$('fat').style.width='0%';$('pause').textContent='';
+  const vis=(id,on)=>$(id).classList.toggle('hidden',!on);
+  vis('g-scene',S.mission===0);vis('g-pt',S.mission<=1);vis('g-extr',S.mission<=2);vis('g-mtx',S.mission===3);
+  $('m-size').classList.toggle('on',m.sized);$('m-enter').classList.toggle('on',m.inside);$('m-enter').classList.toggle('hot',m.sized&&!m.inside&&m.extr.stage>=1);
+  for(const [id,on] of [['m-cspine',m.cspine],['m-survey',m.survey],['m-press',m.ctrl>=1],['m-tq',m.ctrl>=2],['m-mark',m.marked],['m-o2',m.o2],['m-warm',m.warm],['m-protect',m.protected],['m-move',m.moved],['m-load',m.loaded]])$(id).classList.toggle('on',on);
+  $('m-press').classList.toggle('hot',m.survey&&m.ctrl===0);$('m-tq').classList.toggle('hot',m.survey&&m.ctrl===1&&!m.tqAsked);$('m-mark').classList.toggle('hot',m.ctrl===2&&!m.marked);
+  $('m-protect').classList.toggle('hot',m.inside&&!m.protected&&m.extr.stage===1);$('m-move').classList.toggle('hot',m.extr.done&&!m.moved);$('m-load').classList.toggle('hot',m.moved&&!m.loaded&&S.mission===2);
+  $('m-vitals').textContent=m.act&&m.act.k==='vitals'?'Taking vitals…':'Take vitals';
+  $('m-bleed').textContent=!m.survey?'':m.ctrl===0?'Left forearm: bright red, spurting. Uncontrolled.':m.ctrl===1?'Direct pressure — still oozing through.':`Tourniquet on${m.marked?' · time marked':' · mark the time!'}`;
+  const x=m.extr,names=['Stabilizing the car','Glass management','Removing the door','Dash roll / roof','Patient free'];
+  $('x-stage').textContent=!m.sized?'Waiting':x.hold>0?'STOPPED — fuel leak':x.stage===3&&x.rapid===null?'Waiting on the plan':names[Math.min(4,x.stage)];
+  const dur=x.stage===3?(x.rapid?100:300):x.dur[x.stage]||1;$('x-bar').style.width=(x.done?100:Math.min(100,x.t/dur*100))+'%';$('x-left').textContent=x.done?'done':'';
+}
+const M_MVA=[
+ {title:'Size-up and access',sub:'Medic 1 is seven minutes out. The engine crew is starting to cut.',
+  brief:'A sedan went off a county road into a tree at about 40 mph. One occupant: the driver, a woman about 30, conscious and pinned at the legs. It is 41°F and drizzling. Your engine is blocking traffic and the crew is pulling the extrication tools. Your job: get to her, find what will kill her first, and stop it.',
+  skills:['scene','stab','xabc','hemo','tq','smr','hypo'],
+  steps:[{t:'Decision: scene safety',dec:'mvaScene',f:()=>true},
+   {t:'Size up the scene',f:()=>S.m.sized},
+   {t:'Get in with her after the car is stabilized',wait:true,f:()=>S.m.inside},
+   {t:'Hold her head still (manual stabilization)',f:()=>S.m.cspine},
+   {t:'Primary survey — massive bleeding first',f:()=>S.m.survey},
+   {t:'Stop the bleeding: direct pressure now',f:()=>S.m.ctrl>=1},
+   {t:'Tourniquet',f:()=>S.m.tqAsked},{t:'Decision: where the tourniquet goes',dec:'tqPlace',f:()=>S.m.tqAsked},
+   {t:'Mark the tourniquet time',f:()=>S.m.marked},
+   {t:'Oxygen: non-rebreather at 15 LPM',f:()=>S.m.o2},{t:'Blanket — keep her warm',f:()=>S.m.warm},
+   {t:'First full set of vitals',f:()=>S.m.vitCount>=1}]},
+ {title:'Extrication',sub:'They cut, you protect her and keep reassessing.',
+  brief:'The engine crew is working the car around you: glass, then the door, then the dash. You are inside with her. Protect her from the cutting, keep reassessing, and tell the officer when her condition changes the plan.',
+  skills:['protect','shock','rapid','handoff','vitals'],
+  steps:[{t:'Protect her before the glass goes',f:()=>S.m.protected||S.m.extr.stage>=2},
+   {t:'Reassess vitals while they cut',wait:true,f:()=>S.m.vitExtr>=1},
+   {t:'Decision: controlled or rapid extrication',dec:'mvaRapid',any:true,f:()=>S.m.extr.stage>=3},
+   {t:'Decision: handoff to Medic 1',dec:'mvaHandoff',any:true,f:()=>S.m.alsArr},
+   {t:'She\'s free: out to the cot on your count',wait:true,f:()=>S.m.moved}]},
+ {title:'Package and go',sub:'Trauma alert called. Get her loaded.',
+  brief:'She is on the cot with spinal motion restriction per protocol, tourniquet on, oxygen on. Medic 1 has called a trauma alert.',
+  skills:['traumadest','cot'],
+  steps:[{t:'Decision: why that hospital?',dec:'mvaDest',f:()=>true},{t:'Power load into Medic 1',f:()=>S.m.loaded}]},
+ {title:'Transport — Regional Medical Center',sub:'South on I-75 to the trauma center. No drawbridges, but a longer ride.',
+  brief:'You are in the back with the medic for about 22 minutes. She is in shock and still bleeding internally from her thigh. Keep her warm, keep reassessing, and watch the tourniquet.',
+  skills:['vitals','shock','tq','hypo','handoff'],
+  steps:[{t:'Reassess vitals about every 5 minutes (3 times)',wait:true,f:()=>S.m.tx.reass>=3},
+   {t:'Check the tourniquet and below it',f:()=>S.m.tx.tqChecks>=1},
+   {t:'Arrive at the trauma center',wait:true,f:()=>S.m.tx.arrived},
+   {t:'Decision: trauma handoff',dec:'mvaER',f:()=>S.m.tx.arrived}]}
+];
+Object.assign(DEC,{
+ mvaScene:{tag:'Scene safety at a crash',q:'You pull up behind your engine. The sedan is nose-first into a tree, steam rising, driver moaning. The engine crew is grabbing tools. The driver\'s window is broken out and you could reach her right now. What comes first?',
+  opts:[{t:'A 10-second size-up: traffic, fuel, power lines, airbags, and how many patients — then go to her as soon as the car is stabilized',r:'good',why:'A crash scene can still hurt you: traffic, leaking fuel, undeployed airbags, and a car that can move. Ten seconds of size-up and a stabilized car keep you from becoming a second patient.'},
+        {t:'Reach in through the broken window and start assessing her now',r:'bad',why:'The car isn\'t stabilized, you don\'t know about airbags or fuel, and you just committed yourself before anyone knows what\'s there.'},
+        {t:'Wait outside until the engine crew finishes the extrication',r:'bad',why:'Extrication can take 10 to 20 minutes. She may be bleeding to death in the meantime. Patient care starts inside as soon as the car is safe.'}],
+  why:'Scene safety, then access once the vehicle is stabilized. Stay out of undeployed airbag zones where you can, and let the crew stabilize before you climb in.',g:'scene'},
+ tqPlace:{tag:'Tourniquet placement',q:'Direct pressure is slowing the bleeding from her forearm, but blood is still welling through. You have a commercial tourniquet. Where does it go?',
+  opts:[{t:'On the upper arm, 2–3 inches above the wound, not over the elbow — tighten until the bleeding stops',r:'good',why:'Above the wound, on a single bone where it can compress the artery, tight enough to stop the bleeding. Then note the time.'},
+        {t:'Right over the elbow joint so it can\'t slide',r:'bad',why:'A joint protects the artery; a tourniquet over it often fails to stop the bleeding.'},
+        {t:'Snug it until it\'s uncomfortable but she can still feel a pulse at the wrist',r:'bad',why:'A loose tourniquet can make bleeding worse by blocking veins but not the artery. It goes on until the bleeding stops.'}],
+  why:'Life-threatening extremity bleeding not controlled by direct pressure gets a tourniquet: above the wound, not over a joint, tight enough to stop the bleeding, time noted. When the wound location is unclear, many programs teach "high and tight."',g:'tq',after:()=>{S.m.ctrl=2;S.m.tqT=S.t;radio('You','Tourniquet on, high on the left arm. Tightening… bleeding stopped. Sorry, ma\'am — this is going to hurt.');}},
+ mvaRapid:{tag:'Controlled or rapid extrication',q:()=>{const v=mvaV();return `The door is off. Her legs are still pinned under the dash. The officer: "Dash roll will take about five more minutes. Or we flap the roof and pull her out — faster, but rougher." Her latest numbers: pulse ${v.hr}, BP ${v.sbp}/${v.dbp}, GCS ${v.gcs}. What do you tell him?`;},
+  optsFn:()=>{const v=mvaV();const unstable=v.hr>=115||v.sbp<100;return unstable?[
+    {t:'She\'s getting worse — go rapid. We need her out and moving now.',r:'good',why:'Signs of worsening shock make the time saved worth more than a perfectly controlled extraction. Tell the officer what her condition means for the plan.'},
+    {t:'Stay with the dash roll — protect her spine',r:'bad',why:'Five more minutes of an unstable, bleeding patient pinned in a car is a bigger threat than the movement of a rapid extraction.'},
+    {t:'Let the officer decide — it\'s his call',r:'partial',why:'It is his call — but he needs your patient information to make it. Tell him she\'s deteriorating.'}]:[
+    {t:'She\'s holding steady — controlled dash roll, protect her spine',r:'good',why:'With bleeding controlled and stable numbers, a few extra minutes for a gentler, controlled extraction is reasonable.'},
+    {t:'Rip the roof and yank her out now',r:'partial',why:'Not wrong if she worsens, but right now she\'s stable — the controlled option is gentler and only a few minutes longer.'},
+    {t:'Tell them to wait until Medic 1 decides',r:'bad',why:'Extrication shouldn\'t stall. You\'re the one with eyes on her — give the officer what he needs to decide.'}];},
+  why:'The patient\'s condition drives the extrication plan. The person inside with the patient is the officer\'s best source of that information.',g:'rapid',after:()=>{const v=mvaV();const unstable=v.hr>=115||v.sbp<100;S.m.extr.rapid=(S.lastChoice==='good')?unstable:!unstable;}},
+ mvaHandoff:{tag:'Handoff at a crash',q:'Medic 1 leans in the open door: "What have we got?" Which do you give?',
+  opts:[{t:'"About 30, unrestrained? — car into a tree at about 40. Arterial bleed left forearm, tourniquet on at [time]. Deformed left thigh, still pinned. GCS 14, she\'s tachy and pale. O₂ on, warm. Dash is coming off."',r:'good',why:'Mechanism, injuries, signs, treatment — MIST — in about 15 seconds.'},
+        {t:'"She hit a tree. She\'s bleeding pretty bad but we got it."',r:'partial',why:'True, but missing the tourniquet time, vitals, and the femur.'},
+        {t:'"Hang on — let me finish what I\'m doing and I\'ll fill you in."',r:'bad',why:'The medic needs the picture now to plan the airway, access, and destination.'}],
+  why:'For trauma, many systems teach MIST: Mechanism, Injuries, Signs, Treatment.',g:'handoff'},
+ mvaDest:{tag:'Trauma destination',q:'Medic 1: "We\'re going to Regional in Saginaw, not East Side." East Side is closer. Why bypass it?',
+  opts:[{t:'She meets trauma criteria — the trauma center has surgeons, blood, and an OR ready, which is worth the extra minutes for a shock patient',r:'good',why:'For a bleeding trauma patient, the definitive fix is surgery and blood. Going to the right hospital beats going to the nearest one, within the protocol\'s limits.'},
+        {t:'East Side is probably on diversion',r:'partial',why:'Possible, but the real reason here is that a seriously injured trauma patient needs a trauma center.'},
+        {t:'It\'s whatever the medic prefers',r:'bad',why:'Trauma destination is driven by protocol and triage criteria, not preference.'}],
+  why:'Destination is the medic\'s and medical control\'s call under your MCA\'s trauma triage and destination protocols. Understanding why helps you anticipate a longer ride.',g:'traumadest'},
+ loosen:{tag:'Tourniquet pain',q:'Ten minutes into the ride she grabs your arm: "Please, the thing on my arm — it hurts so much. Loosen it, please." The medic is busy with her IV. What do you do?',
+  opts:[{t:'Leave it tight, tell her it is saving her life, and let the medic know she needs pain management',r:'good',why:'An effective tourniquet hurts. Loosening it restarts the bleeding. Comfort her, and get the medic to treat the pain.'},
+        {t:'Loosen it a little so she\'s more comfortable',r:'bad',why:'A partly loosened tourniquet can make bleeding worse. Tourniquet removal is a hospital decision.'},
+        {t:'Ignore her — she\'ll be at the hospital soon',r:'partial',why:'Keeping it on is right, but she deserves an explanation and pain relief from the medic.'}],
+  why:'Field tourniquets stay on until a physician decides otherwise. Pain is expected and treatable.',g:'tq'},
+ mvaER:{tag:'Trauma handoff',q:'The trauma team is moving her to their bed. The trauma lead: "Give me the quick version."',
+  opts:[{t:'Mechanism, injuries, latest vitals, tourniquet time, treatments, and how she\'s trended — in under 30 seconds',r:'good',why:'The trauma team needs the tourniquet time and the trend to decide on blood and surgery.'},
+        {t:'"Car into a tree. She\'s hurt pretty bad."',r:'bad',why:'Not enough to act on.'},
+        {t:'Wait for the medic',r:'partial',why:'The medic leads, but answer when asked directly — especially the tourniquet time you marked.'}],
+  why:'Same rule everywhere: short, structured, complete — and never lose the tourniquet time.',g:'handoff'}
+});
+Object.assign(GUIDE,{
+ scene:{name:'Scene safety at a crash',what:'A quick size-up of hazards before you commit: traffic, fuel, power lines, fire, undeployed airbags, unstable vehicle, number of patients.',when:'Every crash, before you touch the car.',wrong:'Climbing into an unstable car, reaching across an undeployed airbag, or becoming a second patient.',tip:'Use your apparatus to block traffic, wait for stabilization, and stay out of undeployed airbag zones where you can.',mca:'Follow your department\'s extrication and vehicle-safety procedures.',rel:['stab']},
+ stab:{name:'Vehicle stabilization and access',what:'Cribbing and struts keep the car from moving while you work. Access is usually through a door or window away from the cutting.',when:'Before anyone climbs in.',wrong:'Entering before the car is stable, or entering where the crew is about to cut.',tip:'Coordinate with the officer: "Car is stable — I\'m going in the rear driver\'s side."',rel:['scene','protect']},
+ xabc:{name:'Primary survey: X-ABCDE',what:'Find and fix immediate threats in order: eXsanguinating hemorrhage, Airway, Breathing, Circulation, Disability, Exposure (and keep them warm).',when:'Every trauma patient, the moment you reach them.',wrong:'Starting with the airway while an arterial bleed empties the patient.',tip:'Massive bleeding kills fastest. Look for it first — then airway and breathing.',mca:'Your protocol may use MARCH or ABC wording; the priority of major bleeding first is the same.',rel:['hemo','tq']},
+ hemo:{name:'Direct pressure',what:'Firm, direct pressure on the bleeding point, ideally with gauze packed into a deep wound.',when:'Immediately, on any significant bleeding — while the tourniquet is being readied.',wrong:'Peeking under the dressing, light pressure, or pressure that isn\'t on the source.',tip:'Push hard and keep pushing. If blood soaks through fast on a limb, go to the tourniquet.',rel:['tq']},
+ tq:{name:'Tourniquet',what:'A band tightened around a limb to stop life-threatening bleeding by compressing the artery.',when:'Life-threatening limb bleeding not controlled by direct pressure.',wrong:'Too loose (can make bleeding worse), over a joint, not marking the time, or loosening it in the field.',tip:'2–3 inches above the wound, not over a joint, tight until the bleeding stops. Mark the time. It hurts — explain that, and leave it on.',mca:'Tourniquet type, placement teaching, and removal rules follow your MCA protocol.',rel:['hemo','shock']},
+ smr:{name:'Spinal motion restriction',what:'Limiting movement of the head, neck, and spine in patients at risk of spinal injury.',when:'Based on mechanism and assessment findings, per protocol.',wrong:'Letting the head move during access and extrication, or delaying life-saving care for immobilization.',tip:'Manual stabilization from behind is your first tool. Life threats like major bleeding still come first.',mca:'Spinal motion restriction criteria and equipment vary by MCA protocol.',rel:['protect','rapid']},
+ shock:{name:'Recognizing shock',what:'Not enough blood flow to the body\'s tissues. In trauma, usually from blood loss.',when:'Any significant trauma — and it develops over time, so keep checking.',wrong:'Waiting for a low blood pressure. It drops late; a fast pulse, pale cool skin, and changing mental status come first.',tip:'Trend the vitals. A climbing pulse and narrowing patient attention mean she\'s getting worse, even if the BP looks okay.',rel:['vitals','hypo','tq']},
+ hypo:{name:'Keeping trauma patients warm',what:'Bleeding patients lose heat fast, and cold blood clots poorly — which makes bleeding worse.',when:'Every trauma patient, especially outdoors, in cold weather, or wet.',wrong:'Leaving a patient exposed in the cold while you work.',tip:'Blanket early, heat up the rig, and cover them again after every assessment.',rel:['shock']},
+ protect:{name:'Patient protection during extrication',what:'Shielding the patient from glass, sharp edges, and tool forces while the crew cuts.',when:'Before glass is broken or any cutting near the patient.',wrong:'Glass and debris showering the patient and the rescuer inside.',tip:'Hard protection between the patient and the work, a soft blanket over both of you, and eye protection for everyone inside.',rel:['stab','rapid']},
+ rapid:{name:'Controlled vs. rapid extrication',what:'A controlled extrication takes time to create space and protect the spine. A rapid extrication gets an unstable patient out faster with more movement.',when:'The officer decides — based on what the person inside tells them about the patient.',wrong:'Spending extra minutes on a gentle extraction while the patient deteriorates — or not telling the officer they\'re worsening.',tip:'Give the officer clear patient information: "She\'s getting worse — pulse 130, pale, more confused."',rel:['shock','smr']},
+ vitals:{name:'Vital sign trends',what:'Pulse, blood pressure, respirations, SpO₂, skin, and mental status — measured repeatedly.',when:'Unstable patients about every 5 minutes; stable patients about every 15.',wrong:'One set of vitals and never another. A single set is a snapshot; the trend tells you where the patient is going.',tip:'Compare each set to the last out loud: "Pulse up from 112 to 128."',rel:['shock']},
+ traumadest:{name:'Trauma center destination',what:'Seriously injured trauma patients may be taken past a closer hospital to a trauma center with surgeons, blood, and operating rooms ready.',when:'When the patient meets the trauma triage criteria in your MCA\'s protocol.',wrong:'Assuming the closest hospital is always best.',tip:'It\'s the medic\'s and medical control\'s call. Knowing why helps you prepare for a longer ride.',mca:'Trauma triage criteria and destination rules are set by your MCA.',rel:['shock','handoff']}
+});
+function mvaDebrief(){const m=S.m,v=mvaV();const ctrlT=m.ctrlT!==null?mmss(m.ctrlT):'—',tqT=m.tqT!==null?mmss(m.tqT):'—',scene=m.txStart!==null?mmss(m.txStart):'—';
+  const rows=[['Blood loss at arrival',`${Math.round(m.lost)} mL · ${Math.round(v.loss*100)}%`],['Shock class at arrival',shockClass(v.loss)],['Direct pressure on',ctrlT+' after arrival'],['Tourniquet on',tqT+' after arrival'],['Tourniquet time marked',m.marked?'yes':'no'],['Kept warm',m.warm?'yes, at '+mmss(m.warmT):'no'],['Extrication',m.extr.rapid?'rapid':'controlled'],['On-scene time',scene],['Vitals on scene / en route',`${m.vitCount} / ${m.tx.reass}`]];
+  const msg=v.loss<.3?'She arrived compensating — fast bleeding control and warmth kept her out of the worst of shock. The trauma team can fix what\'s left.':v.loss<.4?'She arrived in significant shock. Look at the time to bleeding control and scene time — that\'s where minutes turn into blood.':'She arrived in severe shock. The biggest driver is how long the arterial bleed ran before it was controlled.';
+  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
+
 /* ================= menu, progress, report ================= */
 const KEY='patient-contact';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:'',dept:''};}catch(e){return {runs:[],name:'',dept:''};}}
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
-function record(){const p=load();p.runs.push({d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc});p.runs=p.runs.slice(-50);save(p);}
+function record(){const p=load();p.runs.push({call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc});p.runs=p.runs.slice(-50);save(p);}
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
 function showMenu(){S.running=false;$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
-$('b-call1').onclick=loadCall;$('b-menu').onclick=showMenu;$('b-restart').onclick=loadCall;
+$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
 $('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
 $('b-start').onclick=()=>{$('intro').classList.add('hidden');const p=load();p.seen=true;save(p);showMenu();};
-function snapshot(){return [`Patient Contact report — v${APP_VERSION}`,`Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim time ${mmss(S.t)} · arrest ${S.arrest} · ROSC ${S.rosc} · CPR ${S.cpr.on?compressorNow():'off'} · CCF ${S.arrestT?Math.round(S.compT/S.arrestT*100):0}%`,`AED ${S.aed.state} shocks ${S.aed.shocks} · ALS ${S.als.arrived?'on scene':'ETA '+mmss(S.als.eta)} · LUCAS ${S.als.lucas} · O2 ${Math.round(S.o2psi)} psi`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+function snapshot(){if(CALL==='mva')return [`Patient Contact report — v${APP_VERSION}`,`Call: MVA · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · blood loss ${Math.round(S.m.lost)} mL · control ${S.m.ctrl} · extrication stage ${S.m.extr.stage} · ALS ${S.m.alsArr?'on scene':'ETA '+mmss(S.m.eta)}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');return [`Patient Contact report — v${APP_VERSION}`,`Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim time ${mmss(S.t)} · arrest ${S.arrest} · ROSC ${S.rosc} · CPR ${S.cpr.on?compressorNow():'off'} · CCF ${S.arrestT?Math.round(S.compT/S.arrestT*100):0}%`,`AED ${S.aed.state} shocks ${S.aed.shocks} · ALS ${S.als.arrived?'on scene':'ETA '+mmss(S.als.eta)} · LUCAS ${S.als.lucas} · O2 ${Math.round(S.o2psi)} psi`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
 $('b-report').onclick=()=>{const p=load();$('r-name').value=p.name||'';$('r-dept').value=p.dept||'';$('r-note').value='';$('r-msg').textContent='';$('repov').classList.remove('hidden');};
 $('r-cancel').onclick=()=>$('repov').classList.add('hidden');
 $('r-send').onclick=async()=>{const p=load();p.name=$('r-name').value.trim();p.dept=$('r-dept').value.trim();save(p);const text=`From: ${p.name||'—'} (${p.dept||'—'})\nNote: ${$('r-note').value.trim()||'—'}\n\n${snapshot()}`;
