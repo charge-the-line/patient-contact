@@ -112,8 +112,15 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="v c"><div class="l">SpO₂</div><div class="n" id="mv-spo2">—</div></div>
     <div class="v y"><div class="l">GCS</div><div class="n" id="mv-gcs">—</div></div>
   </div>
+  <div class="vitals hidden" id="vitals-od">
+    <div class="v y"><div class="l">Resp</div><div class="n" id="ov-rr">—</div></div>
+    <div class="v c"><div class="l">SpO₂</div><div class="n" id="ov-spo2">—</div></div>
+    <div class="v g"><div class="l">Pulse</div><div class="n" id="ov-hr">—</div></div>
+    <div class="v w"><div class="l">GCS</div><div class="n" id="ov-gcs">—</div></div>
+  </div>
+  <div class="cprbar hidden" id="od-line"><span id="ov-air">—</span><span id="ov-age"></span></div>
   <div class="cprbar hidden" id="mva-line"><span id="mv-skin">No vitals yet</span><span id="mv-age"></span></div>
-  <div class="cprbar"><span id="who">No compressions</span><div class="track"><div id="fat"></div></div><span id="pause"></span></div>
+  <div class="cprbar"><span id="who">No compressions</span><div class="track" id="fattrack"><div id="fat"></div></div><span id="pause"></span></div>
 </div>
 
 <div class="deck" id="deck">
@@ -140,6 +147,11 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="o2"><span id="x-stage">Waiting</span><div class="track"><div id="x-bar" style="background:var(--orange)"></div></div><span id="x-left"></span></div>
     <div class="row" style="margin-top:6px"><button id="m-move">On your count: out to the cot</button><button id="m-load">Power load</button></div></div>
   <div class="grp hidden" id="g-mtx"><h3>In the back</h3><div class="row"><button id="m-reass">Reassess vitals</button><button id="m-tqcheck">Check tourniquet and below it</button></div></div>
+  <div class="grp hidden" id="g-od-a"><h3>Assess</h3><div class="row three"><button id="o-check">Check: responsive, breathing, pulse</button><button id="o-ox">Pulse oximeter on</button><button id="o-vitals">Full vitals</button><button id="o-pulse">Pulse check</button><button id="o-recov">Recovery position</button><button id="o-cpr" class="hidden">Start CPR</button></div></div>
+  <div class="grp hidden" id="g-od-b"><h3>Airway and breathing</h3><div class="row three"><button id="o-open">Head-tilt, chin-lift</button><button id="o-suct">Suction</button><button id="o-opa">Insert OPA</button><button id="o-bvm">BVM ready</button><button id="o-o2">O₂ 15 LPM</button><button id="o-breath">Breath (1 every 6 s)</button></div>
+    <div class="stat" id="o-airtxt"></div></div>
+  <div class="grp hidden" id="g-od-n"><h3>Naloxone</h3><div class="row"><button id="o-nal">Naloxone 4 mg intranasal</button><span class="stat" id="o-naltxt" style="margin:0;align-self:center"></span></div></div>
+  <div class="grp hidden" id="g-od-t"><h3>Moving and in the back</h3><div class="row"><button id="o-load">Help him onto the cot · load</button><button id="o-reass">Reassess his breathing</button></div></div>
   <div class="grp hidden" id="g-ride"><h3>In the back</h3><div class="row"><button id="a-reassess">Reassess with the medic</button><span></span></div></div>
 </div>
 
@@ -159,7 +171,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You are the medical first responder. You get there first, you work the patient until ALS arrives, then you work for the medic — on scene and in the back of the rig.</p>
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.2 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.3 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -169,6 +181,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p class="stat" id="tierhelp" style="margin:0 0 10px"></p>
   <button class="scen" id="b-call1"><b>62-year-old man down</b><span>Witnessed collapse at home. His wife is doing CPR. Medic 1 is nine minutes out.</span></button>
   <button class="scen" id="b-call2"><b>Car versus tree, driver pinned</b><span>Single-vehicle crash on a county road, early morning, 41°F. Driver trapped, bleeding. Your engine crew is cutting. Medic 1 is seven minutes out.</span></button>
+  <button class="scen" id="b-call3"><b>Unresponsive in the bathroom</b><span>11:47 p.m. A roommate found him on the bathroom floor, barely breathing. Suspected fentanyl. Medic 1 is eight minutes out.</span></button>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
   <button id="b-resume" class="go hidden" style="width:100%;margin-top:8px">Resume call</button>
 </div></div>
@@ -206,7 +219,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.2.0';
+const APP_VERSION='0.3.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -272,6 +285,7 @@ $('a-reassess').onclick=()=>{if(S.mission!==3)return;if(S.t-S.tx.lastReass<40){r
 /* ================= tick ================= */
 function tick(dtReal){
   if(CALL==='mva'){tickMVA(dtReal);return;}
+  if(CALL==='od'){tickOD(dtReal);return;}
   const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
   if(S.act){S.act.t-=dt;if(S.act.t<=0){const k=S.act.k;S.act=null;
     if(k==='breaths'||k==='suction'||k==='switch')startCPR();
@@ -415,11 +429,12 @@ const M_ARREST=[
    {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}
 ];
 let M=M_ARREST;
-function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:M_ARREST;CALL0=id==='mva'?6*3600+12*60:14*3600+41*60;fresh();if(id==='mva')S.m=freshMVA();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
-  $('title').textContent=id==='mva'?'Car versus tree':'Cardiac arrest';
-  if(id==='mva')radio('Dispatch','Single-vehicle crash into a tree, county road. Caller reports the driver is trapped and bleeding. Medic 1 responding, seven minutes. Engine responding for extrication.');
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;M=id==='mva'?M_MVA:id==='od'?M_OD:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:14*3600+41*60;fresh();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':'Cardiac arrest';
+  if(id==='od')radio('Dispatch','Unit responding — 24-year-old male, unresponsive, breathing slow and snoring, possible overdose. Caller is his roommate. Medic 1 responding, eight minutes. PD notified.');
+  else if(id==='mva')radio('Dispatch','Single-vehicle crash into a tree, county road. Caller reports the driver is trapped and bleeding. Medic 1 responding, seven minutes. Engine responding for extrication.');
   else radio('Dispatch','Unit responding — 62-year-old male, unresponsive, CPR in progress by caller. Medic 1 responding, nine minutes.');loadMission(0);}
-function loadMission(i){S.mission=i;S.mStart=S.t;stepsDone=M[i].steps.map(()=>false);const m=M[i];
+function loadMission(i){S.mission=i;S.mStart=S.t;stepsDone=M[i].steps.map(()=>false);const m=M[i];if(m.onStart)m.onStart();
   $('m-title').textContent=`${i+1}/${M.length} · ${m.title}`;$('m-sub').textContent=m.sub;
   $('steps').innerHTML=TIER===0?m.steps.map((s,j)=>`<li id="st-${j}"><span class="box"></span><span>${esc(s.t)}</span></li>`).join(''):`<li id="rc"><span class="box"></span><span>Checklist hidden — ${m.steps.length} steps. <span id="rcn"></span></span></li>`;
   if(TIER<2)showBrief();}
@@ -450,6 +465,7 @@ function finish(){const last=S.mission===M.length-1;$('done-t').textContent=M[S.
   const keys=[...new Set(S.incidents.map(incidentKey).filter(Boolean))];
   let h=S.incidents.length?`<p><b>Feedback:</b> ${S.incidents.map(esc).join(' · ')}</p>`+(keys.length?`<div class="chips">${keys.map(k=>`<button class="chip warn" data-k="${k}">${esc(GUIDE[k].name)}</button>`).join('')}</div>`:''):'<p>Clean — no feedback items.</p>';
   if(last&&CALL==='mva'){h+=mvaDebrief();record();}
+  else if(last&&CALL==='od'){h+=odDebrief();record();}
   else if(last){const ccf=S.arrestT?Math.round(S.compT/S.arrestT*100):0,avg=S.rateN?Math.round(S.rateSum/S.rateN):0;
     h+=`<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Outcome',S.rosc?'ROSC at '+mmss(S.roscAt)+' — delivered with a pulse':'Delivered in arrest, CPR continuous']].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div>`;
     h+=`<p style="font-size:14px;color:var(--soft);margin-top:10px">${S.rosc?'High-quality, continuous compressions, early shocks, and steady ventilation are what make ROSC possible. You gave him the chance.':'This outcome is driven mostly by compression quality: rate, depth, compressor switches, and short pauses. Check the numbers above for where time was lost.'}</p>`;
@@ -460,7 +476,8 @@ $('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length
 
 /* ================= render ================= */
 let wave=[],phase=0;
-function render(){if(CALL==='mva'){renderMVA();return;}const A=S.aed;
+function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}const A=S.aed;
+  ODG.forEach(i=>$(i).classList.add('hidden'));$('fattrack').classList.remove('hidden');$('mon-mode').style.color='';
   ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
   $('clock').textContent=clockStr();$('score').textContent=S.score;
   $('eta-l').textContent=S.mission===3?'East Side Hospital':S.als.arrived?'Medic 1':'Medic 1';
@@ -495,7 +512,8 @@ function render(){if(CALL==='mva'){renderMVA();return;}const A=S.aed;
   $('g-assess').classList.toggle('hidden',S.mission>1&&!S.air.vomit);$('g-cpr').classList.toggle('hidden',S.mission>=2&&S.als.lucas>=2);
 }
 function drawWave(){if(!S.active){requestAnimationFrame(drawWave);return;}const run=S.running;if(run){phase+=1;
-  let y=42;if(CALL==='mva'){if(S.m&&S.m.alsMon){const N=Math.max(18,Math.round(3600/mvaV().hr));const p=phase%N;y=p===0?12:p===1?72:p===2?36:p<6?40:(p>N*.45&&p<N*.6)?36:42;}}
+  let y=42;if(CALL==='od'){if(S.o&&S.o.ox&&S.o.pulse){const N=Math.max(18,Math.round(3600/Math.max(30,S.o.hr)));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(S.o.spo2/100);}}
+  else if(CALL==='mva'){if(S.m&&S.m.alsMon){const N=Math.max(18,Math.round(3600/mvaV().hr));const p=phase%N;y=p===0?12:p===1?72:p===2?36:p<6?40:(p>N*.45&&p<N*.6)?36:42;}}
   else if(!S.checked)y=42;else if(S.rosc){const p=phase%40;y=p===0?14:p===1?70:p===2?36:p<6?40+Math.sin(p)*2:(p>18&&p<24)?36:42;}
   else if(S.cpr.on){y=42+Math.sin(phase*S.cpr.rate/60*0.105*Math.PI)*24*S.cpr.depth;}else if(S.arrest&&S.aed.pads){y=42+Math.sin(phase*.7)*9+Math.sin(phase*1.9)*6+(Math.random()-.5)*6;}
   wave.push(y);if(wave.length>150)wave.shift();}
@@ -520,7 +538,7 @@ const GUIDE={
  rosc:{name:'Return of spontaneous circulation (ROSC)',what:'The heart has resumed an organized rhythm with a pulse.',when:'Recognized by the medic on a rhythm check — often signaled first by a jump in EtCO₂.',wrong:'Hyperventilating, relaxing, or forgetting that re-arrest is common.',tip:'Steady ventilation (one every 6 seconds), SpO₂ about 92–98%, and hands ready to restart compressions.',rel:['vent','etco2']},
  bridge:{name:'Transport delays: the river crossings',what:'Monitor Township is on the west side of the Saginaw River; East Side Hospital is across it. The four Bay City drawbridges open for river traffic.',when:'Any transport across the river, especially in boating season.',wrong:'Being surprised by an opening. A bridge going up for a freighter can add minutes.',tip:'Crews can request through dispatch that a bridge be held down for a priority patient. Commercial ships already committed may not be able to wait. Plan your oxygen and your arms for the longer ride.',rel:['o2math']}
 };
-function incidentKey(w){const R=[[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
+function incidentKey(w){const R=[[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
   const d=w.match(/^Decision — (.*)$/);if(d){const k=Object.keys(DEC).find(x=>DEC[x].tag===d[1]);return k?DEC[k].g:null;}for(const [r,k] of R)if(r.test(w))return k;return null;}
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
@@ -592,12 +610,13 @@ function tickMVA(dtReal){const m=S.m;const F=S.mission===3?5:3;const dt=dtReal*F
 function renderMVA(){const m=S.m;if(!m)return;
   $('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals'].forEach(i=>$(i).classList.add('hidden'));
-  ['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
+  ODG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
   $('eta-l').textContent=S.mission===3?'Regional Medical Center':'Medic 1';$('eta-v').textContent=S.mission===3?(m.tx.arrived?'Arrived':mmss(m.tx.total-m.tx.t)+' out'):m.alsArr?'On scene':mmss(m.eta)+' out';
   $('mon-name').textContent=m.alsMon?'Monitor':'Vitals — taken by hand';$('mon-mode').textContent=m.survey?(m.ctrl===2?'Bleeding controlled':m.ctrl===1?'Pressure on':'Arterial bleed!'):'—';
   const live=m.alsMon,v=live?mvaV():m.vit;
   $('mv-hr').textContent=v?v.hr:'—';$('mv-bp').textContent=v?`${v.sbp}/${v.dbp}`:'—';$('mv-spo2').textContent=v?v.spo2:'—';$('mv-gcs').textContent=v?v.gcs:'—';
   $('mv-skin').textContent=v?`Skin ${v.skin}`:'No vitals yet';$('mv-age').textContent=live?'live':m.vitT>0?`taken ${mmss(S.t-m.vitT)} ago`:'';
+  $('fattrack').classList.add('hidden');$('mon-mode').style.color=m.ctrl<2&&m.survey?'#ff8f8a':'';
   $('who').textContent=m.inside?(m.cspine?'You: holding c-spine':'You: inside with her'):'Outside the car';$('fat').style.width='0%';$('pause').textContent='';
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);
   vis('g-scene',S.mission===0);vis('g-pt',S.mission<=1);vis('g-extr',S.mission<=2);vis('g-mtx',S.mission===3);
@@ -705,6 +724,179 @@ function mvaDebrief(){const m=S.m,v=mvaV();const ctrlT=m.ctrlT!==null?mmss(m.ctr
   const msg=v.loss<.3?'She arrived compensating — fast bleeding control and warmth kept her out of the worst of shock. The trauma team can fix what\'s left.':v.loss<.4?'She arrived in significant shock. Look at the time to bleeding control and scene time — that\'s where minutes turn into blood.':'She arrived in severe shock. The biggest driver is how long the arterial bleed ran before it was controlled.';
   return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
 
+/* ================= Overdose call ================= */
+const ODG=['vitals-od','od-line','g-od-a','g-od-b','g-od-n','g-od-t'];
+function freshOD(){return {checked:false,ox:false,open:false,suct:false,gurgle:true,opa:false,bvm:false,o2:false,recov:false,wake:false,
+  rr:4,spo2:78,hr:56,gcs:5,pulse:true,A:0,L:1,doses:0,doseT:[],extraA:0,withdrawal:false,vomit:false,
+  lastBreath:-99,lastEff:-99,good:0,hyper:0,firstVentT:null,lowSpo2:78,below90:0,hypoxT:0,arrested:false,cpr:false,cprT:0,
+  vitT:-999,vitCount:0,pulseChecks:0,act:null,eta:480,alsArr:false,alsT:null,loaded:false,renarcDone:false,
+  tx:{t:0,total:600,arrived:false,reass:0,lastReass:-999},chaos:{eta:false,vomit:false}};}
+function odA(){const o=S.o;let A=o.extraA;o.doseT.forEach(t=>{const e=S.t-t;A+=e<30?0:e>150?.35:(e-30)/120*.35;});return A;}
+const OX=k=>$(k);
+function odNeedCheck(){if(!S.o.checked){radio('Partner','Check him first — is he breathing? pulse?','bad');return true;}return false;}
+OX('o-check').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(o.checked||o.act)return;o.act={k:'check',t:8};radio('You','Hey! Can you hear me? … Nothing. Snoring, gurgling breaths — maybe four a minute. Pinpoint pupils, lips are blue. Weak, slow pulse.');};
+OX('o-ox').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck()||o.ox)return;o.ox=true;radio('Partner','Pulse ox is on his finger.');};
+OX('o-vitals').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck()||o.act)return;o.act={k:'vitals',t:20};radio('Partner','Getting a full set.');};
+OX('o-pulse').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck()||o.act)return;o.act={k:'pulse',t:7};};
+OX('o-recov').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck())return;if(o.recov)return;if(o.rr<10&&!o.withdrawal){radio('You','He\'s not breathing enough to leave him on his side — keep bagging.','bad');return;}o.recov=true;radio('You','Rolling him onto his side — airway stays open, anything that comes up drains out.');};
+OX('o-cpr').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(o.pulse)return;o.cpr=!o.cpr;radio('You',o.cpr?'Starting compressions. Keep bagging every 30.':'Holding compressions.');};
+OX('o-open').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck()||o.open)return;o.open=true;radio('You','Head-tilt, chin-lift — the snoring stops, but I still hear gurgling.');};
+OX('o-suct').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck())return;if(!o.gurgle){radio('Partner','Airway\'s clear.');return;}o.gurgle=false;o.vomit=false;radio('Partner','Suctioning — clear.','good');};
+OX('o-opa').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck()||o.opa)return;if(o.gcs>=9){radio('Partner','He gags on it — pulling it out. He has a gag reflex now.','bad');return;}o.opa=true;radio('Partner','Sized corner of mouth to earlobe — OPA in, no gag.');};
+OX('o-bvm').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck()||o.bvm)return;o.bvm=true;radio('Partner','BVM with a good two-hand seal — ready.');};
+OX('o-o2').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck()||o.o2)return;if(!o.bvm){radio('Partner','BVM first, then oxygen on it.','bad');return;}o.o2=true;radio('Partner','Oxygen on the bag at 15.');};
+OX('o-breath').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck())return;if(!o.bvm){radio('Partner','Get the BVM ready.','bad');return;}
+  const iv=S.t-o.lastBreath;o.lastBreath=S.t;const eff=(o.open||o.opa)&&!o.gurgle;
+  if(!eff){radio('You',o.gurgle?'Breath isn\'t going in — I hear gurgling. Suction!':'No chest rise — open the airway.','bad');return;}
+  o.lastEff=S.t;if(o.firstVentT===null)o.firstVentT=S.t;if(iv<4){o.hyper++;if(o.hyper%3===1)ding(3,'Bagging too fast — that is hyperventilation');}else if(iv<=8)o.good++;};
+OX('o-nal').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck())return;const last=o.doseT.length?S.t-o.doseT[o.doseT.length-1]:999;
+  if(last<100){ding(3,'Repeat naloxone too soon — give it 2 to 3 minutes to work');}o.doses++;o.doseT.push(S.t);radio('Partner',`Naloxone 4 mg in the ${o.doses%2?'right':'left'} nostril — dose ${o.doses} at ${clockStr()}.`);};
+OX('o-load').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(S.mission!==2||o.loaded||o.act||S.briefing)return;o.act={k:'load',t:15};radio('You','Easy — sit on the cot, we\'ve got you. Belts on. Power load.');};
+OX('o-reass').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(S.mission!==3)return;if(S.t-o.tx.lastReass<100){radio('Medic 1','Just checked — keep watching him.');return;}o.tx.lastReass=S.t;o.tx.reass++;radio('You',`Breathing ${Math.round(o.rr)}, SpO₂ ${Math.round(o.spo2)}%, ${o.gcs>=13?'talking to me':'drowsy'}.`);};
+function tickOD(dtReal){const o=S.o;const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
+  if(o.act){o.act.t-=dt;if(o.act.t<=0){const k=o.act.k;o.act=null;
+    if(k==='check'){o.checked=true;}
+    if(k==='vitals'){o.vitT=S.t;o.vitCount++;radio('Partner',`Resp ${Math.round(o.rr)}, pulse ${Math.round(o.hr)}, SpO₂ ${Math.round(o.spo2)}%, GCS ${Math.round(o.gcs)}. Pupils ${o.gcs<9?'pinpoint':'small but reactive'}.`);}
+    if(k==='pulse'){o.pulseChecks++;radio('You',o.pulse?`Carotid pulse present — about ${Math.round(o.hr)}.`:'No pulse!',o.pulse?'':'bad');}
+    if(k==='load'){o.loaded=true;}}}
+  if(!o.checked){checkMission(dt);renderOD();return;}
+  /* drug effect */
+  const A=odA();const D=Math.max(0,Math.min(1,o.L-A)),over=A-o.L;
+  if(over>.02&&!o.withdrawal)triggerWithdrawal('Too much naloxone — precipitated withdrawal');
+  if(o.doses>=1&&o.rr<10&&o.pulse&&S.t-o.doseT[o.doseT.length-1]>240&&!o.nudged){o.nudged=true;radio('Partner','Still under 10 a minute — time for another dose?');}
+  if(TIER===2&&!o.chaos.vomit&&S.t>200&&!o.withdrawal){o.chaos.vomit=true;o.gurgle=true;o.vomit=true;radio('Partner','He\'s vomiting — airway\'s full!','bad');}
+  if(o.pulse){o.rr=o.withdrawal?22:4+12*Math.pow(1-D,1.5);o.gcs=o.withdrawal?14:Math.min(15,Math.max(o.wake?14:3,3+12*Math.pow(1-D,2)));}else{o.rr=0;o.gcs=3;}
+  if(o.opa&&o.gcs>=9){o.opa=false;radio('Partner','He\'s gagging on the OPA — pulled it.');}
+  /* oxygenation */
+  const vent=S.t-o.lastEff<8;const patent=(o.open||o.opa||o.recov)&&!o.gurgle;
+  let tgt=vent?(o.o2?98:93):Math.min(97,50+3.6*o.rr*(patent?1:.5)+(o.o2&&o.rr>=10?3:0));if(!o.pulse)tgt=vent&&o.cpr?80:50;
+  o.spo2+=(tgt-o.spo2)*Math.min(1,dt/25);o.lowSpo2=Math.min(o.lowSpo2,o.spo2);if(o.spo2<90){o.below90+=dt;if(o.below90>120&&!o.hypoDing){o.hypoDing=true;ding(10,'Over two minutes below 90% oxygen — get the airway open and the bag going sooner');}}
+  if(o.pulse)o.hr=o.spo2<75?48:o.spo2<88?58:o.withdrawal?118:82;else o.hr=0;
+  /* hypoxic arrest */
+  if(o.pulse&&o.spo2<65){o.hypoxT+=dt;if(o.hypoxT>90){o.pulse=false;o.arrested=true;ding(20,'He lost his pulse from hypoxia — breathing for him comes first');radio('You','I\'ve lost his pulse! Starting CPR!','bad');}}else if(o.pulse)o.hypoxT=Math.max(0,o.hypoxT-dt);
+  if(!o.pulse){if(o.cpr&&vent)o.cprT+=dt;if(o.cprT>90){o.pulse=true;o.cpr=false;o.hypoxT=0;o.cprT=0;o.spo2=80;radio('You','Pulse is back! Keep bagging.','good');}}
+  /* ALS */
+  if(!o.alsArr){o.eta-=dt;if(TIER===2&&!o.chaos.eta&&S.t>150){o.chaos.eta=true;o.eta+=120;radio('Dispatch','Medic 1 delayed — plus two minutes.','bad');}if(o.eta<=0){o.alsArr=true;o.alsT=S.t;radio('Medic 1','Medic 1 inside — what have we got?','good');}}
+  /* transport */
+  if(S.mission===3&&!S.briefing){o.tx.t+=dt;
+    if(!o.renarcDone&&o.tx.t>220){o.renarcDone=true;o.wake=false;o.extraA-=.45;o.recov=false;radio('Medic 1','He\'s nodding off again — look at his breathing.','bad');if(!DEC_OPEN){o.renarcPending=false;openDecision('odRenarc',-1);}else o.renarcPending=true;}
+    if(o.renarcPending&&!DEC_OPEN){o.renarcPending=false;openDecision('odRenarc',-1);}
+    if(!o.tx.arrived&&o.tx.t>=o.tx.total){o.tx.arrived=true;radio('EMT','East Side Hospital — we\'re at the doors.','good');}}
+  checkMission(dt);renderOD();}
+function triggerWithdrawal(why){const o=S.o;o.withdrawal=true;o.vomit=true;o.gurgle=true;o.recov=false;ding(10,why);radio('You','He\'s up — vomiting, swinging his arms, ripping the mask off! Roll him, suction!','bad');}
+function renderOD(){const o=S.o;if(!o)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
+  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));
+  ['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
+  const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-od-a',S.mission<=1);vis('g-od-b',S.mission<=1||S.mission===3);vis('g-od-n',S.mission<=1);vis('g-od-t',S.mission>=2);
+  $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(o.tx.arrived?'Arrived':mmss(o.tx.total-o.tx.t)+' out'):o.alsArr?'On scene':mmss(o.eta)+' out';
+  $('mon-name').textContent=o.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!o.checked?'—':!o.pulse?'NO PULSE':o.withdrawal?'Agitated':o.rr<10?'Breathing inadequate':'Breathing on his own';$('mon-mode').style.color=!o.pulse||o.rr<10?'#ff8f8a':'';$('fattrack').classList.add('hidden');
+  const known=o.vitT>0;$('ov-rr').textContent=o.checked?(known||o.alsArr?Math.round(o.rr):'~'+Math.round(o.rr)):'—';$('ov-spo2').textContent=o.ox&&o.pulse?Math.round(o.spo2):'—';$('ov-hr').textContent=o.ox&&o.pulse?Math.round(o.hr):'—';$('ov-gcs').textContent=o.checked?Math.round(o.gcs):'—';
+  $('ov-air').textContent=!o.checked?'Not assessed':o.vomit?'Vomit in the airway':o.gurgle?'Gurgling':(o.open||o.opa||o.recov)?'Airway open':'Snoring — airway not open';$('ov-age').textContent=S.t-o.lastEff<8?'bagging':'';
+  $('who').textContent=o.cpr?'CPR in progress':'';$('pause').textContent='';$('fat').style.width='0%';
+  for(const [id,on] of [['o-check',o.checked],['o-ox',o.ox],['o-open',o.open],['o-opa',o.opa],['o-bvm',o.bvm],['o-o2',o.o2],['o-recov',o.recov],['o-load',o.loaded]])$(id).classList.toggle('on',on);
+  $('o-suct').classList.toggle('hot',o.checked&&o.gurgle);$('o-cpr').classList.toggle('hidden',o.pulse);$('o-cpr').classList.toggle('hot',!o.pulse&&!o.cpr);
+  $('o-breath').classList.toggle('hot',o.bvm&&o.rr<10&&S.t-o.lastBreath>=6);$('o-pulse').textContent=o.act&&o.act.k==='pulse'?'Checking…':'Pulse check';
+  $('o-airtxt').textContent=o.bvm?`Last breath ${Math.round(S.t-o.lastBreath)}s ago · ${o.good} good breaths${o.hyper?` · ${o.hyper} too fast`:''}`:'';
+  $('o-naltxt').textContent=o.doses?`${o.doses} dose${o.doses>1?'s':''} · last ${mmss(S.t-o.doseT[o.doseT.length-1])} ago`:'No doses yet';
+  $('o-load').classList.toggle('hot',S.mission===2&&!o.loaded);$('o-reass').classList.toggle('hidden',S.mission!==3);}
+const M_OD=[
+ {title:'Patient contact',sub:'Medic 1 is eight minutes out. He is barely breathing.',
+  brief:'24-year-old man on the bathroom floor of an apartment. His roommate found him and called. There is a small bag of powder and a syringe on the counter. The roommate says he\'d been clean for six months. You have your jump bag: BVM, airways, suction, oxygen, pulse oximeter, and intranasal naloxone.',
+  skills:['odscene','opioid','breathfirst','rescue','naloxone'],
+  steps:[{t:'Decision: the powder and the needle',dec:'odScene',f:()=>true},
+   {t:'Check: responsive, breathing, pulse',f:()=>S.o.checked},
+   {t:'Decision: what comes first',dec:'odFirst',f:()=>S.o.checked},
+   {t:'Head-tilt, chin-lift — open the airway',f:()=>S.o.open},
+   {t:'Suction the gurgling',f:()=>!S.o.gurgle},
+   {t:'OPA in (no gag reflex)',f:()=>S.o.opa||S.o.gcs>=9},
+   {t:'BVM with oxygen at 15 LPM',f:()=>S.o.bvm&&S.o.o2},
+   {t:'Breathe for him: one breath every 6 seconds (6 good breaths)',wait:true,f:()=>S.o.good>=6},
+   {t:'Naloxone 4 mg intranasal',f:()=>S.o.doses>=1},
+   {t:'Pulse oximeter on',f:()=>S.o.ox},
+   {t:'Pulse check — under 10 seconds',f:()=>S.o.pulseChecks>=1},
+   {t:'Decision: a second dose?',dec:'odSecond',any:true,f:()=>S.o.doses>=1&&S.t-S.o.doseT[0]>=150},
+   {t:'Keep breathing for him until he breathes 10+ a minute on his own',wait:true,f:()=>S.o.rr>=10&&S.o.pulse}]},
+ {title:'Breathing — but not awake',sub:'He\'s breathing on his own. The job isn\'t done.',
+  brief:'His breathing has come back to about 11 a minute and his oxygen is good, but he only groans when you rub his sternum. Medic 1 is close.',
+  skills:['naloxone','withdrawal','xylazine','recovery','handoff'],
+  steps:[{t:'Decision: a third dose?',dec:'odThird',f:()=>true},
+   {t:'Recovery position',f:()=>S.o.recov},{t:'Full set of vitals',f:()=>S.o.vitCount>=1},
+   {t:'Decision: handoff to Medic 1',dec:'odHandoff',any:true,f:()=>S.o.alsArr},
+   {t:'Medic 1 takes over',wait:true,f:()=>S.o.alsArr&&S.t-S.o.alsT>20}]},
+ {title:'"I\'m fine. I\'m leaving."',sub:'He\'s awake — and he wants everybody gone.',
+  brief:'As the second dose fully takes hold, he comes around: embarrassed, irritable, and asking everyone to leave. Medic 1 is talking with him.',
+  skills:['refusal','renarc'],onStart:()=>{S.o.wake=true;},
+  steps:[{t:'Decision: he wants to refuse',dec:'odRefuse',f:()=>true},{t:'Help him onto the cot and load',f:()=>S.o.loaded}]},
+ {title:'Transport — East Side Hospital',sub:'A short ride across the river. Watch him the whole way.',
+  brief:'You are in the back with the medic for about ten minutes. He is awake and quiet, oxygen on. Keep reassessing his breathing.',
+  skills:['renarc','rescue','handoff'],
+  steps:[{t:'Reassess his breathing (twice)',wait:true,f:()=>S.o.tx.reass>=2},
+   {t:'Arrive at East Side Hospital',wait:true,f:()=>S.o.tx.arrived},
+   {t:'Decision: ER handoff',dec:'odER',f:()=>S.o.tx.arrived}]}
+];
+Object.assign(DEC,{
+ odScene:{tag:'Fentanyl on scene',q:'In the doorway you see a small bag of white powder spilled on the counter and an uncapped syringe on the floor next to him. Your partner hesitates: "Is it safe to touch him?" What do you do?',
+  opts:[{t:'Gloves on, don\'t touch the powder, move the syringe out of the way with care — and go to work on him',r:'good',why:'Standard precautions are enough. Brief skin contact with fentanyl is very unlikely to cause an overdose. The real danger here is the needle and the minutes he isn\'t breathing.'},
+        {t:'Back out and wait for police or hazmat to clear the powder',r:'bad',why:'He is dying from lack of oxygen right now. Delaying care out of fear of incidental exposure isn\'t supported by the evidence.'},
+        {t:'Go straight to him without gloves — every second counts',r:'bad',why:'Speed matters, but gloves take seconds. And an uncapped needle next to him is a real hazard.'}],
+  why:'Medical toxicology organizations have found that incidental skin contact with fentanyl is very unlikely to cause toxicity. Use gloves, avoid touching powder, wash with soap and water (not alcohol sanitizer), and watch for needles.',g:'odscene'},
+ odFirst:{tag:'What comes first',q:'Unresponsive, about four snoring breaths a minute, pinpoint pupils, blue lips, weak pulse. Your partner has the naloxone in hand. What comes first?',
+  opts:[{t:'Open his airway and start breathing for him with the BVM and oxygen — your partner gives the naloxone as soon as it\'s ready',r:'good',why:'He is hypoxic now; naloxone takes minutes to work. Ventilation fixes the problem that\'s killing him immediately. Do both, but breathing can\'t wait.'},
+        {t:'Give the naloxone and wait for it to work',r:'bad',why:'Two to five minutes of near-zero breathing on an already hypoxic brain. Waiting is the dangerous part.'},
+        {t:'Sternal rub and shout to wake him up',r:'partial',why:'A quick stimulus is fine, but it won\'t fix four breaths a minute. Get the airway and the bag going.'}],
+  why:'In opioid overdose, the threat is respiratory depression. Open the airway and ventilate first; naloxone is given early but the bag is what keeps him alive until it works.',g:'breathfirst'},
+ odSecond:{tag:'Second naloxone dose',q:()=>`About two and a half minutes since the first dose. He is breathing about ${Math.round(S.o.rr)} times a minute on his own, SpO₂ ${S.o.ox?Math.round(S.o.spo2)+'%':'unknown'}. Your partner holds up the second device. What do you do?`,
+  optsFn:()=>{const low=S.o.rr<10;return low?[
+    {t:'Give the second dose in the other nostril and keep bagging',r:'good',why:'Breathing is still inadequate after a fair trial. Fentanyl often needs more than one dose. Keep ventilating while it works.'},
+    {t:'Wait another five minutes — it\'s still kicking in',r:'bad',why:'The first dose has had time to work. With breathing still inadequate, a repeat dose is indicated.'},
+    {t:'Skip naloxone — just keep bagging until Medic 1 gets here',r:'partial',why:'Bagging is right and must continue, but a repeat dose is the faster path to him breathing on his own.'}]:[
+    {t:'Hold it — he\'s breathing adequately. Keep supporting and watching him',r:'good',why:'The goal of naloxone is adequate breathing, not wide-awake. Extra doses risk vomiting and violent withdrawal.'},
+    {t:'Give it anyway so he wakes up',r:'bad',why:'Overshooting can throw him into precipitated withdrawal: vomiting, agitation, and a fight over the airway.'},
+    {t:'Give half the device',r:'partial',why:'He\'s breathing adequately — no more naloxone is needed right now. Keep watching.'}];},
+  why:'Repeat naloxone every 2 to 3 minutes if breathing remains inadequate. Titrate to breathing, not to consciousness.',g:'naloxone',
+  after:()=>{const low=S.o.rr<10;if((low&&S.lastChoice==='good')||(!low&&S.lastChoice==='bad')){S.o.doses++;S.o.doseT.push(S.t);radio('Partner',`Second dose, ${S.o.doses%2?'right':'left'} nostril, at ${clockStr()}.`);}}},
+ odThird:{tag:'Third naloxone dose',q:'He\'s breathing 11 a minute, SpO₂ 95% on oxygen — but he only groans when you rub his sternum. Your partner reaches for a third dose: "He should be awake by now."',
+  opts:[{t:'Hold the naloxone. His breathing is adequate — recovery position, keep the airway, keep watching',r:'good',why:'Naloxone has done its job: he\'s breathing. Fentanyl is often mixed with sedatives like xylazine or benzodiazepines that naloxone doesn\'t reverse — more doses won\'t wake him and can throw him into withdrawal.'},
+        {t:'Give the third dose — he should be awake',r:'bad',why:'More naloxone won\'t reverse non-opioid sedatives, and overshooting the opioid can trigger violent withdrawal and vomiting into an unprotected airway.'},
+        {t:'Keep doing hard sternal rubs until he wakes up',r:'partial',why:'Checking responsiveness is fine; trying to force him awake isn\'t a treatment. Protect his airway and monitor.'}],
+  why:'The endpoint for naloxone is adequate breathing. Persistent sedation with good breathing may mean other drugs on board — support and monitor.',g:'xylazine',after:()=>{if(S.lastChoice==='bad'){S.o.doses++;S.o.doseT.push(S.t);S.o.extraA+=.2;triggerWithdrawal('Third dose for a breathing patient — precipitated withdrawal');}}},
+ odHandoff:{tag:'Overdose handoff',q:'Medic 1 kneels down: "What do we have?"',
+  opts:[{t:'"24-year-old, suspected fentanyl. Found by roommate, resp about 4, SpO₂ 78, pinpoint, blue. We bagged him with O₂, naloxone 4 mg IN at [times]. Now breathing about 11 on his own, sats mid-90s, responds to pain."',r:'good',why:'What happened, what you found, what you gave and when, and where he is now.'},
+        {t:'"Overdose, we Narcanned him."',r:'partial',why:'Missing doses and times, the hypoxia, and his current status.'},
+        {t:'"His roommate said he\'s been clean for six months — I don\'t know, he had a rough breakup…"',r:'bad',why:'Useful background, but not the clinical picture the medic needs first.'}],
+  why:'Doses and times of naloxone are critical: they tell the medic how much has been given and when it may wear off.',g:'handoff'},
+ odRefuse:{tag:'Refusal after naloxone',q:'He sits up, embarrassed and irritable: "I\'m fine. I don\'t need a hospital. Everybody just leave." The medic is talking with him. What\'s your role?',
+  opts:[{t:'Stay calm and honest: naloxone can wear off before the fentanyl does and he could stop breathing again alone. Back up the medic, who handles the refusal and his capacity',r:'good',why:'Respectful honesty works better than pressure. The medic and medical control own the refusal process.'},
+        {t:'Tell him police will arrest him if he doesn\'t go',r:'bad',why:'Threats and untruths destroy trust — with this patient and the next one.'},
+        {t:'He\'s an adult — pack up and leave',r:'partial',why:'Adults with capacity can refuse, but walking away without explaining the risk of re-sedation isn\'t doing your job.'}],
+  why:'After naloxone, the risk of re-sedation is real. Refusals follow your MCA\'s process, led by the medic. Your job is to support, explain, and stay professional.',g:'refusal',after:()=>{radio('Patient',S.lastChoice==='good'?'…Fine. If it means I don\'t stop breathing again. I\'ll go.':'Whatever. I\'ll go — just get me out of here.');}},
+ odRenarc:{tag:'Re-sedation in transport',q:()=>`Halfway across the river he\'s nodding off. Breathing about ${Math.round(S.o.rr)} a minute, SpO₂ ${Math.round(S.o.spo2)}% and falling. What do you do?`,
+  opts:[{t:'Shake him and talk to him, open his airway, assist with the BVM if he doesn\'t pick up — and tell the medic now',r:'good',why:'Naloxone wears off, often before the opioid does. Support breathing immediately; the medic can give more naloxone.'},
+        {t:'Let him sleep — it\'s been a long night',r:'bad',why:'This is re-sedation. Left alone, he can stop breathing again.'},
+        {t:'Give another nasal dose yourself without saying anything',r:'partial',why:'Naloxone may be needed, but the medic is right there and needs to know — and his breathing needs support right now.'}],
+  why:'Naloxone typically lasts 30 to 90 minutes; fentanyl and other opioids can outlast it. This is why monitoring and transport matter.',g:'renarc',after:()=>{if(S.lastChoice!=='bad'){S.o.extraA+=.4;S.o.open=true;S.o.lastEff=S.t;radio('Medic 1','Good catch. I gave him a little more IV — he\'s breathing better.','good');}else{S.o.extraA+=.4;radio('Medic 1','Hey — his sats are dropping! Bag him. I\'m giving more naloxone.','bad');}}},
+ odER:{tag:'ER handoff',q:'The ER nurse takes the report. "Anything I need to know?"',
+  opts:[{t:'Found apneic with low sats, bagged, naloxone 4 mg IN twice with times, re-sedated in transport and got more from the medic — he needs watching',r:'good',why:'The re-sedation is the key detail: it tells the ER he\'s likely to need monitoring and maybe more naloxone.'},
+        {t:'"He\'s fine now."',r:'bad',why:'He re-sedated once already. "Fine" could cost him his airway in the waiting room.'},
+        {t:'Let the medic handle it',r:'partial',why:'The medic leads — but if asked, make sure the re-sedation and dose times are heard.'}],
+  why:'Doses, times, and any re-sedation are the facts the ER needs most.',g:'renarc'}
+});
+Object.assign(GUIDE,{
+ odscene:{name:'Fentanyl on scene: staying safe',what:'Overdose scenes may have powder, pills, and needles. Medical toxicology organizations have found that incidental skin contact with fentanyl is very unlikely to cause an overdose.',when:'Every suspected overdose.',wrong:'Delaying care out of fear of touching the patient — or ignoring the uncapped needle that is a real hazard.',tip:'Gloves on, don\'t touch or disturb powder, wash skin with soap and water (not alcohol sanitizer), and watch where you kneel.',mca:'Follow your department\'s PPE and exposure procedures.',rel:['opioid']},
+ opioid:{name:'Recognizing opioid overdose',what:'Classic signs: unresponsive or barely responsive, slow or absent breathing, snoring or gurgling, pinpoint pupils, blue lips and fingertips.',when:'Any unresponsive patient — especially with drug paraphernalia, history, or a bystander report.',wrong:'Missing it because pupils aren\'t pinpoint (other drugs can change them) or because they "look asleep."',tip:'Slow, shallow breathing is the emergency. Count it: under 10 a minute in an adult is inadequate.',rel:['breathfirst','naloxone']},
+ breathfirst:{name:'Breathing before naloxone',what:'Opioids kill by stopping breathing. A hypoxic patient needs oxygen delivered now; naloxone takes minutes to work.',when:'Any overdose with inadequate breathing.',wrong:'Giving naloxone and standing back to wait.',tip:'Open the airway, bag with oxygen, and have your partner give the naloxone at the same time.',rel:['rescue','naloxone']},
+ rescue:{name:'Rescue breathing (patient with a pulse)',what:'Breathing for a patient who has a pulse but isn\'t breathing adequately.',when:'Respiratory arrest or severe respiratory depression with a pulse.',wrong:'Bagging too fast or too hard, poor mask seal, and forgetting to recheck the pulse.',tip:'One breath every 6 seconds, each over about one second with visible chest rise. Check the pulse about every 2 minutes; if it\'s gone, start CPR.',mca:'Follows current BLS guidelines; confirm with your MCA protocol.',rel:['bvm','vent']},
+ naloxone:{name:'Naloxone',what:'An opioid antagonist that reverses opioid effects, including respiratory depression.',when:'Suspected opioid overdose with inadequate breathing.',wrong:'Waiting on it instead of ventilating, repeating it too soon, or giving more to a patient who is already breathing adequately.',tip:'Common intranasal dose: 4 mg in one nostril. Onset is usually 2–5 minutes. If breathing is still inadequate after 2–3 minutes, repeat in the other nostril. The goal is breathing, not wide awake.',mca:'Naloxone route, dose, and MFR authorization are set by your MCA protocol.',rel:['breathfirst','withdrawal','renarc']},
+ withdrawal:{name:'Precipitated withdrawal',what:'Sudden, severe opioid withdrawal caused by too much naloxone in a dependent person.',when:'Usually after large or repeated doses beyond what was needed to restore breathing.',wrong:'Vomiting into an unprotected airway, agitation, combativeness, and a patient who refuses care.',tip:'Titrate to breathing. If it happens: roll them, suction, protect everyone, and stay calm.',rel:['naloxone','recovery']},
+ xylazine:{name:'Sedatives in the drug supply',what:'Fentanyl is increasingly mixed with other sedatives such as xylazine or benzodiazepines. Naloxone does not reverse them.',when:'A patient whose breathing improves with naloxone but who stays deeply sedated.',wrong:'Giving dose after dose of naloxone trying to wake them up.',tip:'If breathing is adequate, support the airway, use the recovery position, and monitor. Note any unusual wounds.',rel:['naloxone','recovery']},
+ recovery:{name:'Recovery position',what:'Positioning a patient on their side to keep the airway open and let fluids drain.',when:'Breathing adequately but not fully alert — and you have to step away, or vomiting is likely.',wrong:'Using it on someone who isn\'t breathing adequately — they need ventilation, not positioning.',tip:'Keep checking breathing. Have suction ready.',rel:['rescue','withdrawal']},
+ renarc:{name:'Naloxone wearing off',what:'Naloxone typically lasts about 30–90 minutes. Fentanyl and longer-acting opioids can outlast it, so the patient can become sedated again.',when:'Any patient after naloxone — especially after refusals or during long transports.',wrong:'Assuming a patient who woke up is out of danger.',tip:'Keep monitoring breathing and SpO₂. This is the main reason to encourage transport.',rel:['naloxone','refusal']},
+ refusal:{name:'Refusals after an overdose',what:'Patients who wake after naloxone often want to refuse transport.',when:'Very common after overdose reversals.',wrong:'Threats, lectures, or walking away without explaining the risk.',tip:'Be honest and calm about re-sedation. Let the medic lead the refusal process and capacity assessment.',mca:'Refusal procedures and medical control contact follow your MCA protocol.',rel:['renarc']}
+});
+function odDebrief(){const o=S.o;const rows=[['First effective breath',o.firstVentT!==null?mmss(o.firstVentT)+' after contact':'—'],['Lowest SpO₂',Math.round(o.lowSpo2)+'%'],['Time below 90%',mmss(o.below90)],['Naloxone doses',o.doses+(o.doseT.length?' (first at '+mmss(o.doseT[0])+')':'')],['Precipitated withdrawal',o.withdrawal?'yes':'no'],['Hypoxic arrest',o.arrested?'yes':'no'],['Breaths too fast',o.hyper]];
+  const msg=o.arrested?'He lost his pulse from hypoxia. In an overdose, oxygen is the emergency — the bag keeps him alive while naloxone works.':o.withdrawal?'You got him breathing, but extra naloxone threw him into withdrawal. Titrate to breathing, not to wide awake.':o.below90>180?'He made it, but he spent a long time hypoxic. Getting the airway open and the bag going sooner is the biggest improvement.':'Airway and breathing first, naloxone titrated to breathing, and you caught the re-sedation. That\'s the job.';
+  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:14px;color:var(--soft);margin-top:10px">${msg}</p>`;}
+
 /* ================= menu, progress, report ================= */
 const KEY='patient-contact';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:'',dept:''};}catch(e){return {runs:[],name:'',dept:''};}}
@@ -713,10 +905,11 @@ function record(){const p=load();p.runs.push({call:CALL,d:new Date().toISOString
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
 function showMenu(){S.running=false;$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
-$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
+$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
 $('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
 $('b-start').onclick=()=>{$('intro').classList.add('hidden');const p=load();p.seen=true;save(p);showMenu();};
-function snapshot(){if(CALL==='mva')return [`Patient Contact report — v${APP_VERSION}`,`Call: MVA · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · blood loss ${Math.round(S.m.lost)} mL · control ${S.m.ctrl} · extrication stage ${S.m.extr.stage} · ALS ${S.m.alsArr?'on scene':'ETA '+mmss(S.m.eta)}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');return [`Patient Contact report — v${APP_VERSION}`,`Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim time ${mmss(S.t)} · arrest ${S.arrest} · ROSC ${S.rosc} · CPR ${S.cpr.on?compressorNow():'off'} · CCF ${S.arrestT?Math.round(S.compT/S.arrestT*100):0}%`,`AED ${S.aed.state} shocks ${S.aed.shocks} · ALS ${S.als.arrived?'on scene':'ETA '+mmss(S.als.eta)} · LUCAS ${S.als.lucas} · O2 ${Math.round(S.o2psi)} psi`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+function snapshot(){if(CALL==='od'){const o=S.o;return [`Patient Contact report — v${APP_VERSION}`,`Call: overdose · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${Math.round(o.rr)} SpO2 ${Math.round(o.spo2)} GCS ${Math.round(o.gcs)} · doses ${o.doses} · pulse ${o.pulse}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+  if(CALL==='mva')return [`Patient Contact report — v${APP_VERSION}`,`Call: MVA · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · blood loss ${Math.round(S.m.lost)} mL · control ${S.m.ctrl} · extrication stage ${S.m.extr.stage} · ALS ${S.m.alsArr?'on scene':'ETA '+mmss(S.m.eta)}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');return [`Patient Contact report — v${APP_VERSION}`,`Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim time ${mmss(S.t)} · arrest ${S.arrest} · ROSC ${S.rosc} · CPR ${S.cpr.on?compressorNow():'off'} · CCF ${S.arrestT?Math.round(S.compT/S.arrestT*100):0}%`,`AED ${S.aed.state} shocks ${S.aed.shocks} · ALS ${S.als.arrived?'on scene':'ETA '+mmss(S.als.eta)} · LUCAS ${S.als.lucas} · O2 ${Math.round(S.o2psi)} psi`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
 $('b-report').onclick=()=>{const p=load();$('r-name').value=p.name||'';$('r-dept').value=p.dept||'';$('r-note').value='';$('r-msg').textContent='';$('repov').classList.remove('hidden');};
 $('r-cancel').onclick=()=>$('repov').classList.add('hidden');
 $('r-send').onclick=async()=>{const p=load();p.name=$('r-name').value.trim();p.dept=$('r-dept').value.trim();save(p);const text=`From: ${p.name||'—'} (${p.dept||'—'})\nNote: ${$('r-note').value.trim()||'—'}\n\n${snapshot()}`;
