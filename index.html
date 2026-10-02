@@ -227,7 +227,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
   <p>When the medic arrives, you'll help put the patient on the cardiac monitor — and turn on <b>Sound</b> in the menu for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.10 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.11 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -243,6 +243,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call6"><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
   <button class="scen" id="b-call7"><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
   <button class="scen" id="b-call8"><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
+  <button id="b-drills" class="go" style="width:100%;margin:2px 0 8px;font-size:17px">Quick drills — 60-second skill practice</button>
   <div style="display:flex;gap:8px;margin:2px 0 8px"><button id="b-prog" style="flex:1">My progress</button><button id="b-sound" style="flex:1">Sound: off</button></div>
   <button id="b-rand" style="width:100%;margin-bottom:8px">Patients: varied</button>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
@@ -280,6 +281,10 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p style="font-size:13px;color:var(--soft);margin:8px 0 4px">Medic 1's read:</p><p id="tw-txt" style="font-size:16px"></p>
   <button class="go" id="tw-close" style="width:100%;font-size:18px">Continue</button>
 </div></div>
+<div class="overlay hidden" id="drillov" style="z-index:20"><div class="box">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h2 id="dr-title" style="margin:0">Quick drills</h2><span id="dr-meta" style="font-size:14px;color:var(--soft);text-align:right"></span></div>
+  <div id="dr-body" style="margin-top:10px"></div><div id="dr-foot" style="margin-top:10px"></div>
+</div></div>
 <div class="overlay hidden" id="progov" style="z-index:20"><div class="box">
   <h2>My progress</h2><div id="prog-body"></div>
   <p style="font-size:13px;color:var(--soft)">Saved on this phone. Download it for your training records.</p>
@@ -300,7 +305,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.10.0';
+const APP_VERSION='0.11.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -1964,9 +1969,9 @@ function monSync(){const c=monCfg();const vis=(id,on)=>$(id).classList.toggle('h
 $('mon-4').onclick=()=>{if(!S.active)return;leadStart('4');};$('mon-12').onclick=()=>{if(!S.active)return;leadStart('12');};
 /* --- timeline + progress --- */
 function timelineHTML(){const L=(S.log||[]).filter(e=>e.who!=='Guide');if(!L.length)return'';return `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--orange);font-family:'Saira Condensed';font-size:18px">Call timeline · ${L.length} events</summary><div style="max-height:260px;overflow:auto;font-size:13px;line-height:1.45;margin-top:6px">${L.map(e=>`<div style="padding:3px 0;border-top:1px dashed #2a3d5e"><b style="color:var(--soft)">${e.c}</b> <span style="color:var(--orange)">${esc(e.who)}:</span> ${esc(e.msg)}</div>`).join('')}</div></details>`;}
-function progressShow(){const p=load();const runs=p.runs||[];$('prog-body').innerHTML=Object.keys(CALLNAME).map(k=>{const r=runs.filter(x=>(x.call||'arrest')===k);if(!r.length)return `<div class="mrow"><span>${CALLNAME[k]}</span><b style="color:var(--soft)">not run yet</b></div>`;const best=Math.max(...r.map(x=>x.score)),last=r[r.length-1];const tiers=[...new Set(r.map(x=>['Guided','Recall','Chaos'][x.tier]))].join(', ');return `<div class="mrow"><span>${CALLNAME[k]}<br><small style="color:var(--soft)">${r.length} run${r.length>1?'s':''} · ${tiers} · last ${last.d.slice(0,10)}</small></span><b>${best}</b></div>`;}).join('');$('progov').classList.remove('hidden');}
+function progressShow(){const p=load();const runs=p.runs||[];$('prog-body').innerHTML=Object.keys(CALLNAME).map(k=>{const r=runs.filter(x=>(x.call||'arrest')===k);if(!r.length)return `<div class="mrow"><span>${CALLNAME[k]}</span><b style="color:var(--soft)">not run yet</b></div>`;const best=Math.max(...r.map(x=>x.score)),last=r[r.length-1];const tiers=[...new Set(r.map(x=>['Guided','Recall','Chaos'][x.tier]))].join(', ');return `<div class="mrow"><span>${CALLNAME[k]}<br><small style="color:var(--soft)">${r.length} run${r.length>1?'s':''} · ${tiers} · last ${last.d.slice(0,10)}</small></span><b>${best}</b></div>`;}).join('')+`<h3 style="margin:12px 0 4px;font-family:'Saira Condensed';color:var(--orange)">Quick drills</h3>`+DRILLS.map(d=>{const x=(p.drills||{})[d.id];return `<div class="mrow"><span>${d.name}${x?`<br><small style="color:var(--soft)">${x.runs} run${x.runs>1?'s':''} · last ${x.last.slice(0,10)}</small>`:''}</span><b${x?'':' style="color:var(--soft)"'}>${x?x.best:'not run yet'}</b></div>`;}).join('');$('progov').classList.remove('hidden');}
 $('b-prog').onclick=progressShow;$('prog-close').onclick=()=>$('progov').classList.add('hidden');
-$('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Date','Tier','Score']].concat((p.runs||[]).map(r=>[p.name||'',p.dept||'',CALLNAME[r.call||'arrest'],r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score]));const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+$('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Date','Tier','Score']].concat((p.runs||[]).map(r=>[p.name||'',p.dept||'',CALLNAME[r.call||'arrest'],r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score])).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),r.d.slice(0,16).replace('T',' '),'Drill',r.score]));const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='patient-contact-training-record.csv';a.click();}catch(e){}};
 $('b-rand').onclick=()=>{RANDOM=!RANDOM;const p=load();p.standard=!RANDOM;save(p);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);};
 $('b-sound').onclick=()=>{SOUND=!SOUND;const p=load();p.sound=SOUND;save(p);$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);if(SOUND){tone(960,.08,.06);speak('Sound on.');}};
@@ -1987,6 +1992,105 @@ Object.assign(GUIDE,{
  stemi:{name:'STEMI after ROSC',what:'A heart attack caused by a blocked coronary artery shows ST elevation on the 12-lead. It\'s a common cause of cardiac arrest.',when:'A 12-lead should be done after return of spontaneous circulation.',wrong:'Skipping the post-ROSC 12-lead — it can change the destination to a cath lab.',tip:'ST elevation in II, III, and aVF suggests an inferior STEMI. The medic reads it and activates the cath lab.',rel:['ecg12','rosc']},
  afib:{name:'Atrial fibrillation',what:'A chaotic upper-chamber rhythm: no P waves and an irregularly irregular pulse. Blood can pool and clot.',when:'You\'ll feel an irregular pulse — and it\'s a common cause of stroke.',wrong:'Calling an irregular pulse "normal."',tip:'Note "pulse irregular" in your vitals. The 12-lead confirms it.',rel:['ecg12','befast']}
 });
+
+/* ================= Quick drills ================= */
+const DRILLS=[
+ {id:'cpr',name:'CPR tempo',sub:'20 seconds · tap at 100–120 a minute',g:'cpr'},
+ {id:'leads',name:'Lead placement',sub:'All 10 electrodes · against the clock',g:'ecg12'},
+ {id:'rhythm',name:'Rhythm ID',sub:'8 strips',g:'ecg4'},
+ {id:'med',name:'Med math',sub:'8 questions · mg, mL, mg/kg',g:'conc'},
+ {id:'o2',name:'Oxygen math',sub:'8 cylinders',g:'o2math'},
+ {id:'apgar',name:'APGAR',sub:'8 newborns',g:'apgar'},
+ {id:'lkw',name:'Last known well',sub:'6 stroke scenarios',g:'lkw'}];
+let DR=null;
+const fmt=n=>(Math.round(n*100)/100).toString();
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function drillBest(id){const p=load();return p.drills&&p.drills[id]?p.drills[id].best:null;}
+function drillMenu(){DR=null;$('dr-title').textContent='Quick drills';$('dr-meta').textContent='';
+  $('dr-body').innerHTML=`<p style="font-size:15px;color:#d6deea;margin:0 0 10px">Short, focused practice for the skills that fade fastest. Personal bests are saved on this phone.</p>`+DRILLS.map(d=>{const b=drillBest(d.id);return `<button class="scen" data-a="go" data-d="${d.id}"><b>${d.name}${b!==null?` <span style="float:right;font-size:16px;color:var(--orange)">best ${b}</span>`:''}</b><span>${d.sub}</span></button>`;}).join('');
+  $('dr-foot').innerHTML='<button data-a="close" class="go" style="width:100%">Back to menu</button>';$('drillov').classList.remove('hidden');}
+/* --- quiz generators --- */
+function genMed(){const T=[
+  ()=>{const mg=pick([.3,.15,.5]);return {q:`Epinephrine 1 mg/mL. You need ${fmt(mg)} mg IM. How many mL do you draw?`,a:fmt(mg)+' mL',d:[fmt(mg*10)+' mL',fmt(mg/10)+' mL',fmt(1/mg)+' mL'],why:`Volume = dose ÷ concentration = ${fmt(mg)} mg ÷ 1 mg/mL = ${fmt(mg)} mL.`};},
+  ()=>{const mg=pick([.4,.8,.2]);return {q:`Naloxone vial 0.4 mg/mL. You need ${fmt(mg)} mg. How many mL?`,a:fmt(mg/.4)+' mL',d:[fmt(mg*.4)+' mL',fmt(mg)+' mL',fmt(mg/.4*10)+' mL'],why:`${fmt(mg)} mg ÷ 0.4 mg/mL = ${fmt(mg/.4)} mL.`};},
+  ()=>{const mg=pick([25,50]);return {q:`Diphenhydramine 50 mg/mL. You need ${mg} mg. How many mL?`,a:fmt(mg/50)+' mL',d:[fmt(mg/5)+' mL',fmt(50/mg*2)+' mL',fmt(mg/500)+' mL'],why:`${mg} mg ÷ 50 mg/mL = ${fmt(mg/50)} mL.`};},
+  ()=>{const kg=pick([10,15,20,25,40]);const mg=Math.min(.3,.01*kg);return {q:`Practice math: 0.01 mg/kg for a ${kg} kg child, maximum 0.3 mg. What's the dose?`,a:fmt(mg)+' mg',d:[fmt(.01*kg*10)+' mg',kg>30?fmt(.01*kg)+' mg':fmt(mg+.05)+' mg',fmt(mg/10)+' mg'],why:kg>30?`0.01 × ${kg} = ${fmt(.01*kg)} mg, which is over the 0.3 mg maximum — so 0.3 mg.`:`0.01 mg/kg × ${kg} kg = ${fmt(mg)} mg.`};},
+  ()=>{return {q:'Epinephrine 1 mg/mL. You drew 1.0 mL. How much epinephrine is that?',a:'1 mg',d:['0.1 mg','0.3 mg','10 mg'],why:'1 mL × 1 mg/mL = 1 mg — more than three times the common adult IM dose of 0.3 mg. This is the classic error the cross-check catches.'};}];
+  return pick(T)();}
+function genO2(){const cyl=pick([['D',.16],['E',.28],['M',1.56]]),psi=pick([800,1000,1200,1500,1800,2000]),lpm=pick([2,4,6,10,15]);const m=Math.floor((psi-200)*cyl[1]/lpm);
+  const fac={D:.16,E:.28,M:1.56};const wrong=Object.keys(fac).find(k=>k!==cyl[0]);
+  const d=[Math.floor(psi*cyl[1]/lpm),Math.floor((psi-200)*fac[wrong]/lpm),Math.max(1,Math.floor(m/2))].filter(x=>x!==m);while(d.length<3)d.push(m+d.length*3+2);
+  return {q:`${cyl[0]} cylinder at ${psi} psi, flowing ${lpm} LPM. About how many minutes until the 200 psi safe residual?`,a:m+' min',d:[...new Set(d)].slice(0,3).map(x=>x+' min'),why:`(${psi} − 200) × ${cyl[1]} ÷ ${lpm} = ${m} minutes. Factors: D 0.16, E 0.28, M 1.56.`};}
+function genApgar(){const w=()=>pick([0,1,1,2,2,2]);const A=w(),P=w(),G=w(),Ac=w(),R=w(),t=A+P+G+Ac+R;
+  const tx={A:['blue or pale all over','pink body, blue hands and feet','pink all over'],P:['no heart rate','heart rate about 80','heart rate about 140'],G:['no response when you flick her foot','grimaces when you flick her foot','cries and pulls away when you flick her foot'],Ac:['limp','some flexion of the arms and legs','active, moving all four limbs'],R:['not breathing','weak, irregular breaths','strong cry']};
+  const d=[t+2,t-2,t+1,t-1].filter(x=>x>=0&&x<=10&&x!==t);return {q:`Color: ${tx.A[A]}. ${tx.P[P][0].toUpperCase()+tx.P[P].slice(1)}. ${tx.G[G][0].toUpperCase()+tx.G[G].slice(1)}. Tone: ${tx.Ac[Ac]}. Breathing: ${tx.R[R]}. APGAR?`,a:String(t),d:shuf(d).slice(0,3).map(String),why:`Appearance ${A} + Pulse ${P} + Grimace ${G} + Activity ${Ac} + Respiration ${R} = ${t}.`};}
+const LKWQ=[
+ {q:'Her husband found her slumped and slurring at 3:10 p.m. He last saw her acting normal when they ate lunch together at 12:30.',a:'12:30 p.m.',d:['3:10 p.m.','When 911 was called','Unknown'],why:'Last known well is the last time anyone knew she was normal — lunch at 12:30 — not when she was found.'},
+ {q:'He woke up at 6:45 a.m. unable to move his left arm. His wife says he went to bed normal at 11:00 p.m.',a:'11:00 p.m. last night',d:['6:45 a.m.','Midnight','Unknown — he was asleep'],why:'Wake-up stroke: last known well is bedtime, when he was last known normal.'},
+ {q:'His daughter watched him suddenly slump and stop talking mid-sentence at 4:22 p.m.',a:'4:22 p.m.',d:['When EMS arrived','4:00 p.m.','When he last took his medications'],why:'A witnessed onset is the last known well: 4:22 p.m.'},
+ {q:'A neighbor found him on the kitchen floor at 8:00 a.m. He called his sister at 7:00 p.m. last night and sounded completely normal.',a:'7:00 p.m. last night',d:['8:00 a.m.','Bedtime — probably around 11','Unknown'],why:'The phone call is the last time anyone knew he was normal. Don\'t guess at times nobody witnessed.'},
+ {q:'She has dementia and is always confused. Her aide saw her at her usual baseline — confused, but using both arms — at 2:00 p.m. At 4:00 p.m. her right arm is suddenly weak.',a:'2:00 p.m.',d:['4:00 p.m.','Unknown — she\'s always confused','When her dementia started'],why:'Last known well means last known at her baseline. Her normal is confused-but-strong — that was 2:00 p.m.'},
+ {q:'His wife says he "wasn\'t right" when he got home from work at 5:30. His coworker texted that he seemed fine when he left at 5:00.',a:'5:00 p.m.',d:['5:30 p.m.','When his wife called 911','The start of his shift'],why:'The coworker saw him normal at 5:00 — later than any other normal sighting. Ask everyone who saw him.'}];
+/* --- rhythm strips --- */
+const RHY=[{k:'sinus',n:'Sinus rhythm',hr:72,why:'Regular, a P wave before every QRS, rate 60–100.'},{k:'tach',n:'Sinus tachycardia',hr:132,why:'Regular with P waves, but over 100 a minute.'},{k:'brady',n:'Sinus bradycardia',hr:44,why:'Regular with P waves, but under 60 a minute.'},{k:'afib',n:'Atrial fibrillation',hr:96,why:'Irregularly irregular, no distinct P waves, wavy baseline.'},{k:'vf',n:'Ventricular fibrillation',hr:0,why:'Chaotic, no organized complexes. Shockable — and the patient has no pulse.'},{k:'asys',n:'Asystole',hr:0,why:'A flat line. Not shockable. Confirm the leads are on and the gain is up.'}];
+function drawStrip(cv,r){if(!cv||!cv.getContext)return;const W=320,H=96,d=window.devicePixelRatio||1;cv.width=W*d;cv.height=H*d;const x=cv.getContext('2d');if(!x)return;x.setTransform(d,0,0,d,0,0);x.fillStyle='#030605';x.fillRect(0,0,W,H);
+  x.strokeStyle='rgba(57,227,111,.12)';x.lineWidth=1;for(let i=0;i<W;i+=12){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke();}for(let j=0;j<H;j+=12){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke();}
+  x.strokeStyle='#39e36f';x.lineWidth=2;x.beginPath();let beat=-1,next=.15;const seed=Math.random()*10;
+  for(let px=0;px<W;px++){const t=px/80;let v=0;
+    if(r.k==='vf')v=.55*Math.sin(2*Math.PI*4.6*t+seed)+.28*Math.sin(2*Math.PI*7.1*t+1.3)+.18*Math.sin(2*Math.PI*1.9*t);
+    else if(r.k==='asys')v=.02*Math.sin(t*3+seed);
+    else{if(t>=next){beat=t;const rr=60/r.hr;next=t+(r.k==='afib'?rr*(.55+Math.random()*.9):rr);}v=beat<0?0:beatVal(t-beat,LEADS.II,{noP:r.k==='afib'});if(r.k==='afib')v+=.05*Math.sin(2*Math.PI*6.3*t+seed)+.03*Math.sin(2*Math.PI*9.1*t);}
+    const y=H*.6-v*H*.42;px?x.lineTo(px,y):x.moveTo(px,y);}x.stroke();}
+/* --- runner --- */
+function drillStart(id){const d=DRILLS.find(x=>x.id===id);DR={id,d,i:0,right:0,qs:[],t0:performance.now(),errs:0,taps:[]};$('dr-title').textContent=d.name;
+  if(id==='med')DR.qs=Array.from({length:8},genMed);if(id==='o2')DR.qs=Array.from({length:8},genO2);if(id==='apgar')DR.qs=Array.from({length:8},genApgar);if(id==='lkw')DR.qs=shuf(LKWQ);
+  if(id==='rhythm')DR.qs=Array.from({length:8},()=>{const r=pick(RHY);return {rhy:r,q:'What rhythm is this?',a:r.n,d:shuf(RHY.filter(x=>x.k!==r.k).map(x=>x.n)).slice(0,3),why:r.why};});
+  if(id==='cpr')return cprDrill();if(id==='leads')return leadDrill();drillQ();}
+function drillQ(){const q=DR.qs[DR.i];$('dr-meta').textContent=`${DR.i+1} of ${DR.qs.length} · ${DR.right} right`;
+  const opts=shuf([q.a,...q.d]);q.opts=opts;
+  $('dr-body').innerHTML=(q.rhy?'<canvas id="dr-strip" style="width:100%;height:96px;border-radius:8px;display:block;margin-bottom:8px"></canvas>':'')+`<p style="font-size:17px;line-height:1.45;margin:0 0 10px">${esc(q.q)}</p>`+opts.map((o,i)=>`<button class="opt" data-a="ans" data-i="${i}">${esc(o)}</button>`).join('')+'<p id="dr-fb" style="font-size:15px;margin:6px 0 0"></p>';
+  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Quit drill</button>';if(q.rhy)drawStrip($('dr-strip'),q.rhy);}
+function drillAns(i){const q=DR.qs[DR.i];if(q.done)return;q.done=true;const ok=q.opts[i]===q.a;if(ok)DR.right++;
+  $('dr-fb').innerHTML=`<b style="color:${ok?'#7fe3a4':'#ff8f8a'}">${ok?'Right.':'Not quite — '+esc(q.a)+'.'}</b> ${esc(q.why)}`;
+  $('dr-foot').innerHTML=`<button data-a="next" class="go" style="width:100%">${DR.i+1<DR.qs.length?'Next':'See results'}</button>`;}
+function drillNext(){DR.i++;if(DR.i<DR.qs.length)drillQ();else drillDone(Math.round(DR.right/DR.qs.length*100),`${DR.right} of ${DR.qs.length} right`);}
+function drillDone(score,detail){const p=load();p.drills=p.drills||{};const prev=p.drills[DR.id]?p.drills[DR.id].best:null;p.drills[DR.id]={best:Math.max(prev||0,score),runs:((p.drills[DR.id]||{}).runs||0)+1,last:new Date().toISOString()};
+  p.drillRuns=(p.drillRuns||[]).concat([{drill:DR.id,d:new Date().toISOString(),score}]).slice(-200);save(p);const best=prev!==null&&score>prev;
+  $('dr-meta').textContent='';$('dr-body').innerHTML=`<div class="big">${score}</div><p style="margin:4px 0 8px">${esc(detail)}${best?' · <b style="color:var(--orange)">New personal best!</b>':prev!==null?` · best ${Math.max(prev,score)}`:''}</p><div class="chips"><button class="chip" data-a="learn" data-k="${DR.d.g}">Learn more: ${esc(GUIDE[DR.d.g].name)}</button></div>`;
+  $('dr-foot').innerHTML='<div style="display:flex;gap:8px"><button data-a="menu" style="flex:1">All drills</button><button data-a="again" class="go" style="flex:1">Again</button></div>';}
+/* CPR tempo */
+function cprDrill(){DR.dur=20;$('dr-meta').textContent='Tap the pad in time — 100 to 120 a minute';
+  $('dr-body').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:var(--soft)">Your rate</span><span id="dr-left" style="font-family:'Saira Condensed';font-size:20px">20 s</span></div><div id="dr-rate" class="big" style="text-align:center">—</div><div class="track" style="height:14px;margin:6px 0 10px"><div id="dr-zone" style="width:0%;background:var(--green)"></div></div><button id="dr-pad" data-a="tap" style="width:100%;height:200px;font-size:26px;font-family:'Saira Condensed';background:#2a1310;border-color:var(--red)">TAP — PUSH HARD AND FAST</button><p style="font-size:13px;color:var(--soft);margin:8px 0 0">Starts on your first tap. No metronome — that's the point.</p>`;
+  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Quit drill</button>';}
+function cprTap(){const now=performance.now();if(!DR.taps.length){DR.t0=now;DR.timer=setInterval(cprTick,200);}DR.taps.push(now);cprTick();}
+function cprTick(){if(!DR||DR.id!=='cpr')return;const now=performance.now(),el=(now-DR.t0)/1000;const iv=[];for(let i=1;i<DR.taps.length;i++)iv.push((DR.taps[i]-DR.taps[i-1])/1000);
+  const recent=iv.slice(-6);const rate=recent.length?Math.round(60/(recent.reduce((a,b)=>a+b,0)/recent.length)):0;const inz=iv.filter(x=>{const r=60/x;return r>=100&&r<=120;}).length;
+  if($('dr-rate')){$('dr-rate').textContent=rate||'—';$('dr-rate').style.color=rate>=100&&rate<=120?'var(--green)':'var(--orange)';$('dr-left').textContent=Math.max(0,Math.ceil(DR.dur-el))+' s';$('dr-zone').style.width=(iv.length?inz/iv.length*100:0)+'%';}
+  if(el>=DR.dur&&DR.taps.length){clearInterval(DR.timer);const all=iv.length?Math.round(60/(iv.reduce((a,b)=>a+b,0)/iv.length)):0;const score=iv.length?Math.round(inz/iv.length*100):0;drillDone(score,`Average ${all}/min · ${score}% of compressions in the 100–120 zone`);}}
+/* lead placement */
+function leadDrill(){DR.seq=shuf(SEQ4.concat(SEQV));DR.i=0;const dots=Object.keys(LEADPOS);
+  $('dr-body').innerHTML=`<p id="dr-lp" style="font-size:17px;margin:0 0 6px"></p><div id="dr-board">${torsoSVG(dots,'drl-')}</div><p id="dr-fb" style="font-size:14px;min-height:36px;margin:6px 0 0"></p>`;
+  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Quit drill</button>';DR.t0=performance.now();leadDrillPrompt();}
+function leadDrillPrompt(){const s=DR.seq[DR.i];$('dr-lp').innerHTML=`<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${s.col};border:1px solid #fff;vertical-align:-2px"></span> Place <b>${s.name}</b> · ${DR.i+1} of ${DR.seq.length}`;$('dr-meta').textContent=`${DR.errs} error${DR.errs===1?'':'s'}`;}
+function leadDrillTap(p){const s=DR.seq[DR.i];if(!s)return;if(p===s.p){const el=$('drl-'+p);if(el&&el.setAttribute){el.setAttribute('fill',s.col);el.setAttribute('opacity','1');el.setAttribute('r','6');}DR.i++;$('dr-fb').textContent='';
+    if(DR.i>=DR.seq.length){const secs=Math.round((performance.now()-DR.t0)/1000);const score=Math.max(0,100-DR.errs*8-Math.max(0,secs-30)*2);drillDone(score,`${secs} seconds · ${DR.errs} placement error${DR.errs===1?'':'s'}`);return;}leadDrillPrompt();}
+  else{DR.errs++;$('dr-fb').textContent=LEADCOACH[p]&&s.p.startsWith('L')||LEADCOACH[p]&&s.p==='R4'?LEADCOACH[p]:`Not there. ${s.hint}`;$('dr-fb').style.color='#ff8f8a';leadDrillPrompt();}}
+function torsoSVG(dots,prefix){return `<svg viewBox="0 0 200 250" style="width:100%;max-width:280px;display:block;margin:0 auto">
+    <path d="M40 20 Q100 0 160 20 L178 70 L172 240 L28 240 L22 70 Z" fill="#e8c9a8" stroke="#a9876a"/><path d="M58 44 Q80 52 98 48 M102 48 Q120 52 142 44" stroke="#a9876a" fill="none"/><rect x="96" y="50" width="8" height="98" rx="3" fill="#d6b08d"/>
+    ${[80,98,116,134,152].map((y,k)=>`<path d="M60 ${y} Q100 ${y+6} 140 ${y}" stroke="#c9a281" stroke-dasharray="3 3" fill="none"/><text x="44" y="${y+3}" font-size="7" fill="#7a5a40">${k+2}</text>`).join('')}
+    <line x1="132" y1="60" x2="132" y2="170" stroke="#b9936f" stroke-dasharray="2 4"/><line x1="151" y1="70" x2="151" y2="170" stroke="#b9936f" stroke-dasharray="2 4"/><line x1="167" y1="70" x2="167" y2="170" stroke="#b9936f" stroke-dasharray="2 4"/>
+    <text x="126" y="182" font-size="6" fill="#7a5a40">MCL</text><text x="145" y="182" font-size="6" fill="#7a5a40">AAL</text><text x="161" y="182" font-size="6" fill="#7a5a40">MAL</text><text x="6" y="16" font-size="7" fill="#7a5a40">Patient's RIGHT</text><text x="150" y="16" font-size="7" fill="#7a5a40">Patient's LEFT</text>
+    ${dots.map(p=>`<g data-p="${p}" style="cursor:pointer"><circle cx="${LEADPOS[p][0]}" cy="${LEADPOS[p][1]}" r="9" fill="rgba(19,33,58,.12)" stroke="#13213a" stroke-width="1.2" stroke-dasharray="2 2"/><circle id="${prefix}${p}" cx="${LEADPOS[p][0]}" cy="${LEADPOS[p][1]}" r="4" fill="#13213a" opacity=".35"/></g>`).join('')}</svg>`;}
+/* one delegated handler for the whole drill screen */
+function drillClick(e){const b=e.target.closest&&e.target.closest('[data-a],[data-p]');if(!b)return;const ds=b.dataset||{};
+  if(ds.p&&DR&&DR.id==='leads'){leadDrillTap(ds.p);return;}
+  const a=ds.a;if(a==='go')drillStart(ds.d);else if(a==='ans')drillAns(+ds.i);else if(a==='next')drillNext();else if(a==='tap')cprTap();
+  else if(a==='again'){const id=DR.id;drillStart(id);}else if(a==='menu'||a==='quit'){if(DR&&DR.timer)clearInterval(DR.timer);drillMenu();}
+  else if(a==='close'){if(DR&&DR.timer)clearInterval(DR.timer);DR=null;$('drillov').classList.add('hidden');}
+  else if(a==='learn')openCard(ds.k,true);}
+$('dr-body').onclick=drillClick;$('dr-foot').onclick=drillClick;
+$('b-drills').onclick=()=>drillMenu();
 
 /* ================= menu, progress, report ================= */
 const KEY='patient-contact';
