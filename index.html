@@ -222,7 +222,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You are the medical first responder. You get there first, you work the patient until ALS arrives, then you work for the medic — on scene and in the back of the rig.</p>
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.8 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.8.1 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -275,7 +275,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.8.0';
+const APP_VERSION='0.8.1';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -305,7 +305,7 @@ function startCPR(){if(!S.checked){radio('Partner','Check him first — responsi
 function stopCPR(reason){if(!S.cpr.on)return;S.cpr.on=false;startPause(reason);}
 function startPause(){if(S.pause.on)return;S.pause.on=true;S.pause.t=0;S.pause.aed=false;S.pause.count++;}
 function endPause(){if(!S.pause.on)return;S.pause.on=false;if(S.pause.aed){S.pause.peri=Math.max(S.pause.peri||0,S.pause.t);}else{if(S.pause.t>S.pause.longest)S.pause.longest=S.pause.t;if(S.arrest&&S.checked&&S.compT>0&&S.pause.t>10){S.pause.over10++;ding(5,`Hands-off pause of ${Math.round(S.pause.t)} seconds — keep pauses under 10`);}}S.pause.aed=false;S.pause.t=0;}
-$('a-cpr').onclick=()=>{if(S.cpr.on){stopCPR();radio('You','Holding compressions.');}else startCPR();};
+$('a-cpr').onclick=()=>{if(S.als.lucas===2&&S.arrest){radio('You','The LUCAS is doing compressions — the medic pauses it for rhythm checks.');return;}if(S.cpr.on){stopCPR();radio('You','Holding compressions.');}else startCPR();};
 $('a-switch').onclick=()=>{if(S.als.lucas===2){radio('You','The LUCAS is doing compressions.');return;}if(!S.cpr.on&&S.cpr.who==='Wife'){radio('You','Take over from his wife first.');return;}
   const next=S.cpr.who==='You'?'Partner':'You';S.cpr.who=next;S.fat[next]=Math.max(0,S.fat[next]-.6);S.switches++;S.sinceSwitch=0;
   if(S.cpr.on){S.cpr.on=false;startPause();S.act={k:'switch',t:3};}radio('You',`Switch — ${next==='You'?'I\'m on':'partner\'s on'} compressions.`);};
@@ -317,7 +317,7 @@ $('a-bvm').onclick=()=>{if(S.air.bvm)return;S.air.bvm=true;radio('Partner','BVM 
 $('a-o2').onclick=()=>{if(S.air.o2)return;if(!S.air.bvm){radio('Partner','Get the BVM ready first, then hook up the oxygen.','bad');return;}S.air.o2=true;radio('Partner','Oxygen on the bag at 15.');};
 $('a-breaths').onclick=()=>{if(!S.air.bvm){radio('Partner','BVM isn\'t ready.','bad');return;}if(!S.vent.waiting){radio('Partner','Not yet — wait for the 30.','bad');return;}
   if(S.air.vomit){radio('Partner','Breaths aren\'t going in — there\'s vomit in the airway! Suction!','bad');return;}S.vent.waiting=false;S.act={k:'breaths',t:4};S.vent.cycles++;radio('Partner','Two breaths, chest rise both. Back on.');};
-$('a-breath').onclick=()=>{if(!S.air.adv)return;const iv=S.rt-S.vent.lastRt;S.vent.last=S.t;S.vent.lastRt=S.rt;if(iv<3.5){S.vent.hyper++;if(S.vent.hyper%3===1)ding(3,'Bagging too fast — that is hyperventilation');}else if(iv<=10)S.vent.good++;};
+$('a-breath').onclick=()=>{if(!S.air.adv)return;const iv=S.rt-S.vent.lastRt;S.vent.last=S.t;S.vent.lastRt=S.rt;if(iv>=3.5){S.vent.delivered=(S.vent.delivered||0)+1;if(iv>10&&S.vent.lastRt>0&&iv<900)radio('Medic 1',`That one was ${Math.round(iv)} seconds late — aim for one every 6.`);}if(iv<3.5){S.vent.hyper++;if(S.vent.hyper%3===1)ding(3,'Bagging too fast — that is hyperventilation');}else if(iv<=10)S.vent.good++;};
 $('a-swap').onclick=()=>{if(S.o2psi>600)return;S.o2psi=2000;S.o2ok=true;S.swapped=(S.swapped||0)+1;radio('Partner','Spare D cylinder on — full at 2,000.','good');};
 $('a-suction').onclick=()=>{if(!S.air.vomit)return;S.air.vomit=false;S.act={k:'suction',t:5};stopCPR();radio('You','Roll him, suction — airway\'s clear. Back on the chest.','good');$('a-suction').classList.add('hidden');};
 /* ================= AED ================= */
@@ -397,6 +397,7 @@ function tick(dtReal){
         else{if(S.als.lucas===2){S.cpr.on=true;endPause();S.als.rc=null;S.als.rcDone++;radio('Medic 1','Still VF — shocking — clear!… Resume, LUCAS on.');}
           else{rc.phase='resume';rc.resumeCall=S.t;rc.resumeCallRt=S.rt;radio('Medic 1','VF — shock delivered — resume compressions!');}}
         S.als.rcNext=S.t+120;}}}}
+  if(S.arrest&&S.als.lucas===2&&!S.cpr.on&&!S.als.rc&&!S.act){S.cpr.on=true;endPause();}
   /* EtCO2 */
   if(S.air.adv&&S.als.zoll){const tgt=S.rosc?42:(S.cpr.on?8+S.cpr.depth*10+(S.Q/600)*4:4);S.etco2+=(tgt-S.etco2)*Math.min(1,dt/4);}
   /* transport */
@@ -472,7 +473,7 @@ const M_ARREST=[
   skills:['handoff','zoll','vent','etco2','lucas','pause'],
   steps:[{t:'Decision: your handoff',dec:'handoff',f:()=>true},
    {t:'Move pads to the monitor — keep the pause short',f:()=>S.als.zoll},
-   {t:'Airway is in: one breath every 6 seconds (5 good breaths)',wait:true,f:()=>S.air.adv&&S.vent.good>=5},
+   {t:'Airway is in: one breath about every 6 seconds (5 breaths)',wait:true,f:()=>S.air.adv&&(S.vent.delivered||0)>=5},
    {t:'Rhythm check: hands off on the call, back on when told',wait:true,f:()=>S.als.rcDone>=1||S.als.lucas>=1},
    {t:'LUCAS: back plate in during a rhythm-check pause',f:()=>S.als.lucas>=1},
    {t:'LUCAS: upper part on and running',f:()=>S.als.lucas>=2},
@@ -484,7 +485,7 @@ const M_ARREST=[
  {title:'Transport — East Side Hospital',sub:'Across the river. About ten minutes if the bridge is down.',
   brief:'You are in the back with the medic. The EMT is driving to East Side Hospital, across the Saginaw River. Keep ventilating, reassess with the medic, and be ready for anything.',
   skills:['vent','etco2','rosc','bridge','lucas'],
-  steps:[{t:'Ventilate one breath every 6 seconds (10 more good breaths)',wait:true,f:()=>S.vent.good>=15},
+  steps:[{t:'Ventilate about one breath every 6 seconds (10 more)',wait:true,f:()=>(S.vent.delivered||0)>=15},
    {t:'Reassess with the medic (twice)',wait:true,f:()=>S.tx.reassess>=2},
    {t:'Decision point on the way in',get dec(){return S.rosc?'rosc':'noRosc';},f:()=>S.rosc||S.tx.arrived},
    {t:'Arrive at East Side Hospital',wait:true,f:()=>S.tx.arrived},
@@ -571,10 +572,10 @@ function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD(
   $('a-swap').classList.toggle('hidden',!(S.air.o2&&S.o2psi<600&&!S.als.arrived));$('a-swap').classList.toggle('hot',S.o2psi<400);
   $('o2psi').textContent=Math.round(S.o2psi).toLocaleString()+' psi';$('o2bar').style.width=(S.o2psi/2000*100)+'%';
   /* buttons */
-  $('a-cpr').textContent=S.cpr.on&&compressorNow()!=='LUCAS'?'Hold CPR':'Start CPR';$('a-cpr').classList.toggle('on',S.cpr.on);
+  $('a-cpr').textContent=S.als.lucas===2&&S.arrest?'LUCAS running':S.cpr.on?'Hold CPR':'Start CPR';$('a-cpr').classList.toggle('on',S.cpr.on);
   $('a-met').classList.toggle('on',S.cpr.met);$('a-switch').classList.toggle('hot',S.sinceSwitch>110&&S.cpr.on&&who!=='LUCAS'&&who!=='Wife');
   $('a-check').classList.toggle('on',S.checked);$('a-opa').classList.toggle('on',S.air.opa);$('a-bvm').classList.toggle('on',S.air.bvm);$('a-o2').classList.toggle('on',S.air.o2);
-  $('a-breaths').classList.toggle('hot',S.vent.waiting);$('a-breaths').classList.toggle('hidden',S.air.adv);$('a-breath').classList.toggle('hidden',!S.air.adv);
+  $('a-breaths').classList.toggle('hot',S.vent.waiting);$('a-breath').classList.toggle('hot',S.air.adv&&S.arrest!==false&&S.rt-(S.vent.lastRt>0?S.vent.lastRt:-99)>=6);$('a-breaths').classList.toggle('hidden',S.air.adv);$('a-breath').classList.toggle('hidden',!S.air.adv);
   $('a-pads').classList.toggle('on',A.pads);$('a-analyze').textContent='Analyze (hands off)';$('a-analyze').classList.toggle('hot',A.pads&&!S.als.zoll&&S.arrest&&(A.state==='off'||A.state==='idle'||A.state==='shocked')&&(!A.analyzedOnce||S.t-A.lastAnalyze>=120));
   $('a-clear').classList.toggle('hot',A.state==='ready'&&!A.clear);$('a-shock').classList.toggle('hot',A.state==='ready'&&A.clear);
   $('g-aed').classList.toggle('hidden',S.als.zoll);$('g-als').classList.toggle('hidden',!S.als.arrived||S.mission>1);
@@ -827,7 +828,7 @@ OX('o-o2').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck()||o.o2
 OX('o-breath').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck())return;if(!o.bvm){radio('Partner','Get the BVM ready.','bad');return;}
   const iv=S.rt-o.lastBreathRt;o.lastBreath=S.t;o.lastBreathRt=S.rt;const eff=(o.open||o.opa)&&!o.gurgle;
   if(!eff){radio('You',o.gurgle?'Breath isn\'t going in — I hear gurgling. Suction!':'No chest rise — open the airway.','bad');return;}
-  o.lastEff=S.t;o.lastEffRt=S.rt;if(o.firstVentT===null)o.firstVentT=S.t;if(iv<3.5){o.hyper++;if(o.hyper%3===1)ding(3,'Bagging too fast — that is hyperventilation');}else if(iv<=10)o.good++;};
+  o.lastEff=S.t;o.lastEffRt=S.rt;if(o.firstVentT===null)o.firstVentT=S.t;if(iv>=3.5){o.delivered=(o.delivered||0)+1;if(iv>10&&iv<900)radio('Partner',`That one was ${Math.round(iv)} seconds late — one every 6.`);}if(iv<3.5){o.hyper++;if(o.hyper%3===1)ding(3,'Bagging too fast — that is hyperventilation');}else if(iv<=10)o.good++;};
 OX('o-nal').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(odNeedCheck())return;const last=o.doseT.length?S.t-o.doseT[o.doseT.length-1]:999;
   if(last<100){ding(3,'Repeat naloxone too soon — give it 2 to 3 minutes to work');}o.doses++;o.doseT.push(S.t);radio('Partner',`Naloxone 4 mg in the ${o.doses%2?'right':'left'} nostril — dose ${o.doses} at ${clockStr()}.`);};
 OX('o-load').onclick=()=>{if(CALL!=='od')return;const o=S.o;if(S.mission!==2||o.loaded||o.act||S.briefing)return;o.act={k:'load',t:15};radio('You','Easy — sit on the cot, we\'ve got you. Belts on. Power load.');};
@@ -889,7 +890,7 @@ const M_OD=[
    {t:'Suction the gurgling',f:()=>!S.o.gurgle},
    {t:'OPA in (no gag reflex)',f:()=>S.o.opa||S.o.gcs>=9},
    {t:'BVM with oxygen at 15 LPM',f:()=>S.o.bvm&&S.o.o2},
-   {t:'Breathe for him: one breath every 6 seconds (6 good breaths)',wait:true,f:()=>S.o.good>=6},
+   {t:'Breathe for him: about one breath every 6 seconds (6 breaths)',wait:true,f:()=>(S.o.delivered||0)>=6},
    {t:'Naloxone 4 mg intranasal',f:()=>S.o.doses>=1},
    {t:'Pulse oximeter on',f:()=>S.o.ox},
    {t:'Pulse check — under 10 seconds',f:()=>S.o.pulseChecks>=1},
@@ -1432,7 +1433,7 @@ CX('b-hr').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||x.act)retu
 CX('b-bvm').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||x.bvm)return;x.bvm=true;radio('Partner','Infant BVM, newborn mask — covers the chin and nose, not the eyes.');};
 CX('b-breath').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.born||!x.bvm||x.vigorous)return;const iv=S.rt-x.lastBRt;x.lastBRt=S.rt;
   if(!x.posA||x.gurgly){radio('You',x.gurgly?'No chest rise — gurgling. Suction mouth, then nose.':'No chest rise — fix her head position.','bad');return;}
-  x.lastEffRt=S.rt;if(x.firstEffRt===null)x.firstEffRt=S.rt;if(iv<.65){x.hyper++;if(x.hyper%6===1)ding(3,'Breaths too fast for a newborn — 40 to 60 a minute');}else if(iv<=2.2)x.good++;};
+  x.lastEffRt=S.rt;if(x.firstEffRt===null)x.firstEffRt=S.rt;if(iv>=.65){x.delivered=(x.delivered||0)+1;if(iv>3&&iv<900&&!x.slowTip){x.slowTip=true;radio('Partner','Faster — 40 to 60 a minute. Breathe, two, three.');}}if(iv<.65){x.hyper++;if(x.hyper%6===1)ding(3,'Breaths too fast for a newborn — 40 to 60 a minute');}else if(iv<=2.2)x.good++;};
 CX('b-sts').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(!x.vigorous||x.sts)return;x.sts=true;radio('You','Skin-to-skin on mom\'s chest, blanket over both of them. Look at her — she\'s pinking up.','good');};
 CX('c-massage').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(S.mission<3||x.massage)return;if(!x.placenta){radio('You','Placenta first — then feel for the uterus.','bad');return;}x.massage=true;x.massT=S.t;radio('You','Hand above her pubic bone — the uterus feels soft and boggy. Massaging firmly… it\'s firming up. I\'m sorry, I know this hurts.');};
 CX('c-nurse').onclick=()=>{if(CALL!=='cb')return;const x=S.c;if(S.mission<3||x.nurse||!x.sts)return;x.nurse=true;radio('You','Let\'s see if she\'ll nurse — it helps your uterus clamp down.');};
@@ -1502,7 +1503,7 @@ const M_CB=[
    {t:'Position the airway',f:()=>S.c.posA},{t:'Suction: mouth, then nose',f:()=>!S.c.gurgly},
    {t:'Check her heart rate',f:()=>S.c.hrChecks>=1},
    {t:'Decision: she\'s gasping, heart rate 80',dec:'cbPPV',f:()=>S.c.hrChecks>=1},
-   {t:'Infant BVM — breathe for her at 40–60 a minute',wait:true,f:()=>S.c.good>=10||S.c.vigorous},
+   {t:'Infant BVM — breathe for her at 40–60 a minute',wait:true,f:()=>(S.c.delivered||0)>=10||S.c.vigorous},
    {t:'Decision: 1-minute APGAR',dec:'cbApgar1',any:true,f:()=>S.c.born&&S.rt-S.c.birthRt>=60},
    {t:'Keep going until she breathes on her own',wait:true,f:()=>S.c.vigorous},
    {t:'Skin-to-skin with mom',f:()=>S.c.sts},
