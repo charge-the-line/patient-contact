@@ -232,7 +232,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
   <p>When the medic arrives, you'll help put the patient on the cardiac monitor — and turn on <b>Sound</b> in the menu for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.12 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.12.1 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -322,7 +322,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.12.0';
+const APP_VERSION='0.12.1';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -960,7 +960,7 @@ const M_OD=[
    {t:'Suction the gurgling',f:()=>!S.o.gurgle},
    {t:'OPA in (no gag reflex)',f:()=>S.o.opa||S.o.gcs>=9},
    {t:'BVM with oxygen at 15 LPM',f:()=>S.o.bvm&&S.o.o2},
-   {t:'Breathe for him: about one breath every 6 seconds (6 breaths)',wait:true,f:()=>(S.o.delivered||0)>=6},
+   {t:'Breathe for him about every 6 seconds — until he breathes on his own',wait:true,f:()=>(S.o.delivered||0)>=6||((S.o.delivered||0)>=1&&S.o.rr>=10&&S.o.pulse)},
    {t:'Naloxone 4 mg intranasal',f:()=>S.o.doses>=1},
    {t:'Pulse oximeter on',f:()=>S.o.ox},
    {t:'Pulse check — under 10 seconds',f:()=>S.o.pulseChecks>=1},
