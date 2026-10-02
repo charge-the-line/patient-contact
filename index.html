@@ -83,6 +83,9 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .big{font-family:"Saira Condensed";font-size:60px;font-weight:700;color:var(--orange);line-height:1}
 .mrow{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #2a3d5e;font-size:15px}.mrow:first-child{border-top:0}.mrow span{color:var(--soft)}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
+.ecgwrap{position:relative;height:96px;margin:2px 0 4px;border-radius:6px;background-color:#030605;background-image:linear-gradient(rgba(57,227,111,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(57,227,111,.09) 1px,transparent 1px);background-size:12px 12px}
+.ecgwrap canvas{width:100%;height:96px;display:block}
+.ecglab{position:absolute;top:3px;left:6px;right:6px;display:flex;justify-content:space-between;font-family:'Saira Condensed';font-size:14px;color:#39e36f;pointer-events:none}
 .syr{width:100%;height:58px;display:block;margin:4px 0}
 .scen{display:block;width:100%;text-align:left;padding:12px;margin-bottom:8px}.scen b{display:block;font-family:"Saira Condensed";font-size:21px;font-weight:600}.scen span{font-size:14px;color:var(--soft)}
 textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1a2e;color:var(--ink);width:100%}
@@ -99,7 +102,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <div class="mon" id="monitor">
   <div class="hdr"><span id="mon-name">AED</span><span id="mon-mode"></span></div>
-  <svg class="trace" id="trace" viewBox="0 0 300 84" preserveAspectRatio="none" aria-label="Monitor trace"><path id="ecg" d="" fill="none" stroke="#39e36f" stroke-width="2"/></svg>
+  <div class="ecgwrap hidden" id="trace"><canvas id="ecgc"></canvas><div class="ecglab"><span id="ecg-lead"></span><span id="ecg-hr"></span></div></div>
   <div class="aedmsg" id="aedmsg">Pads not attached</div>
   <div class="vitals" id="vitals">
     <div class="v w"><div class="l">CPR rate</div><div class="n" id="v-rate">—</div></div>
@@ -160,6 +163,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 </div>
 
 <div class="deck" id="deck">
+  <div class="grp hidden" id="g-monitor" style="background:#0d2a1d;border:1px solid #2f9e66;border-radius:10px;padding:8px"><h3 style="color:#7fe3a4">Help the medic: cardiac monitor</h3><div class="row"><button id="mon-4" class="hot">Place the 4-lead</button><button id="mon-12" class="hot">Place the 12-lead</button></div><div class="stat" id="mon-txt"></div></div>
   <div class="grp" id="g-assess"><h3>Assess</h3><div class="row"><button id="a-check">Check: responsive, breathing, pulse</button><button id="a-suction" class="hidden">Suction the airway</button></div></div>
   <div class="grp" id="g-cpr"><h3>Compressions</h3>
     <div class="row three"><button id="a-cpr">Start CPR</button><button id="a-switch">Switch</button><button id="a-met">Metronome</button></div>
@@ -222,7 +226,8 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You are the medical first responder. You get there first, you work the patient until ALS arrives, then you work for the medic — on scene and in the back of the rig.</p>
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.8.1 · prototype.</p>
+  <p>When the medic arrives, you'll help put the patient on the cardiac monitor — and turn on <b>Sound</b> in the menu for monitor beeps, the CPR metronome, and AED voice prompts.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.9 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -238,6 +243,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call6"><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
   <button class="scen" id="b-call7"><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
   <button class="scen" id="b-call8"><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
+  <div style="display:flex;gap:8px;margin:2px 0 8px"><button id="b-prog" style="flex:1">My progress</button><button id="b-sound" style="flex:1">Sound: off</button></div>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
   <button id="b-resume" class="go hidden" style="width:100%;margin-top:8px">Resume call</button>
 </div></div>
@@ -260,6 +266,24 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <div class="overlay hidden" id="guideov" style="z-index:30"><div class="box"><div id="g-body"></div>
   <div style="display:flex;gap:8px"><button id="g-index" style="flex:1">All topics</button><button class="go" id="g-close" style="flex:1">Close</button></div></div></div>
 
+<div class="overlay hidden" id="leadov" style="z-index:25"><div class="box">
+  <span class="tag" style="background:#2f9e66;color:#fff">Lead placement</span><h2 id="lead-title" style="font-size:24px">Place the leads</h2>
+  <p id="lead-prompt" style="font-size:17px;margin-bottom:6px"></p>
+  <div id="lead-board"></div>
+  <p id="lead-fb" style="font-size:14px;min-height:38px;margin:8px 0"></p>
+  <button id="lead-cancel" style="width:100%">Step away (finish later)</button>
+</div></div>
+<div class="overlay hidden" id="twelveov" style="z-index:25"><div class="box">
+  <span class="tag" style="background:#2f9e66;color:#fff">12-lead</span><h2 style="font-size:24px">12-lead acquired</h2>
+  <canvas id="tw-c" style="width:100%;max-width:340px;height:250px;display:block;margin:0 auto;border-radius:6px"></canvas>
+  <p style="font-size:13px;color:var(--soft);margin:8px 0 4px">Medic 1's read:</p><p id="tw-txt" style="font-size:16px"></p>
+  <button class="go" id="tw-close" style="width:100%;font-size:18px">Continue</button>
+</div></div>
+<div class="overlay hidden" id="progov" style="z-index:20"><div class="box">
+  <h2>My progress</h2><div id="prog-body"></div>
+  <p style="font-size:13px;color:var(--soft)">Saved on this phone. Download it for your training records.</p>
+  <div style="display:flex;gap:8px"><button id="prog-csv" style="flex:1">Download training record (CSV)</button><button class="go" id="prog-close">Close</button></div>
+</div></div>
 <div class="overlay hidden" id="done"><div class="box">
   <h2 id="done-t"></h2><div class="big" id="done-s"></div><div id="done-b"></div>
   <button class="go" id="b-next" style="width:100%;font-size:18px;margin-top:10px">Next</button>
@@ -275,11 +299,11 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.8.1';
+const APP_VERSION='0.9.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
-function fresh(){S={t:0,mStart:0,mission:0,running:false,active:false,briefing:false,score:100,incidents:[],decisions:[],lastChoice:null,
+function fresh(){S={mon:{four:false,twelve:false,placing:null,err4:0,err12:0,acqT:0},log:[],t:0,mStart:0,mission:0,running:false,active:false,briefing:false,score:100,incidents:[],decisions:[],lastChoice:null,
   checked:false,arrest:true,rosc:false,roscAt:null,Q:0,
   cpr:{on:false,who:'Wife',met:false,count:0,rate:0,depth:0},fat:{You:0,Partner:0,Wife:.55},switches:0,sinceSwitch:0,
   vent:{mode:'302',waiting:false,waitT:0,breathT:0,cycles:0,missed:0,last:-99,good:0,hyper:0,under:0},
@@ -290,7 +314,7 @@ function fresh(){S={t:0,mStart:0,mission:0,running:false,active:false,briefing:f
   ride:0,cot:false,straps:false,loaded:false,act:null,actT:0,
   tx:{t:0,total:600,bridge:0,arrived:false,reassess:0,lastReass:-999},
   etco2:0,chaos:{vomitDone:false,etaHit:false},rateSum:0,rateN:0,Qm:0,manT:0};}
-function radio(who,msg,cls=''){const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">${esc(who)}:</span> <span class="${cls}">${esc(msg)}</span>`;r.prepend(d);while(r.children.length>18)r.lastChild.remove();}
+function radio(who,msg,cls=''){const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">${esc(who)}:</span> <span class="${cls}">${esc(msg)}</span>`;r.prepend(d);while(r.children.length>18)r.lastChild.remove();if(typeof radioHook==='function')radioHook(who,msg);}
 function ding(p,why){S.score=Math.max(0,S.score-p);S.incidents.push(why);radio('Feedback',`${why} (−${p})`,'bad');if(TIER===0){const k=incidentKey(why);if(k)radio('Guide',`Why it matters: Protocol guide → ${GUIDE[k].name}`);}}
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
 let CALL0=14*3600+41*60;
@@ -340,7 +364,7 @@ $('a-reassess').onclick=()=>{if(S.mission!==3)return;if(S.t-S.tx.lastReass<40){r
 
 /* ================= tick ================= */
 function tick(dtReal){
-  S.rt=(S.rt||0)+dtReal;S.dtr=dtReal;
+  S.rt=(S.rt||0)+dtReal;S.dtr=dtReal;if(typeof monTick==='function')monTick(dtReal);
   if(CALL==='mva'){tickMVA(dtReal);return;}
   if(CALL==='od'){tickOD(dtReal);return;}
   if(CALL==='ep'){tickEP(dtReal);return;}
@@ -544,6 +568,7 @@ function finish(){const last=S.mission===M.length-1;$('done-t').textContent=M[S.
     h+=`<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Outcome',S.rosc?'ROSC at '+mmss(S.roscAt)+' — delivered with a pulse':'Delivered in arrest, CPR continuous']].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div>`;
     h+=`<p style="font-size:14px;color:var(--soft);margin-top:10px">${S.rosc?'High-quality, continuous compressions, early shocks, and steady ventilation are what make ROSC possible. You gave him the chance.':'This outcome is driven mostly by compression quality: rate, depth, compressor switches, and short pauses. Check the numbers above for where time was lost.'}</p>`;
     record();}
+  if(last)h+=timelineHTML();
   $('done-b').innerHTML=h;$('b-next').textContent=last?'Back to calls':'Next';$('done').classList.remove('hidden');}
 $('done-b').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
 $('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length-1){loadMission(S.mission+1);if(!S.briefing)S.running=true;}else{S.active=false;showMenu();}};
@@ -586,18 +611,6 @@ function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD(
   $('a-cot').classList.toggle('on',S.cot);$('a-straps').classList.toggle('on',S.straps);$('a-load').classList.toggle('on',S.loaded);
   $('g-assess').classList.toggle('hidden',S.mission>1&&!S.air.vomit);$('g-cpr').classList.toggle('hidden',S.mission>=2&&S.als.lucas>=2);
 }
-function drawWave(){if(!S.active){requestAnimationFrame(drawWave);return;}const run=S.running;if(run){phase+=1;
-  let y=42;if(CALL==='dm'){if(S.d&&S.d.vit){const N=Math.round(3600/dmV().hr);const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
-  else if(CALL==='cb'){if(S.c&&S.c.born&&S.c.hrKnown){const N=Math.max(14,Math.round(3600/Math.max(40,S.c.hr)));const p=phase%N;y=p===0?14:p===1?70:p===2?36:42;}}
-  else if(CALL==='fl'){if(S.f&&S.f.vitCount){const N=Math.round(3600/98);const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
-  else if(CALL==='st'){if(S.s&&S.s.ox){const N=Math.round(3600/88);const p=(phase+(Math.floor(phase/N)%3===1?7:0))%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*24;}}
-  else if(CALL==='ep'){if(S.e&&S.e.ox){const v=epV();const N=Math.max(18,Math.round(3600/v.hr));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(v.spo2/100);}}
-  else if(CALL==='od'){if(S.o&&S.o.ox&&S.o.pulse){const N=Math.max(18,Math.round(3600/Math.max(30,S.o.hr)));const p=phase%N;y=42-Math.max(0,Math.sin(p/N*Math.PI*2))*26*(S.o.spo2/100);}}
-  else if(CALL==='mva'){if(S.m&&S.m.alsMon){const N=Math.max(18,Math.round(3600/mvaV().hr));const p=phase%N;y=p===0?12:p===1?72:p===2?36:p<6?40:(p>N*.45&&p<N*.6)?36:42;}}
-  else if(!S.checked)y=42;else if(S.rosc){const p=phase%40;y=p===0?14:p===1?70:p===2?36:p<6?40+Math.sin(p)*2:(p>18&&p<24)?36:42;}
-  else if(S.cpr.on){y=42+Math.sin(phase*S.cpr.rate/60*0.105*Math.PI)*24*S.cpr.depth;}else if(S.arrest&&S.aed.pads){y=42+Math.sin(phase*.7)*9+Math.sin(phase*1.9)*6+(Math.random()-.5)*6;}
-  wave.push(y);if(wave.length>150)wave.shift();}
-  $('ecg').setAttribute('d',wave.map((v,i)=>(i?'L':'M')+(i*2)+' '+v.toFixed(1)).join(' '));requestAnimationFrame(drawWave);}
 
 /* ================= guide ================= */
 const GUIDE={
@@ -680,7 +693,7 @@ function tickMVA(dtReal){const m=S.m;const F=S.mission===3?7:3;const dt=dtReal*F
   /* ALS */
   if(!m.alsArr){m.eta-=dt;if(TIER===2&&!m.chaos.eta&&S.t>150){m.chaos.eta=true;m.eta+=120;radio('Dispatch','Medic 1 delayed — new ETA plus two minutes.','bad');}
     if(m.eta<=0){m.alsArr=true;m.alsT=S.t;radio('Medic 1','Medic 1 on scene — what have we got?','good');}}
-  if(m.alsArr&&!m.alsMon&&S.t-m.alsT>40){m.alsMon=true;radio('Medic 1','Monitor\'s on. I\'m calling a trauma alert.');}
+  
   /* transport */
   if(S.mission===3&&!S.briefing){if(m.txStart===null)m.txStart=S.t;m.tx.t+=dt;
     if(!m.tx.loosenAsked&&m.tx.t>420){m.tx.loosenAsked=true;openDecision('loosen',-1);}
@@ -1788,6 +1801,132 @@ const OPT_TEXT={
 for(const k in OPT_TEXT){if(DEC[k]&&DEC[k].opts)DEC[k].opts.forEach((o,i)=>{if(OPT_TEXT[k][i])o.t=OPT_TEXT[k][i];});}
 (()=>{const a=DEC.lkw.after;DEC.lkw.after=()=>{a();if(S.lastChoice==='good')radio('Husband','…Now that you ask — she was on the phone with our daughter at 9:40. She sounded totally fine.','good');};})();
 
+/* ================= Cardiac monitor · lead placement · 12-lead · sound · timeline · progress ================= */
+const CALLNAME={arrest:'Cardiac arrest',mva:'Car versus tree',od:'Overdose',ep:'Anaphylaxis',st:'Stroke',fl:'Elderly fall',cb:'Childbirth',dm:'Diabetic emergency'};
+const MONCFG={
+ arrest:{twelve:true,only12:true,need:()=>S.rosc,read12:'Inferior STEMI — ST elevation in II, III, and aVF, with reciprocal depression in I and aVL. I\'m activating the cath lab at East Side.',stemi:true},
+ mva:{need:()=>S.m&&S.m.moved,rhythm:()=>({r:'sinus',hr:mvaV().hr}),read:()=>`Sinus tach at ${mvaV().hr}. No ectopy. Trauma alert going out.`},
+ od:{need:()=>S.o&&S.o.alsArr,rhythm:()=>S.o.pulse?{r:'sinus',hr:Math.round(S.o.hr)}:{r:'pea',hr:30},read:()=>`Sinus at ${Math.round(S.o.hr)}.`},
+ ep:{need:()=>S.e&&S.e.alsArr,rhythm:()=>({r:'sinus',hr:epV().hr}),read:()=>`Sinus tach, ${epV().hr} — the epi plus the reaction.`},
+ st:{need:()=>S.s&&S.s.alsArr,twelve:true,rhythm:()=>({r:'afib',hr:88}),read:()=>'Irregularly irregular — she\'s in atrial fibrillation, rate about 90.',read12:'Atrial fibrillation, rate about 90, no ST elevation. New A-fib is a common source of stroke clots. Transmitting with the stroke alert.'},
+ fl:{need:()=>S.f&&S.f.alsArr,twelve:true,rhythm:()=>({r:'sinus',hr:98}),read:()=>'Sinus at 98.',read12:'Sinus rhythm, 98, no acute changes. A normal 12-lead doesn\'t rule out a cardiac cause for her lightheadedness — the ER will keep looking.'},
+ dm:{need:()=>S.d&&S.d.alsArr,rhythm:()=>({r:'sinus',hr:dmV().hr}),read:()=>`Sinus tach, ${dmV().hr} — adrenaline from the low. Should settle as his sugar comes up.`}
+};
+function monCfg(){return MONCFG[CALL]||null;}
+function monState(){
+  if(CALL==='arrest'){if(!S.aed.pads)return {kind:'none'};if(S.rosc)return {kind:'ecg',r:'sinus',hr:96,stemi:true,lead:S.mon.twelve?'II':'pads'};return {kind:'ecg',r:S.cpr.on?'cpr':'vf',hr:S.cpr.on?S.cpr.rate:0,lead:S.als.zoll?'pads':'AED'};}
+  if(CALL==='cb'){const x=S.c;return x&&x.born&&x.hrKnown?{kind:'ecg',r:'sinus',hr:Math.max(40,x.hr),lead:'HR (counted)'}:{kind:'none'};}
+  const c=monCfg();if(c&&S.mon.four&&c.rhythm)return Object.assign({kind:'ecg',lead:'II'},c.rhythm());
+  const ox={od:()=>S.o&&S.o.ox&&S.o.pulse&&{hr:S.o.hr},ep:()=>S.e&&S.e.ox&&{hr:epV().hr},st:()=>S.s&&S.s.ox&&{hr:88,irr:true},fl:()=>S.f&&S.f.vitCount&&{hr:98},dm:()=>S.d&&S.d.vit&&{hr:dmV().hr}}[CALL];
+  const o=ox&&ox();return o?{kind:'pleth',hr:o.hr,irr:o.irr,lead:'SpO₂ pleth'}:{kind:'none'};}
+/* --- waveform math --- */
+const g=(t,c,w)=>Math.exp(-((t-c)*(t-c))/(2*w*w));const sm=(a,b,t)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
+const LEADS={I:{P:.08,Q:.04,R:.55,S:.08,T:.18},II:{P:.12,Q:.06,R:1,S:.18,T:.28},III:{P:.06,Q:.05,R:.45,S:.12,T:.12},aVR:{P:-.1,Q:0,R:-.6,S:0,T:-.2},aVL:{P:.04,Q:.03,R:.3,S:.05,T:.08},aVF:{P:.09,Q:.05,R:.7,S:.15,T:.2},
+  V1:{P:.06,Q:0,R:.25,S:.9,T:-.08},V2:{P:.07,Q:0,R:.45,S:.85,T:.25},V3:{P:.07,Q:0,R:.75,S:.5,T:.32},V4:{P:.08,Q:.04,R:1.1,S:.3,T:.34},V5:{P:.08,Q:.05,R:.95,S:.15,T:.28},V6:{P:.07,Q:.05,R:.75,S:.1,T:.22}};
+const STEMI_INF={II:.3,III:.32,aVF:.3,I:-.14,aVL:-.2};
+function beatVal(t,L,opt){const w=opt.wide?2.6:1;let v=0;if(!opt.noP)v+=L.P*g(t,.1,.022);
+  v+=-L.Q*g(t,.2,.008*w)+L.R*g(t,.22,.01*w)-L.S*g(t,.245,.011*w);
+  const st=opt.st||0;v+=st*sm(.255,.29,t)*(1-sm(.36,.46,t));v+=(L.T+(st>0?st*.4:0))*g(t,.4,.05);return v;}
+/* --- live sweep renderer --- */
+const MV={t:0,beat:-9,next:0,x:0,py:null,kind:'',lastFrame:0,metro:0,ctx:null,w:0,h:0,dpr:1};
+function monSample(st,t){if(st.kind==='pleth'){const ph=t-MV.beat;return .9*g(ph,.18,.07)+.35*g(ph,.42,.06)-.4;}
+  if(st.r==='vf')return .55*Math.sin(2*Math.PI*4.6*t)+.28*Math.sin(2*Math.PI*7.1*t+1.3)+.18*Math.sin(2*Math.PI*1.9*t)*(0.7+.3*Math.sin(t*.7));
+  if(st.r==='cpr'){const f=(st.hr||110)/60,ph=(t*f)%1;return .95*Math.sin(2*Math.PI*ph)*(ph<.5?1:.6);}
+  if(st.r==='asys')return .02*Math.sin(t*3)+(Math.random()-.5)*.02;
+  const ph=t-MV.beat;const L=LEADS.II;let v=beatVal(ph,L,{noP:st.r==='afib',wide:st.r==='pea',st:st.stemi?STEMI_INF.II:0});if(st.r==='afib')v+=.045*Math.sin(2*Math.PI*6.3*t)+.03*Math.sin(2*Math.PI*9.1*t+.5);return v;}
+function monSetup(){const c=$('ecgc');if(!c||!c.getContext)return false;const r=c.getBoundingClientRect?c.getBoundingClientRect():{width:300,height:96};MV.dpr=window.devicePixelRatio||1;MV.w=Math.max(200,Math.round(r.width||300));MV.h=Math.round(r.height||96);c.width=MV.w*MV.dpr;c.height=MV.h*MV.dpr;MV.ctx=c.getContext('2d');if(!MV.ctx)return false;MV.ctx.setTransform(MV.dpr,0,0,MV.dpr,0,0);MV.ctx.clearRect(0,0,MV.w,MV.h);MV.x=0;MV.py=null;return true;}
+function drawWave(now){requestAnimationFrame(drawWave);if(!S.active)return;const st=monState();
+  if(!MV.lastFrame)MV.lastFrame=now||0;const dt=Math.min(.1,((now||0)-MV.lastFrame)/1000);MV.lastFrame=now||0;
+  if(st.kind!==MV.kind){MV.kind=st.kind;if(!monSetup())return;}
+  if(!MV.ctx||st.kind==='none')return;
+  const pps=105,ctx=MV.ctx,H=MV.h,mid=H*.58,amp=H*.42;const n=Math.max(1,Math.round(dt*pps));
+  for(let i=0;i<n;i++){MV.t+=1/pps;
+    if(st.kind==='pleth'||(st.kind==='ecg'&&!['vf','cpr','asys'].includes(st.r))){if(MV.t>=MV.next){MV.beat=MV.t;const rr=60/Math.max(20,st.hr||60);MV.next=MV.t+(st.r==='afib'||st.irr?rr*(.55+Math.random()*.9):rr);if(S.running)monBeep(st);}}
+    const v=monSample(st,MV.t);const y=mid-v*amp*(st.kind==='pleth'?.8:1);
+    ctx.clearRect(MV.x,0,14,H);ctx.strokeStyle=st.kind==='pleth'?'#6fd3ff':'#39e36f';ctx.lineWidth=2;ctx.lineJoin='round';
+    if(MV.py!==null&&MV.x>0){ctx.beginPath();ctx.moveTo(MV.x-1,MV.py);ctx.lineTo(MV.x,y);ctx.stroke();}
+    MV.py=y;MV.x+=1;if(MV.x>=MV.w){MV.x=0;MV.py=null;}}
+  /* CPR metronome */
+  if(SOUND&&S.running&&CALL==='arrest'&&S.cpr.on&&S.cpr.met&&compressorNow()!=='LUCAS'&&S.arrest){MV.metro+=dt;if(MV.metro>=60/110){MV.metro=0;tone(1600,.025,.05,'square');}}}
+/* --- sound, voice, haptics --- */
+let SOUND=false,AC=null;
+function tone(f,d,v,type){if(!SOUND)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),gn=AC.createGain();o.type=type||'sine';o.frequency.value=f;gn.gain.value=v;o.connect(gn);gn.connect(AC.destination);const t=AC.currentTime;gn.gain.setValueAtTime(v,t);gn.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d+.02);}catch(e){}}
+function monBeep(st){if(st.kind==='ecg')tone(st.r==='afib'?880:960,.07,.06);else if(st.kind==='pleth')tone(500+((CALL==='od'&&S.o)?S.o.spo2:96)*4,.06,.04);}
+function speak(t){if(!SOUND)return;try{if(window.speechSynthesis){const u=new SpeechSynthesisUtterance(t);u.rate=1.02;window.speechSynthesis.speak(u);}}catch(e){}}
+function buzz(ms){if(!SOUND)return;try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){}}
+function radioHook(who,msg){if(S&&S.log){S.log.push({c:clockStr(),who,msg});if(S.log.length>400)S.log.shift();}if(who==='AED')speak(msg);if(/Shock delivered/i.test(msg))buzz(300);if(who==='Feedback')buzz(60);}
+/* --- lead placement mini-game --- */
+const LEADPOS={RA:[52,58],LA:[148,58],RL:[64,204],LL:[136,204],R2:[90,80],L2:[110,80],L3:[110,98],R4:[90,116],L4:[110,116],L45:[121,125],L5ster:[110,134],L5mcl:[132,134],L4mcl:[132,116],L6mcl:[132,152],R5mcl:[68,134],L5aal:[151,134],L5mal:[167,134]};
+const SEQ4=[{p:'RA',name:'White (RA)',col:'#f2f5f8',hint:'"White on right" — right upper chest, just below the collarbone.'},{p:'LA',name:'Black (LA)',col:'#222',hint:'"Smoke over fire" — black goes above red: left upper chest, below the collarbone.'},{p:'LL',name:'Red (LL)',col:'#e5383b',hint:'Left lower abdomen, below the ribs.'},{p:'RL',name:'Green (RL)',col:'#2f9e66',hint:'"Snow over grass" — white over green: right lower abdomen.'}];
+const SEQV=[{p:'R4',name:'V1',col:'#e5383b',hint:'4th intercostal space, just RIGHT of the sternum.'},{p:'L4',name:'V2',col:'#ffc23d',hint:'4th intercostal space, just LEFT of the sternum.'},{p:'L5mcl',name:'V4',col:'#7a5cff',hint:'5th intercostal space, left midclavicular line. Place V4 before V3.'},{p:'L45',name:'V3',col:'#39e36f',hint:'Halfway between V2 and V4.'},{p:'L5aal',name:'V5',col:'#ff7a1a',hint:'Level with V4, at the anterior axillary line.'},{p:'L5mal',name:'V6',col:'#c7c7c7',hint:'Level with V4, at the midaxillary line.'}];
+const LEADCOACH={R2:'That\'s the 2nd intercostal space. Find the angle of Louis, then count down to the 4th.',L2:'That\'s the 2nd intercostal space. Find the angle of Louis, then count down to the 4th.',L3:'That\'s the 3rd space — one more down.',L4mcl:'Right line, wrong space — V4 sits in the 5th intercostal space.',L6mcl:'Too low — V4 is in the 5th intercostal space.',R5mcl:'That\'s the patient\'s right side. V4 goes on the left.',L5ster:'Right level, but move out to the midclavicular line.'};
+let LG=null;
+function leadStart(kind){if(LG||DEC_OPEN||S.briefing)return;if(kind==='4'&&S.mon.four)return;if(kind==='12'&&(S.mon.twelve||S.mon.acqT>0))return;const c=monCfg();const seq=kind==='4'?SEQ4:(c&&c.only12?SEQ4.concat(SEQV):SEQV);LG={kind,seq,i:0,err:0,placed:[],wasRunning:S.running};S.running=false;S.mon.placing=kind;
+  const dots=Object.keys(LEADPOS).filter(p=>kind==='4'||c&&c.only12?true:!['RA','LA','RL','LL'].includes(p)).filter(p=>kind!=='4'||['RA','LA','RL','LL'].includes(p));
+  const svg=`<svg viewBox="0 0 200 250" style="width:100%;max-width:300px;display:block;margin:0 auto">
+    <path d="M40 20 Q100 0 160 20 L178 70 L172 240 L28 240 L22 70 Z" fill="#e8c9a8" stroke="#a9876a"/>
+    <path d="M58 44 Q80 52 98 48 M102 48 Q120 52 142 44" stroke="#a9876a" fill="none"/>
+    <rect x="96" y="50" width="8" height="98" rx="3" fill="#d6b08d"/>
+    ${[80,98,116,134,152].map((y,k)=>`<path d="M60 ${y} Q100 ${y+6} 140 ${y}" stroke="#c9a281" stroke-dasharray="3 3" fill="none"/><text x="44" y="${y+3}" font-size="7" fill="#7a5a40">${k+2}</text>`).join('')}
+    <line x1="132" y1="60" x2="132" y2="170" stroke="#b9936f" stroke-dasharray="2 4"/><line x1="151" y1="70" x2="151" y2="170" stroke="#b9936f" stroke-dasharray="2 4"/><line x1="167" y1="70" x2="167" y2="170" stroke="#b9936f" stroke-dasharray="2 4"/>
+    <text x="126" y="182" font-size="6" fill="#7a5a40">MCL</text><text x="145" y="182" font-size="6" fill="#7a5a40">AAL</text><text x="161" y="182" font-size="6" fill="#7a5a40">MAL</text>
+    <text x="6" y="16" font-size="7" fill="#7a5a40">Patient's RIGHT</text><text x="150" y="16" font-size="7" fill="#7a5a40">Patient's LEFT</text>
+    ${dots.map(p=>`<g data-p="${p}" style="cursor:pointer"><circle cx="${LEADPOS[p][0]}" cy="${LEADPOS[p][1]}" r="9" fill="rgba(19,33,58,.12)" stroke="#13213a" stroke-width="1.2" stroke-dasharray="2 2"/><circle id="ld-${p}" cx="${LEADPOS[p][0]}" cy="${LEADPOS[p][1]}" r="4" fill="#13213a" opacity=".35"/></g>`).join('')}</svg>`;
+  $('lead-board').innerHTML=svg;$('lead-title').textContent=kind==='4'?'Place the 4-lead':(c&&c.only12?'Place the 12-lead (limb leads, then V1–V6)':'Place the 12-lead: V1–V6');leadPrompt();$('leadov').classList.remove('hidden');}
+function leadPrompt(){const s=LG.seq[LG.i];$('lead-prompt').innerHTML=`<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${s.col};border:1px solid #fff;vertical-align:-2px"></span> Place <b>${s.name}</b> · ${LG.i+1} of ${LG.seq.length}`;$('lead-fb').textContent=TIER===0?s.hint:'';$('lead-fb').style.color='';}
+function leadTap(p){if(!LG)return;const s=LG.seq[LG.i];
+  if(p===s.p){const el=$('ld-'+p);if(el&&el.setAttribute){el.setAttribute('fill',s.col);el.setAttribute('opacity','1');el.setAttribute('r','6');}LG.placed.push(p);LG.i++;
+    if(LG.i>=LG.seq.length){leadDone();return;}leadPrompt();}
+  else{LG.err++;$('lead-fb').textContent=LEADCOACH[p]&&LG.seq[LG.i].p!=='RA'?LEADCOACH[p]:`Not there. ${s.hint}`;$('lead-fb').style.color='#ff8f8a';}}
+function leadDone(){const k=LG.kind,err=LG.err;$('leadov').classList.add('hidden');S.mon.placing=null;S.mon['err'+k]=err;const run=S.active&&!DEC_OPEN&&!S.briefing;LG=null;if(err>0)ding(Math.min(6,err),`${err} lead placement error${err>1?'s':''} — know your landmarks`);
+  if(k==='4'){S.mon.four=true;const c=monCfg();radio('Medic 1',c&&c.read?c.read():'Monitor\'s on.');if(CALL==='mva'&&S.m)S.m.alsMon=true;S.running=run;}
+  else{S.mon.acqT=10;S.running=run;radio('Medic 1','Leads are on — everybody hold still. Acquiring the 12-lead…');}
+  monSync();}
+$('lead-board').onclick=e=>{const b=e.target.closest&&e.target.closest('[data-p]');if(b)leadTap(b.dataset.p);};
+$('lead-cancel').onclick=()=>{if(!LG)return;$('leadov').classList.add('hidden');S.mon.placing=null;S.running=S.active&&!DEC_OPEN&&!S.briefing;LG=null;};
+/* --- 12-lead printout --- */
+function twelveShow(){const c=monCfg();S.mon.wasRun=S.running;S.running=false;const cv=$('tw-c');$('tw-txt').textContent=c&&c.read12||'';$('twelveov').classList.remove('hidden');
+  if(!cv||!cv.getContext)return;const W=340,H=250,d=window.devicePixelRatio||1;cv.width=W*d;cv.height=H*d;const x=cv.getContext('2d');if(!x)return;x.setTransform(d,0,0,d,0,0);
+  x.fillStyle='#fff7f5';x.fillRect(0,0,W,H);x.strokeStyle='#f3c4bd';x.lineWidth=.5;for(let i=0;i<=W;i+=8){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke();}for(let j=0;j<=H;j+=8){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke();}
+  x.strokeStyle='#e8958a';x.lineWidth=.8;for(let i=0;i<=W;i+=40){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke();}for(let j=0;j<=H;j+=40){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke();}
+  const grid=[['I','aVR','V1','V4'],['II','aVL','V2','V5'],['III','aVF','V3','V6']];const afib=CALL==='st',hr=CALL==='st'?88:CALL==='fl'?98:96,stemi=c&&c.stemi;
+  const draw=(lead,x0,y0,wd,ht)=>{const L=LEADS[lead];x.strokeStyle='#111';x.lineWidth=1.1;x.beginPath();let tt=0,beat=0,next=0;for(let px=0;px<wd;px++){tt=px/100;if(tt>=next){beat=tt;next=tt+(60/hr)*(afib?(.6+((px*37)%50)/60):1);}let v=beatVal(tt-beat,L,{noP:afib,st:stemi?(STEMI_INF[lead]||0):0});if(afib)v+=.04*Math.sin(2*Math.PI*6.3*tt+lead.length);const y=y0+ht*.55-v*ht*.45;px?x.lineTo(x0+px,y):x.moveTo(x0+px,y);}x.stroke();x.fillStyle='#111';x.font='9px sans-serif';x.fillText(lead,x0+3,y0+10);};
+  grid.forEach((row,r)=>row.forEach((ld,cI)=>draw(ld,cI*85,r*62,85,62)));draw('II',0,186,W,62);x.fillText('II (rhythm)',3,196);}
+$('tw-close').onclick=()=>{$('twelveov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing)S.running=true;};
+/* --- per-tick upkeep, UI sync --- */
+function monTick(dtReal){if(S.mon&&S.mon.acqT>0&&!DEC_OPEN){S.mon.acqT-=dtReal*3;if(S.mon.acqT<=0){S.mon.acqT=0;S.mon.twelve=true;if(!S.mon.four)S.mon.four=true;radio('Medic 1','12-lead acquired.','good');twelveShow();}}}
+function monSync(){const c=monCfg();const vis=(id,on)=>$(id).classList.toggle('hidden',!on);
+  const need=!!(c&&S.active&&c.need()),show4=need&&!c.only12&&!S.mon.four,show12=need&&c.twelve&&(S.mon.four||c.only12)&&!S.mon.twelve&&!(S.mon.acqT>0);
+  vis('g-monitor',(show4||show12||S.mon.acqT>0)&&S.mission<=3);vis('mon-4',show4);vis('mon-12',show12);
+  $('mon-txt').textContent=S.mon.acqT>0?'Acquiring the 12-lead — keep the patient still…':show4?'The medic is putting the patient on the cardiac monitor. Help place the leads.':show12?'The medic wants a 12-lead. Help place the chest leads.':'';
+  const st=monState();$('trace').classList.toggle('hidden',st.kind==='none');$('ecg-lead').textContent=st.lead||'';$('ecg-hr').textContent=st.kind==='ecg'&&['vf','cpr'].includes(st.r)?'':st.hr?`${st.kind==='pleth'?'PR':'HR'} ${Math.round(st.hr)}`:'';}
+$('mon-4').onclick=()=>{if(!S.active)return;leadStart('4');};$('mon-12').onclick=()=>{if(!S.active)return;leadStart('12');};
+/* --- timeline + progress --- */
+function timelineHTML(){const L=(S.log||[]).filter(e=>e.who!=='Guide');if(!L.length)return'';return `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--orange);font-family:'Saira Condensed';font-size:18px">Call timeline · ${L.length} events</summary><div style="max-height:260px;overflow:auto;font-size:13px;line-height:1.45;margin-top:6px">${L.map(e=>`<div style="padding:3px 0;border-top:1px dashed #2a3d5e"><b style="color:var(--soft)">${e.c}</b> <span style="color:var(--orange)">${esc(e.who)}:</span> ${esc(e.msg)}</div>`).join('')}</div></details>`;}
+function progressShow(){const p=load();const runs=p.runs||[];$('prog-body').innerHTML=Object.keys(CALLNAME).map(k=>{const r=runs.filter(x=>(x.call||'arrest')===k);if(!r.length)return `<div class="mrow"><span>${CALLNAME[k]}</span><b style="color:var(--soft)">not run yet</b></div>`;const best=Math.max(...r.map(x=>x.score)),last=r[r.length-1];const tiers=[...new Set(r.map(x=>['Guided','Recall','Chaos'][x.tier]))].join(', ');return `<div class="mrow"><span>${CALLNAME[k]}<br><small style="color:var(--soft)">${r.length} run${r.length>1?'s':''} · ${tiers} · last ${last.d.slice(0,10)}</small></span><b>${best}</b></div>`;}).join('');$('progov').classList.remove('hidden');}
+$('b-prog').onclick=progressShow;$('prog-close').onclick=()=>$('progov').classList.add('hidden');
+$('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Date','Tier','Score']].concat((p.runs||[]).map(r=>[p.name||'',p.dept||'',CALLNAME[r.call||'arrest'],r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score]));const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='patient-contact-training-record.csv';a.click();}catch(e){}};
+$('b-sound').onclick=()=>{SOUND=!SOUND;const p=load();p.sound=SOUND;save(p);$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);if(SOUND){tone(960,.08,.06);speak('Sound on.');}};
+SOUND=!!load().sound;$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);
+window.addEventListener('resize',()=>{MV.kind='';});
+
+function insertStep(Ms,mi,beforeText,step){const st=Ms[mi].steps;let j=beforeText?st.findIndex(x=>x.t.startsWith(beforeText)):-1;if(j<0)j=st.length;st.splice(j,0,step);}
+insertStep(M_MVA,2,'Power load',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
+insertStep(M_OD,1,'Medic 1 takes over',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
+insertStep(M_EP,2,'Medic 1 takes over',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
+insertStep(M_ST,1,'Onto the cot',{t:'Help Medic 1: 4-lead and 12-lead',f:()=>S.mon.twelve});
+insertStep(M_FL,1,null,{t:'Help Medic 1: 4-lead and 12-lead',f:()=>S.mon.twelve});
+insertStep(M_DM,1,'He\'s alert and oriented',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
+insertStep(M_ARREST,3,'Arrive at East Side Hospital',{t:'Pulse back? Help with the 12-lead',f:()=>!S.rosc||S.mon.twelve});
+Object.assign(GUIDE,{
+ ecg4:{name:'Placing a 4-lead',what:'Four electrodes for cardiac monitoring: white (RA), black (LA), red (LL), green (RL).',when:'Whenever ALS puts a patient on the monitor — MFRs often place them.',wrong:'Swapping colors, placing over bone or on hairy, sweaty skin, or loose electrodes that cause artifact.',tip:'"White on right, smoke over fire, snow over grass": white on the right upper chest, black on the left upper chest above red on the left lower abdomen, green on the right lower abdomen.',mca:'Lead placement follows the monitor manufacturer and your agency\'s training.',rel:['ecg12','artifact']},
+ ecg12:{name:'Placing a 12-lead',what:'Six chest electrodes (V1–V6) plus the limb leads give twelve views of the heart.',when:'Chest pain, after cardiac arrest with ROSC, syncope, stroke, and other complaints per protocol — ideally within about 10 minutes for chest pain.',wrong:'V1 and V2 too high (the 2nd space instead of the 4th), V4 off the midclavicular line, or V3 placed before V4.',tip:'Find the angle of Louis (the bump below the notch) — that\'s the 2nd rib; the space below it is the 2nd intercostal space. Count down to the 4th: V1 right of the sternum, V2 left. V4: 5th space, midclavicular. V3 halfway between. V5 and V6 level with V4 at the anterior and midaxillary lines.',rel:['ecg4','stemi','artifact']},
+ artifact:{name:'Monitor artifact',what:'Interference on the ECG from movement, shivering, talking, or loose electrodes.',when:'Every time you\'re acquiring a 12-lead or reading a rhythm.',wrong:'Talking to or moving the patient during acquisition, or poor skin prep.',tip:'Dry the skin, press electrodes firmly, keep cables untangled, and have the patient stay still and quiet while the 12-lead acquires.',rel:['ecg12']},
+ stemi:{name:'STEMI after ROSC',what:'A heart attack caused by a blocked coronary artery shows ST elevation on the 12-lead. It\'s a common cause of cardiac arrest.',when:'A 12-lead should be done after return of spontaneous circulation.',wrong:'Skipping the post-ROSC 12-lead — it can change the destination to a cath lab.',tip:'ST elevation in II, III, and aVF suggests an inferior STEMI. The medic reads it and activates the cath lab.',rel:['ecg12','rosc']},
+ afib:{name:'Atrial fibrillation',what:'A chaotic upper-chamber rhythm: no P waves and an irregularly irregular pulse. Blood can pool and clot.',when:'You\'ll feel an irregular pulse — and it\'s a common cause of stroke.',wrong:'Calling an irregular pulse "normal."',tip:'Note "pulse irregular" in your vitals. The 12-lead confirms it.',rel:['ecg12','befast']}
+});
+
 /* ================= menu, progress, report ================= */
 const KEY='patient-contact';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:'',dept:''};}catch(e){return {runs:[],name:'',dept:''};}}
@@ -1815,7 +1954,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventLis
 
 /* ================= boot ================= */
 fresh();render();if(load().seen){$('intro').classList.add('hidden');showMenu();}
-let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();},250);
+let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();},250);
 requestAnimationFrame(drawWave);
 </script>
 </body>
