@@ -86,6 +86,11 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .ecgwrap{position:relative;height:96px;margin:2px 0 4px;border-radius:6px;background-color:#030605;background-image:linear-gradient(rgba(57,227,111,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(57,227,111,.09) 1px,transparent 1px);background-size:12px 12px}
 .ecgwrap canvas{width:100%;height:96px;display:block}
 .ecglab{position:absolute;top:3px;left:6px;right:6px;display:flex;justify-content:space-between;font-family:'Saira Condensed';font-size:14px;color:#39e36f;pointer-events:none}
+.fab{position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9;border-radius:24px;padding:12px 16px;background:#3b2a6b;border-color:#7a5cff;color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+body.tv{max-width:1320px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);column-gap:18px;align-items:start}
+body.tv>.top,body.tv>.eta{grid-column:1/-1}body.tv>#monitor{grid-column:1;grid-row:3}body.tv>#deck{grid-column:1;grid-row:4/span 2}body.tv>#callcard{grid-column:2;grid-row:3/span 2}body.tv>#radiocard{grid-column:2;grid-row:5}
+body.tv .radio{max-height:320px}body.tv .ecgwrap,body.tv .ecgwrap canvas{height:150px}
+@media (min-width:1100px){body.tv{zoom:1.18}}
 .syr{width:100%;height:58px;display:block;margin:4px 0}
 .scen{display:block;width:100%;text-align:left;padding:12px;margin-bottom:8px}.scen b{display:block;font-family:"Saira Condensed";font-size:21px;font-weight:600}.scen span{font-size:14px;color:var(--soft)}
 textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1a2e;color:var(--ink);width:100%}
@@ -210,14 +215,14 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="grp hidden" id="g-ride"><h3>In the back</h3><div class="row"><button id="a-reassess">Reassess with the medic</button><span></span></div></div>
 </div>
 
-<div class="card">
+<div class="card" id="callcard">
   <h2 id="m-title">Call</h2>
   <p class="sub" id="m-sub"></p>
   <ul class="steps" id="steps"></ul>
   <div class="actions"><button id="b-restart">Restart</button><button id="b-menu">Menu</button></div>
   <button id="b-report" style="width:100%;margin-top:8px">Report an issue or idea</button>
 </div>
-<div class="card"><h2>Radio</h2><div class="radio" id="radio"></div></div>
+<div class="card" id="radiocard"><h2>Radio</h2><div class="radio" id="radio"></div></div>
 
 <!-- overlays -->
 <div class="overlay" id="intro"><div class="box">
@@ -227,7 +232,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
   <p>When the medic arrives, you'll help put the patient on the cardiac monitor — and turn on <b>Sound</b> in the menu for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.11 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.12 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -246,6 +251,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button id="b-drills" class="go" style="width:100%;margin:2px 0 8px;font-size:17px">Quick drills — 60-second skill practice</button>
   <div style="display:flex;gap:8px;margin:2px 0 8px"><button id="b-prog" style="flex:1">My progress</button><button id="b-sound" style="flex:1">Sound: off</button></div>
   <button id="b-rand" style="width:100%;margin-bottom:8px">Patients: varied</button>
+  <button id="b-inst" style="width:100%;margin-bottom:8px">Instructor mode: off</button>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
   <button id="b-resume" class="go hidden" style="width:100%;margin-top:8px">Resume call</button>
 </div></div>
@@ -281,6 +287,17 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p style="font-size:13px;color:var(--soft);margin:8px 0 4px">Medic 1's read:</p><p id="tw-txt" style="font-size:16px"></p>
   <button class="go" id="tw-close" style="width:100%;font-size:18px">Continue</button>
 </div></div>
+<button id="inst-fab" class="fab hidden">Instructor</button>
+<div class="overlay hidden" id="instov" style="z-index:22"><div class="box">
+  <div style="display:flex;justify-content:space-between;align-items:center"><span class="tag" style="background:#7a5cff;color:#fff;margin:0">Instructor</span><button id="inst-close" class="go">Close — resume</button></div>
+  <div id="inst-body" style="margin-top:10px"></div>
+</div></div>
+<div class="overlay hidden" id="discov" style="z-index:23"><div class="box" style="max-width:760px">
+  <span class="tag" style="background:#7a5cff;color:#fff">Freeze — discuss</span>
+  <h2 id="disc-q" style="font-size:36px;line-height:1.15"></h2>
+  <p style="color:var(--soft)">The clock is stopped. Talk it through, then resume.</p>
+  <button class="go" id="disc-go" style="width:100%;font-size:20px">Resume the call</button>
+</div></div>
 <div class="overlay hidden" id="drillov" style="z-index:20"><div class="box">
   <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h2 id="dr-title" style="margin:0">Quick drills</h2><span id="dr-meta" style="font-size:14px;color:var(--soft);text-align:right"></span></div>
   <div id="dr-body" style="margin-top:10px"></div><div id="dr-foot" style="margin-top:10px"></div>
@@ -305,7 +322,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.11.0';
+const APP_VERSION='0.12.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -1971,7 +1988,7 @@ $('mon-4').onclick=()=>{if(!S.active)return;leadStart('4');};$('mon-12').onclick
 function timelineHTML(){const L=(S.log||[]).filter(e=>e.who!=='Guide');if(!L.length)return'';return `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--orange);font-family:'Saira Condensed';font-size:18px">Call timeline · ${L.length} events</summary><div style="max-height:260px;overflow:auto;font-size:13px;line-height:1.45;margin-top:6px">${L.map(e=>`<div style="padding:3px 0;border-top:1px dashed #2a3d5e"><b style="color:var(--soft)">${e.c}</b> <span style="color:var(--orange)">${esc(e.who)}:</span> ${esc(e.msg)}</div>`).join('')}</div></details>`;}
 function progressShow(){const p=load();const runs=p.runs||[];$('prog-body').innerHTML=Object.keys(CALLNAME).map(k=>{const r=runs.filter(x=>(x.call||'arrest')===k);if(!r.length)return `<div class="mrow"><span>${CALLNAME[k]}</span><b style="color:var(--soft)">not run yet</b></div>`;const best=Math.max(...r.map(x=>x.score)),last=r[r.length-1];const tiers=[...new Set(r.map(x=>['Guided','Recall','Chaos'][x.tier]))].join(', ');return `<div class="mrow"><span>${CALLNAME[k]}<br><small style="color:var(--soft)">${r.length} run${r.length>1?'s':''} · ${tiers} · last ${last.d.slice(0,10)}</small></span><b>${best}</b></div>`;}).join('')+`<h3 style="margin:12px 0 4px;font-family:'Saira Condensed';color:var(--orange)">Quick drills</h3>`+DRILLS.map(d=>{const x=(p.drills||{})[d.id];return `<div class="mrow"><span>${d.name}${x?`<br><small style="color:var(--soft)">${x.runs} run${x.runs>1?'s':''} · last ${x.last.slice(0,10)}</small>`:''}</span><b${x?'':' style="color:var(--soft)"'}>${x?x.best:'not run yet'}</b></div>`;}).join('');$('progov').classList.remove('hidden');}
 $('b-prog').onclick=progressShow;$('prog-close').onclick=()=>$('progov').classList.add('hidden');
-$('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Date','Tier','Score']].concat((p.runs||[]).map(r=>[p.name||'',p.dept||'',CALLNAME[r.call||'arrest'],r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score])).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),r.d.slice(0,16).replace('T',' '),'Drill',r.score]));const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+$('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Patient','Date','Tier','Score','Instructor']].concat((p.runs||[]).flatMap(r=>(r.who&&r.who.length?r.who:[p.name||'']).map(n=>[n,p.dept||'',CALLNAME[r.call||'arrest'],r.variant||'',r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score,r.inst||'']))).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),'',r.d.slice(0,16).replace('T',' '),'Drill',r.score,'']));const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='patient-contact-training-record.csv';a.click();}catch(e){}};
 $('b-rand').onclick=()=>{RANDOM=!RANDOM;const p=load();p.standard=!RANDOM;save(p);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);};
 $('b-sound').onclick=()=>{SOUND=!SOUND;const p=load();p.sound=SOUND;save(p);$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);if(SOUND){tone(960,.08,.06);speak('Sound on.');}};
@@ -2092,11 +2109,58 @@ function drillClick(e){const b=e.target.closest&&e.target.closest('[data-a],[dat
 $('dr-body').onclick=drillClick;$('dr-foot').onclick=drillClick;
 $('b-drills').onclick=()=>drillMenu();
 
+/* ================= Instructor mode ================= */
+let INST=false;
+function etaRef(){return CALL==='arrest'?(S.als&&!S.als.arrived?{o:S.als,k:'eta'}:null):({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d}[CALL]&&(()=>{const o={mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d}[CALL];return o&&!o.alsArr?{o,k:'eta'}:null;})());}
+function instLog(t){if(S.log)S.log.push({c:clockStr(),who:'Instructor',msg:t});}
+const INJECTS=[
+ {id:'delay',label:'Medic 1 delayed (+2 min)',ok:()=>!!etaRef(),run:()=>{const r=etaRef();r.o[r.k]+=120;radio('Dispatch','Medic 1 is delayed — plus two minutes.','bad');}},
+ {id:'vomit',label:'Patient vomits',ok:()=>(CALL==='arrest'&&S.arrest&&S.checked&&!S.air.adv&&!S.air.vomit)||(CALL==='od'&&S.o.checked&&S.mission<=1)||(CALL==='st'&&S.s.abc&&!S.s.vomit&&S.mission<=1),
+  run:()=>{if(CALL==='arrest'){S.air.vomit=true;$('a-suction').classList.remove('hidden');radio('Partner','He vomited — the airway\'s full!','bad');}else if(CALL==='od'){S.o.gurgle=true;S.o.vomit=true;S.o.recov=false;radio('Partner','He\'s vomiting — airway\'s full!','bad');}else{S.s.vomit=true;S.s.spo2=89;radio('Husband','She\'s throwing up!','bad');}}},
+ {id:'lucas',label:'LUCAS battery dies',ok:()=>CALL==='arrest'&&S.arrest&&S.als.lucas===2,run:()=>{S.als.lucas=0;S.cpr.on=false;S.cpr.who='You';S.fat.You=.2;startPause();radio('Medic 1','The LUCAS just died — battery! Manual compressions, now!','bad');}},
+ {id:'rearrest',label:'Re-arrest after ROSC',ok:()=>CALL==='arrest'&&S.rosc,run:()=>{S.rosc=false;S.arrest=true;S.Q=0;S.cpr.on=false;if(S.als.lucas===3)S.als.lucas=2;S.cpr.who=S.als.lucas===2?'You':'You';startPause();radio('Medic 1','I\'ve lost the pulse — he\'s re-arrested! Compressions!','bad');S.als.rcNext=S.t+120;}},
+ {id:'o2',label:'O₂ cylinder runs out',ok:()=>CALL==='arrest'&&S.air.o2&&!S.als.arrived&&S.o2psi>220,run:()=>{S.o2psi=190;S.o2ok=false;radio('Partner','The D cylinder just hit empty!','bad');}},
+ {id:'worse',label:'Patient deteriorates',ok:()=>({arrest:()=>false,mva:()=>S.m.inside,od:()=>S.o.checked&&S.o.pulse,ep:()=>S.e.assessed,st:()=>S.s.abc,fl:()=>S.f.primary,cb:()=>S.c.born,dm:()=>S.d.abc}[CALL]||(()=>false))(),
+  run:()=>{({mva:()=>{S.m.lost+=600;radio('You','She\'s getting paler and more confused — pulse is climbing.','bad');},
+    od:()=>{S.o.extraA-=.35;S.o.wake=false;radio('Partner','He\'s nodding off again — breathing\'s slowing down.','bad');},
+    ep:()=>{S.e.sev=Math.min(1,S.e.sev+.3);radio('Patient','My throat… it\'s closing again…','bad');},
+    st:()=>{S.s.sev=Math.max(S.s.sev,.65);radio('You','Her speech is worse — and the arm\'s weaker than it was.','bad');},
+    fl:()=>{S.f.gcs=Math.max(12,S.f.gcs-1);radio('Patient','…What happened? Where am I?','bad');},
+    cb:()=>{if(S.mission>=3){S.c.loss+=400;S.c.massage=false;radio('Partner','Mom\'s bleeding picked up — the uterus feels soft again!','bad');}else if(!S.c.vigorous){S.c.hr=Math.max(45,S.c.hr-20);radio('You','Her heart rate is dropping!','bad');}else{radio('Partner','Baby\'s getting a little dusky — is she staying warm?','bad');S.c.sts=false;}},
+    dm:()=>{S.d.gl=Math.max(22,S.d.gl-12);radio('Partner','He\'s less responsive — sugar must be dropping again.','bad');}})[CALL]();}},
+ {id:'bridge',label:'Drawbridge goes up',ok:()=>S.mission===3&&((CALL==='arrest'&&!S.tx.arrived)||(CALL==='st'&&!V.lvo&&!S.s.tx.arrived)||(CALL==='od'&&!S.o.tx.arrived)||(CALL==='ep'&&!S.e.tx.arrived)),run:()=>{const t=CALL==='arrest'?S.tx:CALL==='st'?S.s.tx:CALL==='od'?S.o.tx:S.e.tx;t.total+=180;radio('EMT','The bridge is going up in front of us — freighter. We\'re stuck about three minutes.','bad');}},
+ {id:'family',label:'Family member gets in the way',ok:()=>S.active&&S.mission<=1,run:()=>{const line={arrest:['Son','Why aren\'t you shocking him?! Do something!'],mva:['Bystander','I\'m a nurse — let me in there!'],od:['Roommate','Is he going to jail? Don\'t tell the cops!'],ep:['Wife','He hates hospitals — just give him Benadryl!'],st:['Husband','Can\'t you just give her an aspirin?'],fl:['Daughter (phone)','Just put her in bed, she\'ll be fine!'],cb:['Husband','Should I drive her? I can drive her!'],dm:['Officer','He\'s faking it. I\'m taking him in.']}[CALL]||['Bystander','What\'s happening?!'];radio(line[0],line[1],'bad');}}
+];
+function instOpen(){if(!S.active)return;S.instWasRunning=S.running;S.running=false;instRender();$('instov').classList.remove('hidden');}
+function instClose(){$('instov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing&&$('discov').classList.contains('hidden')&&S.instWasRunning!==false)S.running=true;}
+function instRender(){const p=load(),m=M[S.mission]||{};const inj=INJECTS.filter(x=>{try{return x.ok();}catch(e){return false;}});
+  const tps=(m.skills||[]).filter(k=>GUIDE[k]).map(k=>`<details style="margin:4px 0"><summary style="cursor:pointer">Ask the crew: what goes wrong with <b>${esc(GUIDE[k].name.toLowerCase())}</b>?</summary><p style="font-size:14px;margin:4px 0 0">${esc(GUIDE[k].wrong)}</p><p style="font-size:14px;margin:4px 0 0;color:#9fd0ff">${esc(GUIDE[k].tip)}</p></details>`).join('');
+  $('inst-body').innerHTML=`<div class="mrow"><span>Call</span><b>${esc(CALLNAME[CALL])} · ${S.mission+1}/${M.length}</b></div><div class="mrow"><span>Patient</span><b style="text-align:right;max-width:65%">${esc(V.label||'standard')}</b></div><div class="mrow"><span>Score · tier</span><b>${S.score} · ${['Guided','Recall','Chaos'][TIER]}</b></div>
+    <h3 style="margin:12px 0 6px;font-family:'Saira Condensed';color:var(--orange)">Inject a complication</h3><div class="row">${inj.map(x=>`<button data-a="inj" data-i="${x.id}">${esc(x.label)}</button>`).join('')||'<span class="stat">Nothing to inject right now — try again in a moment.</span>'}</div>
+    <h3 style="margin:12px 0 6px;font-family:'Saira Condensed';color:var(--orange)">Freeze and discuss</h3><div class="row"><button data-a="disc" data-q="What's your next priority — and why?">"What's your next priority?"</button><button data-a="disc" data-q="What could kill this patient in the next five minutes?">"What could kill this patient?"</button><button data-a="disc" data-q="What would you tell the medic right now?">"Give me your handoff"</button><button data-a="disc" data-q="What are you going to watch for on the way in?">"What are you watching for?"</button></div>
+    <h3 style="margin:12px 0 6px;font-family:'Saira Condensed';color:var(--orange)">Talking points for this part</h3>${tps||'<p class="stat">—</p>'}
+    <h3 style="margin:12px 0 6px;font-family:'Saira Condensed';color:var(--orange)">Session</h3>
+    <input id="inst-name" placeholder="Instructor name" value="${esc(p.instName||'')}" style="margin-bottom:6px"><input id="inst-crew" placeholder="Crew on this drill (comma-separated names)" value="${esc((p.crew||[]).join(', '))}" style="margin-bottom:6px">
+    <div class="row"><button data-a="save">Save roster</button><button data-a="tv" class="${document.body.classList.contains('tv')?'on':''}">TV layout: ${document.body.classList.contains('tv')?'on':'off'}</button><button data-a="reroll">New patient — restart this call</button><button data-a="end">End drill — back to menu</button></div>
+    <p class="stat" id="inst-msg"></p>`;}
+function instAct(ds){const a=ds.a;
+  if(a==='inj'){const x=INJECTS.find(y=>y.id===ds.i);if(x&&x.ok()){x.run();instLog('Injected: '+x.label);$('instov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing)S.running=true;}}
+  else if(a==='disc'){$('instov').classList.add('hidden');$('disc-q').textContent=ds.q;instLog('Freeze and discuss: '+ds.q);$('discov').classList.remove('hidden');S.running=false;}
+  else if(a==='save'){const p=load();p.instName=($('inst-name').value||'').trim();p.crew=($('inst-crew').value||'').split(',').map(x=>x.trim()).filter(Boolean);save(p);$('inst-msg').textContent=`Saved. ${p.crew.length} crew member${p.crew.length===1?'':'s'} will get credit for completed calls.`;}
+  else if(a==='tv'){document.body.classList.toggle('tv');const p=load();p.tv=document.body.classList.contains('tv');save(p);instRender();}
+  else if(a==='reroll'){$('instov').classList.add('hidden');loadCall(CALL);}
+  else if(a==='end'){$('instov').classList.add('hidden');S.active=false;showMenu();}}
+$('inst-body').onclick=e=>{const b=e.target.closest&&e.target.closest('[data-a]');if(b)instAct(b.dataset);};
+$('inst-fab').onclick=instOpen;$('inst-close').onclick=instClose;
+$('disc-go').onclick=()=>{$('discov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing)S.running=true;};
+$('b-inst').onclick=()=>{INST=!INST;const p=load();p.inst=INST;save(p);instSync();};
+function instSync(){$('b-inst').textContent='Instructor mode: '+(INST?'on':'off');$('b-inst').classList.toggle('on',INST);$('inst-fab').classList.toggle('hidden',!(INST&&S.active));}
+
 /* ================= menu, progress, report ================= */
 const KEY='patient-contact';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:'',dept:''};}catch(e){return {runs:[],name:'',dept:''};}}
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
-function record(){const p=load();p.runs.push({call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc});p.runs=p.runs.slice(-50);save(p);}
+function record(){const p=load();p.runs.push({who:INST&&p.crew&&p.crew.length?p.crew.slice():null,inst:INST?(p.instName||''):'',variant:V.label||'',call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc});p.runs=p.runs.slice(-500);save(p);}
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
 function showMenu(){S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
@@ -2119,9 +2183,9 @@ if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventLis
 
 /* ================= boot ================= */
 fresh();render();
-{const pr=load();SOUND=!!pr.sound;RANDOM=!pr.standard;$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);}
+{const pr=load();INST=!!pr.inst;if(pr.tv)document.body.classList.add('tv');SOUND=!!pr.sound;RANDOM=!pr.standard;$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);}
 if(load().seen){$('intro').classList.add('hidden');showMenu();}
-let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();},250);
+let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();},250);
 requestAnimationFrame(drawWave);
 </script>
 </body>
