@@ -1,5 +1,5 @@
 // Bump CACHE when you upload a new version so phones pick it up.
-const CACHE = 'patient-contact-v0.12.1';
+const CACHE = 'charge-the-line-v2.2.0';
 const CORE = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -10,6 +10,9 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  // Only handle Charge the Line's own files — other apps on this domain (e.g. /patient-contact/) manage themselves.
+  const url = new URL(req.url);
+  if (url.origin === self.location.origin && url.pathname.startsWith('/patient-contact')) return;
   // Pages: network first so updates arrive; fall back to cache offline.
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put('index.html', copy)); return r; })

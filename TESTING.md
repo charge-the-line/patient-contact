@@ -1,20 +1,20 @@
-# Patient Contact — testing guide
+# Charge the Line — testing guide
 
-Read this before changing the app. It records how the app is tested **and the lessons that produced each test**. Every rule here exists because a real bug got through without it.
+Read this before changing the app. It records how the app is tested **and the lessons behind each test**. Every rule here exists because a real bug got through without it.
 
 ## Run the tests
 
 You need [Node.js](https://nodejs.org) 18 or newer. No install step: the harness loads `index.html` directly.
 
 ```
-node tests/run_all.js          # everything — about 15 seconds
-node tests/run_all.js quick    # syntax, answer balance, drills, instructor, short fuzz
-node tests/run_all.js human variants    # pick sections
+node tests/run_all.js          # everything — about 20 seconds
+node tests/run_all.js quick    # syntax, answer balance, guide, short fuzz
+node tests/run_all.js play human    # pick sections
 ```
 
-Exit code 0 means every check passed. Run the full suite before every upload.
+Exit code 0 means every check passed. Before a release, run it several times (`for i in 1 2 3 4 5; do node tests/run_all.js | tail -1; done`), because chaos faults fire at random times and an intermittent failure usually means a real bug.
 
-**Optional real-browser check** (catches layout and JavaScript errors only a browser shows):
+**Optional real-browser check** (layout and JavaScript errors at 320, 375, and 430 px):
 
 ```
 pip install playwright && playwright install chromium
@@ -25,46 +25,40 @@ python3 tests/browser_check.py
 
 | Section | What it proves |
 |---|---|
-| `syntax` | The script compiles; the service-worker cache name matches `APP_VERSION` (forgetting to bump it means phones keep the old version) |
-| `balance` | The right answer is the longest option in no more than 45% of decisions; every decision links to a guide card |
-| `fast` | Six calls complete on every tier with good, partial, and bad answers (instant bots) |
-| `human` | Every call completes at human speed (one tap about every 1.2 s, 2 s reactions, a breath every 6 s) and scores 100 when played correctly |
-| `sloppy` | Irregular breathing still progresses, and **breaths 11 seconds apart still count** |
-| `variants` | Each randomized patient type, forced one at a time, completes with a perfect score |
-| `drills` | Every quiz scores 100 when right and 0 when wrong; **answer keys are recalculated independently from the question text**; CPR tempo separates 110/min from 135 and 90 |
-| `instructor` | Every injectable complication fires in every call; re-arrest restarts the LUCAS |
-| `fuzz` | Random tapping (including menu, instructor, and drill buttons) never crashes or produces NaN |
+| `syntax` | The script compiles; the service-worker cache name matches `APP_VERSION`; the service worker ignores `/patient-contact/` |
+| `balance` | The right answer is neither usually the longest nor usually the shortest (limit 45% each), and answers are shuffled on screen |
+| `play` | All 10 scenarios complete on Guided, Recall, and Chaos with a competent bot |
+| `paths` | Every Real Save is still completable after partial and wrong decisions |
+| `human` | Every scenario completes on every tier at human speed (an action about every 1.25 s, 2–3 s reactions) |
+| `checks` | `qa2.js`: chaos faults, wrong-answer paths, pacing, duplicate IDs, and simulation cost per tick |
+| `guide` | `qa_guide.js`: every guide card complete, links valid, every penalty and decision mapped to a lesson |
+| `stress` | 600 randomized playthroughs with no failures |
+| `fuzz` | Random tapping on every button never crashes or produces NaN pressures |
 
-The suite has been verified to **catch planted bugs**: late breaths not counting, a wrong APGAR answer key, and a forgotten cache bump all fail loudly.
+The suite has been verified to **catch planted bugs**: removing the answer shuffle, bumping the version without the cache, and breaking the hydrant control all fail. The broken hydrant fails exactly the seven scenarios that use a hydrant.
 
 ## Rules learned the hard way
 
-1. **Two clocks.** `S.t` is game time and runs 2–7× faster than real life, so calls stay short; use it for physiology (bleeding, drug effects, ETAs). `S.rt` is real time; use it for **anything that measures the player**: breath intervals, reaction times, pause lengths, rhythms. *Bug that taught this:* breaths were timed on game time, so bagging correctly every 6 real seconds never counted.
-2. **Test at human speed, not robot speed.** Instant bots never hit timing bugs. Every new call needs a human-pace run, and anything rhythmic needs a deliberately late or irregular run. *Bug:* breaths 11 seconds apart silently didn't count, and only a player found it.
-3. **Never test an answer against its own answer key.** Recalculate independently, or a wrong key passes every test.
-4. **Don't make the right answer the longest.** Writers naturally explain the right answer more. Run the `balance` check after writing any decision. *History:* the right answer was longest in 34 of 35 decisions before the first rebalance, and this author kept repeating the habit on new calls.
-5. **Every pause must resume safely.** Overlays (decisions, briefings, lead placement, discussion) stop the clock. When one closes, resume based on what is *actually* open (`DEC_OPEN`, `S.briefing`), never a remembered flag.
-6. **Buttons must be safe to double-tap and must never lie.** *Bugs:* a "Start CPR" label stopped a running LUCAS; a fast second tap restarted lead placement after it was finished.
-7. **Startup order matters.** Load saved settings in the boot section at the bottom. Calling `load()` earlier fails silently (the error is caught), and settings stop being remembered.
-8. **Wait steps.** Steps that wait on an event (the medic arriving, extrication, transport time) need `wait:true` or must be decisions, or Recall mode charges hint penalties while the player is legitimately waiting.
-9. **Randomized patients.** Variant text goes through `vt()`. Tests force a specific patient with `window.FORCE_V = {callId: {...}}`, and the test harness must not overwrite `window`.
-10. **Randomized patients make bugs intermittent — run the suite several times.** A check that fails now and then almost always means a real bug that only appears with one patient variant. *Bug:* a one-dose overdose patient started breathing on his own before six rescue breaths, so the "6 breaths" step could never finish — it failed about 3 runs in 8. Before a release:
-    ```
-    for i in 1 2 3 4 5; do node tests/run_all.js | tail -1; done
-    ```
-11. **Each release:** bump `APP_VERSION`, the `CACHE` name in `sw.js`, and the version on the intro screen. The `syntax` check enforces the first two.
+1. **Bots must use the controls a player uses.** Setting state directly (`S.valves.rear2.open = 25`) hides missing controls. *Bug:* gating a discharge back down had no button at all (only Crack and Close), so players got stuck on the Queens call while every test passed. That's why the **Gate −** button exists. Prefer `$('id').onclick()` and `setValve()` over editing `S`.
+2. **Test at human speed.** The `human` section plays with realistic delays. Charge the Line runs on real time throughout, which is why it never had Patient Contact's timing bug. Keep it that way: anything that measures the player must use real seconds.
+3. **Don't let answer length or position give the answer away.** *History:* the right answer was the longest in 16 of 18 decisions **and listed first in 17 of 18**. Picking the first option nearly always scored perfectly. Answers are now rebalanced (`CTL_OPT`) and shuffled on screen; `data-i` keeps the original index, so scoring is unchanged.
+4. **Version and cache move together.** *Bug:* `sw.js` was updated alone (cache 2.1.2) while the app still said 2.1.1. Bump `APP_VERSION`, the intro version, and `CACHE` in `sw.js` together; `syntax` enforces it.
+5. **Two apps share one domain.** Patient Contact lives at `/patient-contact/`. Charge the Line's service worker must leave those requests alone, or it caches the wrong app's page. `syntax` checks this.
+6. **Learn mode must never fire a control.** Tapping a control in Panel guide mode opens its card and does nothing else; `qa_guide.js` checks it in a real browser.
+7. **Keep the simulation cheap.** `qa2.js` measures cost per tick against the 250 ms budget, so older phones don't lag.
+8. **Every penalty teaches.** Each penalty type maps to a guide card (`incidentKey`), and `qa_guide.js` fails if one doesn't.
 
 ## How the app is organized (one file: `index.html`)
 
-- **Each call is a module:** `freshX()` for starting state, `tickX()` for physiology each tick, `renderX()` for the screen, `M_X` for missions and steps, entries in `DEC` (decisions) and `GUIDE` (protocol cards), and `xDebrief()`. `CALL` picks the module.
-- **Shared systems:** the cardiac monitor (`monState`, `drawWave`, lead placement, 12-lead), quick drills, instructor mode, randomized patients (`VARIANTS`, `vt`), and progress/CSV.
-- **Clinical content** follows current guidelines with "check your protocol" notes. Bay County MCA review is still pending, so keep agency and hospital names generic until approved.
+- `CAMP` holds the scenarios: rig, valves, missions, steps, decisions, and Real Save story, source, and outcome.
+- The physics tick (every 250 ms) covers the pressure governor, friction loss, hydrant residual, drafting, check valves, heat, freezing, and faults.
+- `GUIDE`, `DECG`, and `incidentKey` handle the Panel guide, linking decisions and penalties to lessons.
+- Real Saves follow published accounts. Rig specifications that aren't published are modeled and say so.
 
-## Adding a new call — checklist
+## Adding a scenario — checklist
 
-1. Build the module (fresh, tick, render, missions, decisions, guide cards, debrief) and add it to the menu, `CALLNAME`, and the `MONCFG` monitor table if the medic attaches a monitor.
-2. Use `S.rt` for anything the player does on a rhythm or against a reaction clock.
-3. Add a bot in `tests/` (copy the closest existing one) and add the call to `run_all.js`.
+1. Add it to `CAMP` with missions, steps, and (for Real Saves) story, source, and outcome.
+2. Teach `tests/qa.js` (`stepAct`) any new step wording, using real controls.
+3. Map new decisions and penalties to guide cards.
 4. Run `balance` and rewrite answers until it passes.
-5. Add variants if the call has meaningful ones, and add forced cases to the `variants` section.
-6. Run the full suite plus the browser check; bump the versions.
+5. Run the full suite several times plus the browser check; bump all three version numbers.
