@@ -16,7 +16,8 @@ const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 
 if(want.includes('syntax')){try{new vm.Script(html.split('<script>')[1].split('</script>')[0]);report('syntax','index.html script compiles',true);}catch(e){report('syntax','index.html script compiles',false,e.message);}
   const ver=(html.match(/APP_VERSION='([^']+)'/)||[])[1],sw=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8'),cache=(sw.match(/CACHE = '([^']+)'/)||[])[1];
-  report('syntax','service-worker cache matches app version',cache===`patient-contact-v${ver}`,`app ${ver}, cache ${cache}`);}
+  report('syntax','service-worker cache matches app version',cache===`patient-contact-v${ver}`,`app ${ver}, cache ${cache}`);
+  report('syntax','offline helper only clears its own old caches',/k\.startsWith\('patient-contact-v'\)/.test(fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8')));}
 
 if(want.includes('balance')){const {boot}=require('./pc_mock.js');const {api}=boot();const D=api.DEC;let longest=0,total=0;
   let shortest=0;const chk=o=>{const L=o.map(x=>x.t.length),g=o.findIndex(x=>x.r==='good');if(g<0)return;total++;if(L[g]===Math.max(...L))longest++;else if(L[g]===Math.min(...L))shortest++;};
