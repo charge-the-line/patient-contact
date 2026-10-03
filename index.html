@@ -7,6 +7,26 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#13213a">
+<script data-pca>window.PCA_MOD="pc";
+/* Preconnect anonymous statistics (GoatCounter). Sends only activity paths — never names, organizations, or typed text.
+   Turn off per device on the Privacy page (localStorage 'preconnect-stats' = 'off'). Not sent from file:// or localhost. */
+(function(){var off=false;try{off=localStorage.getItem('preconnect-stats')==='off';}catch(e){}
+ var P=window.PCA={mod:window.PCA_MOD||'app',off:off,q:[],seen:{},cur:null,
+  clean:function(p){return String(p).toLowerCase().replace(/[^a-z0-9\/\-]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').slice(0,120);},
+  ev:function(path){if(this.off)return;var p=this.clean(path);if(this.q.length<60)this.q.push({path:p,title:p,event:true});this.flush();},
+  flush:function(){var g=window.goatcounter,s=this;if(!g||typeof g.count!=='function'){if(!s.t)s.t=setTimeout(function(){s.t=null;s.flush();},1500);return;}while(s.q.length){try{g.count(s.q.shift());}catch(e){}}},
+  bkt:function(n){n=+n;return n>=90?'score-90-100':n>=80?'score-80s':n>=70?'score-70s':n>=60?'score-60s':'score-under-60';},
+  att:function(n){return 'attempt-'+(n>=5?'5plus':n);},
+  begin:function(mod,act,where){this.abandon();this.cur={mod:mod,act:act,where:where};this.ev(mod+'/start/'+act);},
+  end:function(detail){var c=this.cur;if(!c)return;this.cur=null;this.ev(c.mod+'/finish/'+c.act+(detail?'/'+detail:''));},
+  abandon:function(){var c=this.cur;if(!c)return;this.cur=null;var w='';try{w=c.where?c.where():'';}catch(e){}this.ev(c.mod+'/quit/'+c.act+(w?'/'+w:''));},
+  err:function(mod,msg){var k=mod+'|'+msg;if(this.seen[k])return;this.seen[k]=1;this.ev('error/'+mod+'/'+String(msg).slice(0,60));}};
+ if(!off){var s=document.createElement('script');s.async=true;s.src='https://gc.zgo.at/count.js';s.setAttribute('data-goatcounter','https://preconnect.goatcounter.com/count');(document.head||document.documentElement).appendChild(s);}
+ window.addEventListener('error',function(e){P.err(P.mod||'app',e&&e.message||'error');});
+ window.addEventListener('pagehide',function(){P.abandon();});
+})();
+</script>
+
 <title>Patient Contact</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
@@ -232,12 +252,12 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
   <p>When the medic arrives, you'll help put the patient on the cardiac monitor — and turn on <b>Sound</b> in the menu for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.13 · prototype.</p>
+  <p style="font-size:14px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.14 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
 <div class="overlay hidden" id="menu"><div class="box">
-  <a href="../" style="display:inline-block;font-size:13px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0 0 6px">◂ PRECONNECT</a>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-block;font-size:13px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="font-size:13px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a></div>
   <h2>Calls</h2>
   <div class="tiers"><button data-tier="0">Guided</button><button data-tier="1">Recall</button><button data-tier="2">Chaos</button></div>
   <p class="stat" id="tierhelp" style="margin:0 0 10px"></p>
@@ -323,7 +343,8 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <script>
 /* ================= core ================= */
-const APP_VERSION='0.13.0';
+const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
+const APP_VERSION='0.14.0';
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
@@ -573,7 +594,7 @@ const M_ARREST_PEA=M_ARREST.map((m,i)=>i!==0?m:Object.assign({},m,{steps:m.steps
   if(st.t==='Rhythm check at two minutes: analyze, clear, shock')return [{t:'Rhythm check at two minutes: analyze again',wait:true,f:()=>(S.aed.noShock||0)>=2}];
   return [st];})}));
 let M=M_ARREST;
-function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;V=pickVariant(id);M=id==='arrest'?(V.shock?M_ARREST:M_ARREST_PEA):id==='cb'?(V.vig?M_CB_VIG:M_CB):id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:id==='dm'?M_DM:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:id==='dm'?15*3600+40*60:14*3600+41*60;fresh();if(id==='dm')S.d=freshDM();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;pca('begin','pc',id,()=>`mission-${S.mission+1}`);V=pickVariant(id);M=id==='arrest'?(V.shock?M_ARREST:M_ARREST_PEA):id==='cb'?(V.vig?M_CB_VIG:M_CB):id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:id==='dm'?M_DM:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:id==='dm'?15*3600+40*60:14*3600+41*60;fresh();if(id==='dm')S.d=freshDM();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
   $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':id==='cb'?'Childbirth':id==='dm'?'Altered driver':'Cardiac arrest';
   if(id==='dm')radio('Dispatch','Unit responding to assist PD — male driver slumped in a running vehicle, grocery store lot. Officer reports possible intoxication, combative. Medic 1 responding, nine minutes.');
   else if(id==='cb')radio('Dispatch','Unit responding — 27-year-old female in active labor, says the baby is coming. Third pregnancy. Medic 1 responding from across the county, ten minutes, slick roads.');
@@ -2061,7 +2082,7 @@ function drawStrip(cv,r){if(!cv||!cv.getContext)return;const W=320,H=96,d=window
     else{if(t>=next){beat=t;const rr=60/r.hr;next=t+(r.k==='afib'?rr*(.55+Math.random()*.9):rr);}v=beat<0?0:beatVal(t-beat,LEADS.II,{noP:r.k==='afib'});if(r.k==='afib')v+=.05*Math.sin(2*Math.PI*6.3*t+seed)+.03*Math.sin(2*Math.PI*9.1*t);}
     const y=H*.6-v*H*.42;px?x.lineTo(px,y):x.moveTo(px,y);}x.stroke();}
 /* --- runner --- */
-function drillStart(id){const d=DRILLS.find(x=>x.id===id);DR={id,d,i:0,right:0,qs:[],t0:performance.now(),errs:0,taps:[]};$('dr-title').textContent=d.name;
+function drillStart(id){pca('begin','pc','drill-'+id,()=>DR&&DR.qs?`question-${DR.i+1}`:'');const d=DRILLS.find(x=>x.id===id);DR={id,d,i:0,right:0,qs:[],t0:performance.now(),errs:0,taps:[]};$('dr-title').textContent=d.name;
   if(id==='med')DR.qs=Array.from({length:8},genMed);if(id==='o2')DR.qs=Array.from({length:8},genO2);if(id==='apgar')DR.qs=Array.from({length:8},genApgar);if(id==='lkw')DR.qs=shuf(LKWQ);
   if(id==='rhythm')DR.qs=Array.from({length:8},()=>{const r=pick(RHY);return {rhy:r,q:'What rhythm is this?',a:r.n,d:shuf(RHY.filter(x=>x.k!==r.k).map(x=>x.n)).slice(0,3),why:r.why};});
   if(id==='cpr')return cprDrill();if(id==='leads')return leadDrill();drillQ();}
@@ -2073,7 +2094,7 @@ function drillAns(i){const q=DR.qs[DR.i];if(q.done)return;q.done=true;const ok=q
   $('dr-fb').innerHTML=`<b style="color:${ok?'#7fe3a4':'#ff8f8a'}">${ok?'Right.':'Not quite — '+esc(q.a)+'.'}</b> ${esc(q.why)}`;
   $('dr-foot').innerHTML=`<button data-a="next" class="go" style="width:100%">${DR.i+1<DR.qs.length?'Next':'See results'}</button>`;}
 function drillNext(){DR.i++;if(DR.i<DR.qs.length)drillQ();else drillDone(Math.round(DR.right/DR.qs.length*100),`${DR.right} of ${DR.qs.length} right`);}
-function drillDone(score,detail){const p=load();p.drills=p.drills||{};const prev=p.drills[DR.id]?p.drills[DR.id].best:null;p.drills[DR.id]={best:Math.max(prev||0,score),runs:((p.drills[DR.id]||{}).runs||0)+1,last:new Date().toISOString()};
+function drillDone(score,detail){pca('end',pca('bkt',score));const p=load();p.drills=p.drills||{};const prev=p.drills[DR.id]?p.drills[DR.id].best:null;p.drills[DR.id]={best:Math.max(prev||0,score),runs:((p.drills[DR.id]||{}).runs||0)+1,last:new Date().toISOString()};
   p.drillRuns=(p.drillRuns||[]).concat([{drill:DR.id,d:new Date().toISOString(),score}]).slice(-200);save(p);const best=prev!==null&&score>prev;
   $('dr-meta').textContent='';$('dr-body').innerHTML=`<div class="big">${score}</div><p style="margin:4px 0 8px">${esc(detail)}${best?' · <b style="color:var(--orange)">New personal best!</b>':prev!==null?` · best ${Math.max(prev,score)}`:''}</p><div class="chips"><button class="chip" data-a="learn" data-k="${DR.d.g}">Learn more: ${esc(GUIDE[DR.d.g].name)}</button></div>`;
   $('dr-foot').innerHTML='<div style="display:flex;gap:8px"><button data-a="menu" style="flex:1">All drills</button><button data-a="again" class="go" style="flex:1">Again</button></div>';}
@@ -2161,7 +2182,7 @@ function instSync(){$('b-inst').textContent='Instructor mode: '+(INST?'on':'off'
 const KEY='patient-contact';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:'',dept:''};}catch(e){return {runs:[],name:'',dept:''};}}
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
-function record(){const p=load();p.runs.push({who:INST&&p.crew&&p.crew.length?p.crew.slice():null,inst:INST?(p.instName||''):'',variant:V.label||'',call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc});p.runs=p.runs.slice(-500);save(p);}
+function record(){const p=load();pca('end',`${['guided','recall','chaos'][TIER]}/${pca('att',(p.runs||[]).filter(r=>(r.call||'arrest')===CALL).length+1)}/${pca('bkt',S.score)}`);p.runs.push({who:INST&&p.crew&&p.crew.length?p.crew.slice():null,inst:INST?(p.instName||''):'',variant:V.label||'',call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc});p.runs=p.runs.slice(-500);save(p);}
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
 function showMenu(){S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
