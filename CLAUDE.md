@@ -130,5 +130,8 @@ Cardiac arrest (VF or PEA) · Car versus tree (MVA with entrapment) · Overdose 
 ## Tests
 `node tests/run_all.js` (about 15 seconds, 63 checks): syntax/version sync, answer balance (both directions), fast bots, human pace, sloppy and late breathing (`breathEvery: 11`), every forced variant, drills with **independently recalculated answer keys**, instructor injects, fuzz. Bots: `pc_bot`, `mva_bot`, `od_bot`, `ep_bot`, `st_bot`, `fl_bot`, `cb_bot`, `dm_bot`, `human_bot` (options `sloppy`, `breathEvery`, `instChaos`). Optional: `python3 tests/browser_check.py`.
 
+## Repo housekeeping (done October 3, 2026)
+When this repo was created, the test files were uploaded flat at the root. On October 3, 2026 (approved by Max) they were moved into `tests/` with `git mv`, so `node tests/run_all.js` works in place as TESTING.md describes. Nothing left to clean up here.
+
 ## Open items
 MCA protocol review; Medstar/MMR training-coordinator review; real hospital names after sign-off; exact Bay County epi kit specifications; next calls (pediatric breathing, carbon monoxide, cold-water hypothermia).
