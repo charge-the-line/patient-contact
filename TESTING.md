@@ -88,3 +88,7 @@ Foundation fixes: fonts served from this site, screen wake lock, finger-sized bu
 
 - First-run card under 120 words, the full guide under How to play, the settings sheet wired, and the menu's Sound button follows the shared setting.
 - Browser check opens the Settings sheet from the menu.
+
+## Milestone 5 part one checks (added October 2026)
+
+- No new checks; the core moved to 1.2.0 (lesson and quiz engines) and Patient Contact does not use them yet.
