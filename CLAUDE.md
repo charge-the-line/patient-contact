@@ -145,7 +145,7 @@ Max's likely picks after 1: 2, then 3, then either Charge the Line catch-up or D
 
 # This repo: Patient Contact (`patient-contact` → `/patient-contact/`)
 
-**Current version: 0.22.0.** Medical First Responder training. **The player is always the MFR**, never the driver: the EMT drives, the medic works the patient, and 1–2 firefighters assist. Calls run at 3× game speed **except** real-time skills (compressions, breath timing, the newborn golden minute).
+**Current version: 0.22.1.** Medical First Responder training. **The player is always the MFR**, never the driver: the EMT drives, the medic works the patient, and 1–2 firefighters assist. Calls run at 3× game speed **except** real-time skills (compressions, breath timing, the newborn golden minute). The home list opens with the module title, the tagline "First through the door." and a "What this is" card (0.22.1), the same header every module carries.
 
 ## Home list and lesson (October 3, 2026)
 The `#menu` overlay is now a home list: readiness card (`rdy-t`, `rdy-n`, `rdy-s`; `readiness()` over `PC_ACTS` = lesson + 8 calls + 7 drills = 16), sections (1 · Learn, 2 · Calls with the tier row, 3 · Drills and tools, Drill night), a `.bchip` per call (`chip-<callId>`, best score or Due/Again from `pcSpacing`) and for the lesson (`chip-lesson`), `homeRender()` from `showMenu()`. The lesson (`LESSON`, 12 slides, button `b-lesson`, overlays `#lessonov` and `#ldone`) runs on the core engine and saves to `drillRuns` with `drill:'lesson'`, which the hub shows as type Lesson (`L.pcDrill.lesson`). The menu Sound button was removed; `SOUND` still follows the shared setting through `window.onPreconnectSettings`.
