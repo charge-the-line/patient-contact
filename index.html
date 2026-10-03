@@ -28,6 +28,7 @@
 </script>
 
 <title>Patient Contact</title>
+<script src="preconnect-core.js"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -43,15 +44,15 @@
 button{min-height:48px}
 </style>
 <style>
-:root{--navy:#13213a;--deck:#1c2d4a;--deck2:#24385a;--line:#33496f;--ink:#f2f5f8;--soft:#a9b7cc;--orange:#ff7a1a;--red:#e5383b;--green:#39e36f;--amber:#ffc23d;--mon:#050708}
+:root{--navy:#0a0c0f;--bg:#0a0c0f;--deck:#14171c;--deck2:#1c2026;--line:#2a2f37;--ink:#f6f7f9;--soft:#aab2bd;--orange:#ff7a1a;--acc:#ff7a1a;--acc-ink:#0a0c0f;--red:#e5383b;--green:#39e36f;--amber:#ffc23d;--mon:#050708}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--navy);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,sans-serif;-webkit-text-size-adjust:100%}
 body{max-width:520px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-right,0px)) calc(40px + env(safe-area-inset-bottom,0px)) calc(12px + env(safe-area-inset-left,0px))}
 .num,h1,h2,h3{font-family:"Saira Condensed","Arial Narrow",sans-serif}
-button{font-family:inherit;font-size:15px;border-radius:10px;padding:11px 12px;cursor:pointer;color:var(--ink);background:var(--deck2);border:1px solid var(--line);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;line-height:1.15}
+button{font-family:inherit;font-size:15px;border-radius:6px;padding:11px 12px;cursor:pointer;color:var(--ink);background:var(--deck2);border:1px solid var(--line);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;line-height:1.15}
 button:active{transform:translateY(1px)}button:disabled{opacity:.35;cursor:default}
 button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
-.go{background:var(--orange);border-color:var(--orange);color:#1a0d02;font-weight:700}
+.go{background:var(--acc);border-color:var(--acc);color:var(--acc-ink);font-family:"Saira Condensed",sans-serif;font-weight:600;font-size:18px;letter-spacing:.5px;text-transform:uppercase}
 .on{background:#1f6b45!important;border-color:#2f9e66!important;color:#fff}
 .hot{background:var(--red)!important;border-color:var(--red)!important;color:#fff;animation:pulse 1s infinite}
 @keyframes pulse{50%{box-shadow:0 0 0 4px rgba(229,56,59,.35)}}
@@ -64,7 +65,7 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .meta{text-align:right;font-size:15px;color:var(--soft)}
 .meta b{color:var(--ink);font-family:"Saira Condensed";font-size:18px}
 .guidebtn{padding:6px 10px;font-size:15px;background:#14324d;border-color:#2b6a99;color:#cfe6ff}
-.eta{display:flex;justify-content:space-between;align-items:center;background:var(--deck);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px;font-size:15px}
+.eta{display:flex;justify-content:space-between;align-items:center;background:var(--deck);border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:15px}
 .eta b{font-family:"Saira Condensed";font-size:24px;font-weight:600}
 /* the monitor: the one bold element */
 .mon{background:var(--mon);border-radius:16px;border:3px solid #2a3340;padding:10px 12px 12px;margin-bottom:10px;box-shadow:inset 0 0 0 1px #000}
@@ -78,7 +79,7 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .cprbar{display:flex;gap:10px;align-items:center;margin-top:8px;font-size:14px;color:#9fb0c3}
 .track{flex:1;height:10px;border-radius:5px;background:#1a2028;overflow:hidden}.track div{height:100%;background:var(--green);width:0}
 /* action deck */
-.deck{background:var(--deck);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px}
+.deck{background:var(--deck);border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:10px}
 .grp{margin-bottom:10px}.grp:last-child{margin-bottom:0}
 .grp h3{margin:0 0 6px;font-size:17px;font-weight:600;color:var(--soft)}
 .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
@@ -86,7 +87,7 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .stat{font-size:14px;color:var(--soft);margin-top:6px;line-height:1.35}
 .o2{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:14px;color:var(--soft)}
 /* call card */
-.card{background:var(--deck);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.card{background:var(--deck);border:1px solid var(--line);border-radius:6px;padding:12px;margin-bottom:10px}
 .card h2{margin:0 0 4px;font-size:22px;font-weight:600}
 .card .sub{font-size:14px;color:var(--soft);margin:0 0 8px}
 .steps{list-style:none;padding:0;margin:0}.steps li{display:flex;gap:10px;padding:6px 0;font-size:15px;border-top:1px solid #2a3d5e}.steps li:first-child{border-top:0}
@@ -98,13 +99,13 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .radio .who{color:var(--orange);font-weight:700}.radio .bad{color:#ff8f8a}.radio .good{color:#7fe3a4}
 /* overlays */
 .overlay{position:fixed;inset:0;background:rgba(5,10,20,.9);display:flex;align-items:flex-start;justify-content:center;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));z-index:10;overflow:auto}
-.overlay .box{background:var(--deck);border:1px solid var(--line);border-radius:16px;padding:18px;max-width:460px;width:100%;margin:auto}
+.overlay .box{background:var(--deck);border:1px solid var(--line);border-radius:8px;padding:18px;max-width:460px;width:100%;margin:auto}
 .overlay h2{font-size:28px;margin:0 0 8px;font-weight:600;line-height:1.1}
 .overlay p{font-size:16px;line-height:1.5;color:#d6deea;margin:0 0 12px}
-.tag{display:inline-block;font-size:14px;font-weight:700;border-radius:6px;padding:2px 8px;margin-bottom:8px;background:var(--orange);color:#1a0d02}
+.tag{display:inline-block;font-family:"Saira Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:.5px;border-radius:4px;padding:2px 8px;margin-bottom:8px;background:var(--acc);color:var(--acc-ink)}
 .opt{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px;font-size:16px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
-.chip{padding:7px 11px;font-size:15px;border-radius:16px;background:#14324d;border-color:#2b6a99;color:#cfe6ff}
+.chip{padding:7px 11px;font-size:15px;border-radius:6px;background:#14324d;border-color:#2b6a99;color:#cfe6ff;font-family:inherit;font-weight:400;letter-spacing:0;text-transform:none;line-height:1.2;white-space:normal}
 .chip.warn{background:#3a1512;border-color:var(--red);color:#ffb3a8}
 .gsec{margin:0 0 12px}.gsec b{display:block;font-family:"Saira Condensed";font-size:16px;color:var(--orange);margin-bottom:2px}
 .gsec p{margin:0;font-size:15px;line-height:1.45;color:#dbe3ee}
@@ -121,7 +122,7 @@ body.tv>.top,body.tv>.eta{grid-column:1/-1}body.tv>#monitor{grid-column:1;grid-r
 body.tv .radio{max-height:320px}body.tv .ecgwrap,body.tv .ecgwrap canvas{height:150px}
 @media (min-width:1100px){body.tv{zoom:1.18}}
 .syr{width:100%;height:58px;display:block;margin:4px 0}
-.scen{display:block;width:100%;text-align:left;padding:12px;margin-bottom:8px}.scen b{display:block;font-family:"Saira Condensed";font-size:21px;font-weight:600}.scen span{font-size:15px;color:var(--soft)}
+.scen{display:block;width:100%;text-align:left;padding:12px 14px;margin-bottom:8px;background:var(--deck);border:0;border-left:4px solid var(--acc);border-radius:6px}.scen b{display:block;font-family:"Saira Condensed";font-size:21px;font-weight:600}.scen span{font-size:15px;color:var(--soft)}
 textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1a2e;color:var(--ink);width:100%}
 </style>
 </head>
@@ -255,18 +256,25 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <!-- overlays -->
 <div class="overlay" id="intro"><div class="box">
-  <div class="brand" style="font-size:18px">PATIENT CONTACT</div>
-  <h2>The first minutes are yours.</h2>
+  <span class="tag">PATIENT CONTACT</span>
+  <h2 style="font-size:32px;line-height:1.05">The first minutes are yours.</h2>
+  <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
+  <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
+  <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.17.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
+</div></div>
+<div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
+  <h2>How to play</h2>
   <p>You are the medical first responder. You get there first, you work the patient until ALS arrives, then you work for the medic — on scene and in the back of the rig.</p>
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
   <p>When the medic arrives, you'll help put the patient on the cardiac monitor — and turn on <b>Sound</b> in the menu for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:15px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.16.0 · prototype.</p>
-  <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
+  <button class="go" id="how-close" style="width:100%;font-size:18px">Close</button>
 </div></div>
 
 <div class="overlay hidden" id="menu"><div class="box">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-block;font-size:14px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="font-size:14px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-block;font-size:14px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="font-size:14px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a><button class="gear" id="h-set" style="margin-left:12px">Settings</button></div>
   <h2>Calls</h2>
   <div class="tiers"><button data-tier="0">Guided</button><button data-tier="1">Recall</button><button data-tier="2">Chaos</button></div>
   <p class="stat" id="tierhelp" style="margin:0 0 10px"></p>
@@ -279,7 +287,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call7"><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
   <button class="scen" id="b-call8"><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
   <button id="b-drills" class="go" style="width:100%;margin:2px 0 8px;font-size:17px">Quick drills — 60-second skill practice</button>
-  <div style="display:flex;gap:8px;margin:2px 0 8px"><button id="b-prog" style="flex:1">My progress</button><button id="b-sound" style="flex:1">Sound: off</button></div>
+  <div style="display:flex;gap:8px;margin:2px 0 8px"><button id="b-prog" style="flex:1">My progress</button><button id="b-sound" style="flex:1">Sound: off</button><button id="b-howto" style="flex:1">How to play</button></div>
   <button id="b-rand" style="width:100%;margin-bottom:8px">Patients: varied</button>
   <button id="b-inst" style="width:100%;margin-bottom:8px">Instructor mode: off</button>
   <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
@@ -350,11 +358,23 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p id="r-msg" style="font-size:15px;margin:10px 0 0"></p>
 </div></div>
 
-<script src="preconnect-core.js"></script>
+<div class="overlay hidden" id="setov" style="z-index:20"><div class="box">
+ <div class="flex"><h2 style="margin:0">Settings</h2><div class="sp"></div><button class="gear" id="set-close">Done</button></div>
+ <div class="sec">Display</div>
+ <div class="set"><div class="k">Text size</div><div class="seg2" data-set="text"><button data-val="normal">Normal</button><button data-val="large">Large</button></div></div>
+ <div class="set"><div class="k">High contrast<small>Black background, brighter text: for daylight.</small></div><div class="seg2" data-set="contrast"><button data-val="normal">Off</button><button data-val="high">On</button></div></div>
+ <div class="set"><div class="k">Motion<small>Auto follows your phone's Reduce Motion setting.</small></div><div class="seg2" data-set="motion"><button data-val="auto">Auto</button><button data-val="off">Off</button></div></div>
+ <div class="sec">Feedback</div>
+ <div class="set"><div class="k">Sound<small>Monitor beeps, metronome, voice prompts, in modules that have them.</small></div><div class="seg2" data-set="sound"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
+ <div class="set"><div class="k">Haptics<small>A tap you can feel on compressions and mistakes.</small></div><div class="seg2" data-set="haptics"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
+ <div class="sec">Privacy</div>
+ <div class="set"><div class="k">Anonymous statistics<small>Counts like "someone finished the infant station." Never names. <a href="../privacy.html" style="color:var(--acc)">Details</a></small></div><div class="seg2" data-set="stats"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
+ <p class="stat" style="margin-top:10px">Settings apply to every Preconnect module on this phone.</p>
+</div></div>
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.16.0';
+const APP_VERSION='0.17.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -1977,7 +1997,7 @@ let SOUND=false,AC=null;
 function tone(f,d,v,type){if(!SOUND)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),gn=AC.createGain();o.type=type||'sine';o.frequency.value=f;gn.gain.value=v;o.connect(gn);gn.connect(AC.destination);const t=AC.currentTime;gn.gain.setValueAtTime(v,t);gn.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d+.02);}catch(e){}}
 function monBeep(st){if(st.kind==='ecg')tone(st.r==='afib'?880:960,.07,.06);else if(st.kind==='pleth')tone(500+((CALL==='od'&&S.o)?S.o.spo2:96)*4,.06,.04);}
 function speak(t){if(!SOUND)return;try{if(window.speechSynthesis){const u=new SpeechSynthesisUtterance(t);u.rate=1.02;window.speechSynthesis.speak(u);}}catch(e){}}
-function buzz(ms){if(!SOUND)return;try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){}}
+function buzz(ms){if(!SOUND)return;try{haptic(ms);}catch(e){}}
 function radioHook(who,msg){if(S&&S.log){S.log.push({c:clockStr(),who,msg});if(S.log.length>400)S.log.shift();}if(who==='AED')speak(msg);if(/Shock delivered/i.test(msg))buzz(300);if(who==='Feedback')buzz(60);}
 /* --- lead placement mini-game --- */
 const LEADPOS={RA:[52,58],LA:[148,58],RL:[64,204],LL:[136,204],R2:[90,80],L2:[110,80],L3:[110,98],R4:[90,116],L4:[110,116],L45:[121,125],L5ster:[110,134],L5mcl:[132,134],L4mcl:[132,116],L6mcl:[132,152],R5mcl:[68,134],L5aal:[151,134],L5mal:[167,134]};
@@ -2032,7 +2052,7 @@ $('b-prog').onclick=progressShow;$('prog-close').onclick=()=>$('progov').classLi
 $('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Patient','Date','Tier','Score','Instructor']].concat((p.runs||[]).flatMap(r=>(r.who&&r.who.length?r.who:[p.name||'']).map(n=>[n,p.dept||'',CALLNAME[r.call||'arrest'],r.variant||'',r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score,r.inst||'']))).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),'',r.d.slice(0,16).replace('T',' '),'Drill',r.score,'']));const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='patient-contact-training-record.csv';a.click();}catch(e){}};
 $('b-rand').onclick=()=>{RANDOM=!RANDOM;const p=load();p.standard=!RANDOM;save(p);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);};
-$('b-sound').onclick=()=>{SOUND=!SOUND;const p=load();p.sound=SOUND;save(p);$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);if(SOUND){tone(960,.08,.06);speak('Sound on.');}};
+$('b-sound').onclick=()=>{SOUND=!SOUND;setSetting('sound',SOUND?'on':'off');const p=load();p.sound=SOUND;save(p);$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);if(SOUND){tone(960,.08,.06);speak('Sound on.');}};
 window.addEventListener('resize',()=>{MV.kind='';});
 
 function insertStep(Ms,mi,beforeText,step){const st=Ms[mi].steps;let j=beforeText?st.findIndex(x=>x.t.startsWith(beforeText)):-1;if(j<0)j=st.length;st.splice(j,0,step);}
@@ -2220,11 +2240,13 @@ $('r-cancel').onclick=()=>$('repov').classList.add('hidden');
 $('r-send').onclick=async()=>{const p=load();p.name=$('r-name').value.trim();p.dept=$('r-dept').value.trim();save(p);const text=`From: ${p.name||'—'} (${p.dept||'—'})\nNote: ${$('r-note').value.trim()||'—'}\n\n${snapshot()}`;
   if(navigator.share){try{await navigator.share({title:'Patient Contact report',text});$('repov').classList.add('hidden');return;}catch(e){if(e.name==='AbortError')return;}}
   try{await navigator.clipboard.writeText(text);$('r-msg').textContent='Report copied — paste it into a text or email.';}catch(e){$('r-note').value=text;$('r-msg').textContent='Copy the text above and send it.';}};
+applySettings();settingsBind();window.onPreconnectSettings=s=>{SOUND=s.sound==='on';$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);};
+$('b-howmore').onclick=()=>$('howov').classList.remove('hidden');$('how-close').onclick=()=>$('howov').classList.add('hidden');$('b-howto').onclick=()=>$('howov').classList.remove('hidden');
 if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
 /* ================= boot ================= */
 fresh();render();
-{const pr=load();INST=!!pr.inst;if(pr.tv)document.body.classList.add('tv');SOUND=!!pr.sound;RANDOM=!pr.standard;$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);}
+{const pr=load();INST=!!pr.inst;if(pr.tv)document.body.classList.add('tv');SOUND=settings().sound==='on'||!!pr.sound;if(SOUND&&settings().sound!=='on')setSetting('sound','on');RANDOM=!pr.standard;$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);}
 if(load().seen){$('intro').classList.add('hidden');showMenu();}
 let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();},250);
 requestAnimationFrame(drawWave);

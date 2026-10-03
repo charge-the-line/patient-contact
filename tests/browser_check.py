@@ -19,7 +19,7 @@ with sync_playwright() as p:
             rows.append((w, f'call {n}', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.close()
         pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True)
         pg.on('pageerror', lambda e: errs.append(str(e)))
-        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click('#b-drills'); pg.click('[data-d="rhythm"]'); pg.wait_for_timeout(300)
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click('#h-set'); pg.wait_for_timeout(150); rows.append((w, 'settings', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.click('#set-close'); pg.click('#b-drills'); pg.click('[data-d="rhythm"]'); pg.wait_for_timeout(300)
         rows.append((w, 'drills', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.close()
     b.close()
 bad = [r for r in rows if r[2] > 1]

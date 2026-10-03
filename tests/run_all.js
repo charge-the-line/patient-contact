@@ -30,6 +30,8 @@ if(want.includes('syntax')){try{new vm.Script(html.split('<script>')[1].split('<
    report('syntax','debrief body: compare line, metrics table, what cost points, lessons, steps table',bp.best===80&&bp.prev===60&&/Best 80 · last time 60 · new best/.test(h)&&/pc-metrics/.test(h)&&/What cost points/.test(h)&&/data-k="x"/.test(h)&&/pc-steps/.test(h)&&/✗/.test(h));}
 
   {const {boot}=require('./pc_mock.js');const b3=boot();b3.api.$('b-call1').onclick();b3.api.$('brief-go').onclick();b3.api.finish();report('syntax','call debrief uses Debrief 2.0 (steps table, score count-up)',/pc-steps/.test(b3.els['done-b'].innerHTML)&&b3.els['done-s'].dataset.final==='100');}
+  {const intro=(html.match(/<div class="overlay" id="intro">([\s\S]*?)<\/div><\/div>/)||[])[1]||'';const words=intro.replace(/<[^>]+>/g,' ').trim().split(/\s+/).length;const {boot}=require('./pc_mock.js');const b5=boot();b5.api.setSetting('sound','on');
+   report('syntax','first-run card is short, settings sheet wired, sound follows the shared setting',words<120&&/id="howov"/.test(html)&&/id="setov"/.test(html)&&/id="h-set"/.test(html)&&b5.els['b-sound'].textContent==='Sound: on'&&b5.api.settings().sound==='on',`${words} words · ${b5.els['b-sound'].textContent}`);}
   {const lits=[...html.matchAll(/(?:Version |>v)(\d+\.\d+\.\d+)/g)].map(m=>m[1]);report('syntax','intro shows the current version',lits.length>=1&&lits.every(v=>v===ver),`found ${lits.join(', ')}; app ${ver}`);}
   {// Milestone 1: fonts are served from this site; nothing loads from Google (offline fidelity + privacy). Every font file exists and is in the offline cache list.
    const sw3=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');const urls=[...html.matchAll(/url\((fonts\/[^)]+)\)/g)].map(m=>m[1]);
