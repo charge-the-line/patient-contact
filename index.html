@@ -127,6 +127,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 </style>
 </head>
 <body>
+<div id="pc-drill" class="pc-drillbar hidden" data-hub="../"></div>
 
 <div class="top">
   <div><div class="brand">PATIENT CONTACT</div><h1 id="title">Patient Contact</h1></div>
@@ -261,7 +262,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.17.1 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.18.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -326,6 +327,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="go" id="tw-close" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 <button id="inst-fab" class="fab hidden">Instructor</button>
+<div class="overlay hidden" id="pc-drillov" style="z-index:25"><div class="box" id="pc-drillbox"></div></div>
 <div class="overlay hidden" id="instov" style="z-index:22"><div class="box">
   <div style="display:flex;justify-content:space-between;align-items:center"><span class="tag" style="background:#7a5cff;color:#fff;margin:0">Instructor</span><button id="inst-close" class="go">Close — resume</button></div>
   <div id="inst-body" style="margin-top:10px"></div>
@@ -374,7 +376,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.17.1';
+const APP_VERSION='0.18.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -2134,7 +2136,7 @@ function drillAns(i){const q=DR.qs[DR.i];if(q.done)return;q.done=true;const ok=q
   $('dr-foot').innerHTML=`<button data-a="next" class="go" style="width:100%">${DR.i+1<DR.qs.length?'Next':'See results'}</button>`;}
 function drillNext(){DR.i++;if(DR.i<DR.qs.length)drillQ();else drillDone(Math.round(DR.right/DR.qs.length*100),`${DR.right} of ${DR.qs.length} right`);}
 function drillDone(score,detail){pca('end',pca('bkt',score));const p=load();p.drills=p.drills||{};const prev=p.drills[DR.id]?p.drills[DR.id].best:null;p.drills[DR.id]={best:Math.max(prev||0,score),runs:((p.drills[DR.id]||{}).runs||0)+1,last:new Date().toISOString()};
-  p.drillRuns=(p.drillRuns||[]).concat([{drill:DR.id,d:new Date().toISOString(),score}]).slice(-200);save(p);const best=prev!==null&&score>prev;
+  p.drillRuns=(p.drillRuns||[]).concat([pcDrillStamp({drill:DR.id,d:new Date().toISOString(),score})]).slice(-200);save(p);const best=prev!==null&&score>prev;
   $('dr-meta').textContent='';$('dr-body').innerHTML=`<div class="big">${score}</div><p style="margin:4px 0 8px">${esc(detail)}${best?' · <b style="color:var(--orange)">New personal best!</b>':prev!==null?` · best ${Math.max(prev,score)}`:''}</p><div class="chips"><button class="chip" data-a="learn" data-k="${DR.d.g}">Learn more: ${esc(GUIDE[DR.d.g].name)}</button></div>`;
   $('dr-foot').innerHTML='<div style="display:flex;gap:8px"><button data-a="menu" style="flex:1">All drills</button><button data-a="again" class="go" style="flex:1">Again</button></div>';}
 /* CPR tempo */
@@ -2215,13 +2217,14 @@ $('inst-body').onclick=e=>{const b=e.target.closest&&e.target.closest('[data-a]'
 $('inst-fab').onclick=instOpen;$('inst-close').onclick=instClose;
 $('disc-go').onclick=()=>{$('discov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing)S.running=true;};
 $('b-inst').onclick=()=>{INST=!INST;const p=load();p.inst=INST;save(p);instSync();};
-function instSync(){$('b-inst').textContent='Instructor mode: '+(INST?'on':'off');$('b-inst').classList.toggle('on',INST);$('inst-fab').classList.toggle('hidden',!(INST&&S.active));}
+const instOn=()=>INST||!!pcDrill();
+function instSync(){$('b-inst').textContent='Instructor mode: '+(INST?'on':pcDrill()?'on (Drill Night)':'off');$('b-inst').classList.toggle('on',instOn());$('inst-fab').classList.toggle('hidden',!(instOn()&&S.active));}
 
 /* ================= menu, progress, report ================= */
 const KEY='patient-contact';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:'',dept:''};}catch(e){return {runs:[],name:'',dept:''};}}
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
-function record(){const p=load();pca('end',`${['guided','recall','chaos'][TIER]}/${pca('att',(p.runs||[]).filter(r=>(r.call||'arrest')===CALL).length+1)}/${pca('bkt',S.score)}`);p.runs.push({who:INST&&p.crew&&p.crew.length?p.crew.slice():null,inst:INST?(p.instName||''):'',variant:V.label||'',call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc});p.runs=p.runs.slice(-500);save(p);}
+function record(){const p=load();pca('end',`${['guided','recall','chaos'][TIER]}/${pca('att',(p.runs||[]).filter(r=>(r.call||'arrest')===CALL).length+1)}/${pca('bkt',S.score)}`);p.runs.push(pcDrillStamp({who:INST&&p.crew&&p.crew.length?p.crew.slice():null,inst:INST?(p.instName||''):'',variant:V.label||'',call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc}));p.runs=p.runs.slice(-500);save(p);}
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
 function showMenu(){keepAwake(false);S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
@@ -2246,7 +2249,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventLis
 
 /* ================= boot ================= */
 fresh();render();
-{const pr=load();INST=!!pr.inst;if(pr.tv)document.body.classList.add('tv');SOUND=settings().sound==='on'||!!pr.sound;if(SOUND&&settings().sound!=='on')setSetting('sound','on');RANDOM=!pr.standard;$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);}
+{const pr=load();INST=!!pr.inst;if(pr.tv)document.body.classList.add('tv');SOUND=settings().sound==='on'||!!pr.sound;if(SOUND&&settings().sound!=='on')setSetting('sound','on');RANDOM=!pr.standard&&!pcDrill();$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':pcDrill()?'Patients: standard (Drill Night)':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);pcDrillBind();instSync();}
 if(load().seen){$('intro').classList.add('hidden');showMenu();}
 let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();},250);
 requestAnimationFrame(drawWave);

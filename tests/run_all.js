@@ -7,7 +7,7 @@
    Exit code 0 = all passed. */
 global.window=global.window||{};
 const path=require('path'),fs=require('fs'),vm=require('vm');
-const ALL=['syntax','balance','fast','human','sloppy','variants','drills','instructor','fuzz'];
+const ALL=['syntax','balance','fast','human','sloppy','variants','drills','instructor','drill','fuzz'];
 let want=process.argv.slice(2);if(!want.length)want=ALL;if(want.includes('quick'))want=['syntax','balance','drills','instructor','fuzz'];
 const results=[];let failed=0;const T0=Date.now();
 function report(section,name,ok,detail=''){results.push({section,name,ok,detail});if(!ok)failed++;console.log(`${ok?'PASS':'FAIL'}  ${section.padEnd(10)} ${name}${detail?'  — '+detail:''}`);}
@@ -99,6 +99,10 @@ if(want.includes('instructor')){const {boot}=require('./pc_mock.js');
     for(const x of offered){const n=S.log.length;api.instAct({a:'inj',i:x.id});if(S.log.length>n)fired++;}report('instructor',`${call}: every offered complication fires`,offered.length>0&&fired===offered.length,`${fired}/${offered.length}`);}
   {const {api}=boot();api.loadCall('arrest');const S=api.S();api.$('brief-go').onclick();Object.assign(S,{checked:true,mission:3,rosc:true,arrest:false,running:true});S.als.lucas=3;S.als.arrived=true;S.als.zoll=true;S.als.rcNext=S.t+999;
     api.instAct({a:'inj',i:'rearrest'});for(let i=0;i<8;i++)api.tick(.25);report('instructor','re-arrest restarts the LUCAS',S.arrest&&S.als.lucas===2&&S.cpr.on);}}
+
+if(want.includes('drill')){const {boot}=require('./pc_mock.js');const start=new Date().toISOString();const {api,els}=boot({'preconnect-drill':JSON.stringify({on:true,inst:'Max',roster:['Jo','Sam'],who:'Jo',start})});
+  const labels=new Set();for(let k=0;k<8;k++){api.loadCall('arrest');labels.add(api.V().label);}api.record();const runs=api.load().runs;const r=runs[runs.length-1];
+  report('drill','Drill Night: standard patient every time, instructor on without the switch, bar shows who is up, the saved call names them with the instructor and the night',!api.RANDOM()&&labels.size===1&&api.instOn()&&/Up: Jo/.test(els['pc-drill'].innerHTML)&&(r.who||[])[0]==='Jo'&&r.inst==='Max'&&r.night===start&&/Drill Night/.test(els['b-rand'].textContent)&&/Drill Night/.test(els['b-inst'].textContent),`who ${r.who}, inst ${r.inst}, patients ${[...labels].join('|')}`);}
 
 if(want.includes('fuzz')){const {boot}=require('./pc_mock.js');const prevNoMon=boot.noMon;boot.noMon=true;let crashes=0,runs=want.length<=5?24:80;const errs=[];
   const ids=['a-cpr','a-analyze','a-clear','a-shock','a-breath','a-breaths','a-suction','m-size','m-enter','m-tq','o-check','o-breath','o-nal','e-check','e-syr','e-p10','e-drawn','e-xcheck','e-inject','s-abc','s-B','s-time','f-primary','f-head','c-push','c-shoulders','b-breath','b-cut','d-glu','d-sw','mon-4','mon-12','inst-fab','disc-go','brief-go','brief-menu','b-resume','b-next','b-restart'];
