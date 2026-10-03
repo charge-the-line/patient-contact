@@ -107,3 +107,7 @@ Foundation fixes: fonts served from this site, screen wake lock, finger-sized bu
 - `home` section: readiness counts 16 activities; chips show the best score, Due and Again from the shared spacing; the empty phone reads 0 of 16 and points at the lesson. The lesson scores 100 when every check is right first try and 0 when every first answer is wrong, cannot be skipped, saves under `drillRuns` as `lesson`, and lights its chip; right answers are the longest in no more than 45% of slides and the shortest in no more than 45%; every check has one right answer and three distinct options; the text names the Medical Control Authority and no real agency or hospital.
 - The first-run check now asserts the menu Sound button is gone (`b-sound`), since the settings sheet owns sound.
 - Browser check: home list and lesson rows at 320 and 390 px.
+
+## Milestone 9 checks (added October 2026)
+
+- `?drill=apgar` on load opens the APGAR drill with the intro hidden; an unknown id is ignored. Browser check adds a daily-link row.

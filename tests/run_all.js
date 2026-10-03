@@ -122,6 +122,9 @@ if(want.includes('home')){const {boot}=require('./pc_mock.js');
    report('home','lesson checks: right answer is not usually the longest or the shortest',lo/L.length<=.45&&sh/L.length<=.45,`longest ${lo}/${L.length}, shortest ${sh}/${L.length}`);
    report('home','lesson: every check has one right answer and three distinct options; generic names and a protocol caveat',L.every(s=>s.o.filter(o=>o[1]==='good').length===1&&new Set(s.o.map(o=>o[0])).size===3)&&/Medical Control Authority/.test(JSON.stringify(L))&&!/Medstar|MMR|McLaren|Covenant/.test(JSON.stringify(L)));}}
 
+if(want.includes('drill')){const {boot}=require('./pc_mock.js');global.__loc={search:'?drill=apgar'};const {api,els}=boot();global.__loc={search:'?drill=nope'};const b=boot();global.__loc=undefined;
+  report('drill','daily-drill deep link: ?drill=apgar opens the APGAR drill on load with the intro hidden; an unknown id is ignored',!!api.DR()&&api.DR().id==='apgar'&&els.intro.classList.contains('hidden')&&!els.drillov.classList.contains('hidden')&&!b.api.DR(),`drill ${api.DR()&&api.DR().id}`);}
+
 if(want.includes('fuzz')){const {boot}=require('./pc_mock.js');const prevNoMon=boot.noMon;boot.noMon=true;let crashes=0,runs=want.length<=5?24:80;const errs=[];
   const ids=['a-cpr','a-analyze','a-clear','a-shock','a-breath','a-breaths','a-suction','m-size','m-enter','m-tq','o-check','o-breath','o-nal','e-check','e-syr','e-p10','e-drawn','e-xcheck','e-inject','s-abc','s-B','s-time','f-primary','f-head','c-push','c-shoulders','b-breath','b-cut','d-glu','d-sw','mon-4','mon-12','inst-fab','disc-go','brief-go','brief-menu','b-resume','b-next','b-restart'];
   for(let run=0;run<runs;run++){const {api}=boot();const {$}=api;api.setTier(run%3);api.setInst(run%2===0);api.loadCall(['arrest','mva','od','ep','st','fl','cb','dm'][run%8]);

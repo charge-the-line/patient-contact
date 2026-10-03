@@ -265,7 +265,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.20.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.21.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -384,7 +384,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.20.0';
+const APP_VERSION='0.21.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -2299,6 +2299,8 @@ if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventLis
 fresh();render();
 {const pr=load();INST=!!pr.inst;if(pr.tv)document.body.classList.add('tv');SOUND=settings().sound==='on'||!!pr.sound;if(SOUND&&settings().sound!=='on')setSetting('sound','on');RANDOM=!pr.standard&&!pcDrill();$('b-rand').textContent=RANDOM?'Patients: varied':pcDrill()?'Patients: standard (Drill Night)':'Patients: standard';$('b-rand').classList.toggle('on',RANDOM);pcDrillBind();instSync();}
 if(load().seen){$('intro').classList.add('hidden');showMenu();}
+/* the home page's daily drill deep-links here: patient-contact/?drill=med */
+{const q=new URLSearchParams((typeof location!=='undefined'&&location.search)||'').get('drill');if(q&&DRILLS.find(x=>x.id===q)){$('intro').classList.add('hidden');$('menu').classList.add('hidden');drillMenu();drillStart(q);}}
 let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();},250);
 requestAnimationFrame(drawWave);
 </script>
