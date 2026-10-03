@@ -68,3 +68,11 @@ The suite has been verified to **catch planted bugs**: late breaths not counting
 4. Run `balance` and rewrite answers until it passes.
 5. Add variants if the call has meaningful ones, and add forced cases to the `variants` section.
 6. Run the full suite plus the browser check; bump the versions.
+
+## Milestone 1 checks (added October 2026)
+
+Foundation fixes: fonts served from this site, screen wake lock, finger-sized buttons. The `syntax` section (the hub: the plain list) now also proves:
+- Fonts self-hosted in `fonts/`, no Google reference, every file in the cache list.
+- Screen wake lock: requested when a call starts (`brief-go`), released at the menu.
+- Intro version text equals `APP_VERSION`.
+- Browser check: any visible button under 44 px tall fails the screen.
