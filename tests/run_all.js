@@ -7,7 +7,7 @@
    Exit code 0 = all passed. */
 global.window=global.window||{};
 const path=require('path'),fs=require('fs'),vm=require('vm');
-const ALL=['syntax','balance','fast','human','sloppy','variants','drills','instructor','drill','fuzz'];
+const ALL=['syntax','balance','fast','human','sloppy','variants','drills','instructor','drill','home','fuzz'];
 let want=process.argv.slice(2);if(!want.length)want=ALL;if(want.includes('quick'))want=['syntax','balance','drills','instructor','fuzz'];
 const results=[];let failed=0;const T0=Date.now();
 function report(section,name,ok,detail=''){results.push({section,name,ok,detail});if(!ok)failed++;console.log(`${ok?'PASS':'FAIL'}  ${section.padEnd(10)} ${name}${detail?'  — '+detail:''}`);}
@@ -31,7 +31,7 @@ if(want.includes('syntax')){try{new vm.Script(html.split('<script>')[1].split('<
 
   {const {boot}=require('./pc_mock.js');const b3=boot();b3.api.$('b-call1').onclick();b3.api.$('brief-go').onclick();b3.api.finish();report('syntax','call debrief uses Debrief 2.0 (steps table, score count-up)',/pc-steps/.test(b3.els['done-b'].innerHTML)&&b3.els['done-s'].dataset.final==='100');}
   {const intro=(html.match(/<div class="overlay" id="intro">([\s\S]*?)<\/div><\/div>/)||[])[1]||'';const words=intro.replace(/<[^>]+>/g,' ').trim().split(/\s+/).length;const {boot}=require('./pc_mock.js');const b5=boot();b5.api.setSetting('sound','on');
-   report('syntax','first-run card is short, settings sheet wired, sound follows the shared setting',words<120&&/id="howov"/.test(html)&&/id="setov"/.test(html)&&/id="h-set"/.test(html)&&b5.els['b-sound'].textContent==='Sound: on'&&b5.api.settings().sound==='on',`${words} words · ${b5.els['b-sound'].textContent}`);}
+   report('syntax','first-run card is short, settings sheet wired, sound follows the shared setting',words<120&&/id="howov"/.test(html)&&/id="setov"/.test(html)&&/id="h-set"/.test(html)&&b5.api.settings().sound==='on'&&!/b-sound/.test(html),`${words} words`);}
   {const lits=[...html.matchAll(/(?:Version |>v)(\d+\.\d+\.\d+)/g)].map(m=>m[1]);report('syntax','intro shows the current version',lits.length>=1&&lits.every(v=>v===ver),`found ${lits.join(', ')}; app ${ver}`);}
   {// Milestone 1: fonts are served from this site; nothing loads from Google (offline fidelity + privacy). Every font file exists and is in the offline cache list.
    const sw3=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');const urls=[...html.matchAll(/url\((fonts\/[^)]+)\)/g)].map(m=>m[1]);
@@ -106,6 +106,21 @@ if(want.includes('drill')){const {boot}=require('./pc_mock.js');const start=new 
 
 if(want.includes('drill')){const {boot}=require('./pc_mock.js');const fakeAudio=()=>{const log=[];const AC=function(){this.currentTime=0;this.state='running';this.destination={};this.resume=()=>{};this.createOscillator=()=>({type:'sine',frequency:{value:0},connect(){},start(t){log.push({f:this.frequency.value,t});},stop(){}});this.createGain=()=>({gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}});};const buzz=[];const F={log,buzz,fs:()=>log.map(x=>x.f),arm(){global.window=global.window||{};global.window.AudioContext=AC;navigator.vibrate=p=>{buzz.push(JSON.stringify(p));return true;};}};F.arm();return F;};const F=fakeAudio();const {api}=boot();F.arm();api.setSetting('sound','on');api.loadCall('arrest');api.$('brief-go').onclick();F.log.length=0;F.buzz.length=0;api.ding(5,'test');const bad=F.fs().includes(220)&&F.buzz.includes('[30,40,30]');F.log.length=0;api.finish();const done=F.fs().join().includes('523,659,784');delete global.window.AudioContext;delete navigator.vibrate;
   report('drill','sound and haptics: a penalty plays the bad tone and buzzes, finishing a call chimes',bad&&done,`bad ${bad}, done ${done}`);}
+
+if(want.includes('home')){const {boot}=require('./pc_mock.js');
+  {// the home list: readiness card, a chip per call and for the lesson, Due/Again from the shared spacing
+   const old=new Date(Date.now()-10*864e5).toISOString();const {api,els}=boot({'patient-contact':JSON.stringify({runs:[{call:'arrest',score:95,d:new Date().toISOString(),tier:0},{call:'st',score:60,d:old,tier:1},{call:'fl',score:88,d:old,tier:0}],drillRuns:[{drill:'cpr',score:100,d:old}]})});api.showMenu();const R=api.readiness();
+   report('home','home list: readiness counts lesson + 8 calls + 7 drills (16), chips show best, Due and Again, the empty lesson chip reads —',R.total===16&&R.done===4&&els['chip-arrest'].textContent==='95'&&els['chip-st'].textContent==='Again'&&els['chip-fl'].textContent==='Due'&&els['chip-lesson'].textContent==='—'&&els['rdy-t'].textContent==='4 of 16 activities'&&els['rdy-n'].textContent==='25%'&&/2 due for review/.test(els['rdy-s'].textContent)&&/id="b-lesson"/.test(html)&&/class="sec"[^>]*>1 · Learn/.test(html)&&/3 · Drills and tools/.test(html),`${R.done}/${R.total} · arrest ${els['chip-arrest'].textContent}, st ${els['chip-st'].textContent}, fl ${els['chip-fl'].textContent}`);
+   const e=boot();e.api.showMenu();report('home','empty phone: 0 of 16, the card points at the lesson or a call',e.els['rdy-t'].textContent==='0 of 16 activities'&&/Start with the lesson/.test(e.els['rdy-s'].textContent));}
+  {// the lesson: 12 slides, first-try scoring, no skipping, saved under drillRuns as 'lesson' and credited on the chip
+   const {api,els,store}=boot();api.lessonStart();const L=api.LESSON;let skipped=false;
+   for(let i=0;i<L.length;i++){const before=api.LS().i;api.lessonAct({l:'next'});if(api.LS()&&api.LS().i!==before)skipped=true;api.lessonAct({l:'ans',k:L[i].o.findIndex(o=>o[1]==='good')});api.lessonAct({l:'next'});}
+   const dr=api.load().drillRuns||[];api.showMenu();report('home',`lesson: all ${L.length} checks right scores 100, cannot skip, recorded, chip shows 100`,!skipped&&dr.length===1&&dr[0].drill==='lesson'&&dr[0].score===100&&api.LS()===null&&els['chip-lesson'].textContent==='100'&&!els.ldone.classList.contains('hidden'),`score ${dr[0]&&dr[0].score}`);
+   const b=boot();b.api.lessonStart();for(let i=0;i<L.length;i++){b.api.lessonAct({l:'ans',k:L[i].o.findIndex(o=>o[1]!=='good')});b.api.lessonAct({l:'ans',k:L[i].o.findIndex(o=>o[1]==='good')});b.api.lessonAct({l:'next'});}const dr2=b.api.load().drillRuns||[];
+   report('home','lesson: a wrong first answer on every slide scores 0 (retry still lets you continue)',dr2.length===1&&dr2[0].score===0);
+   const lo=L.filter(s=>{const n=s.o.map(o=>o[0].length);return n[s.o.findIndex(o=>o[1]==='good')]===Math.max(...n);}).length,sh=L.filter(s=>{const n=s.o.map(o=>o[0].length);return n[s.o.findIndex(o=>o[1]==='good')]===Math.min(...n);}).length;
+   report('home','lesson checks: right answer is not usually the longest or the shortest',lo/L.length<=.45&&sh/L.length<=.45,`longest ${lo}/${L.length}, shortest ${sh}/${L.length}`);
+   report('home','lesson: every check has one right answer and three distinct options; generic names and a protocol caveat',L.every(s=>s.o.filter(o=>o[1]==='good').length===1&&new Set(s.o.map(o=>o[0])).size===3)&&/Medical Control Authority/.test(JSON.stringify(L))&&!/Medstar|MMR|McLaren|Covenant/.test(JSON.stringify(L)));}}
 
 if(want.includes('fuzz')){const {boot}=require('./pc_mock.js');const prevNoMon=boot.noMon;boot.noMon=true;let crashes=0,runs=want.length<=5?24:80;const errs=[];
   const ids=['a-cpr','a-analyze','a-clear','a-shock','a-breath','a-breaths','a-suction','m-size','m-enter','m-tq','o-check','o-breath','o-nal','e-check','e-syr','e-p10','e-drawn','e-xcheck','e-inject','s-abc','s-B','s-time','f-primary','f-head','c-push','c-shoulders','b-breath','b-cut','d-glu','d-sw','mon-4','mon-12','inst-fab','disc-go','brief-go','brief-menu','b-resume','b-next','b-restart'];

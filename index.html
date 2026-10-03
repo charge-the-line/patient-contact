@@ -122,7 +122,10 @@ body.tv>.top,body.tv>.eta{grid-column:1/-1}body.tv>#monitor{grid-column:1;grid-r
 body.tv .radio{max-height:320px}body.tv .ecgwrap,body.tv .ecgwrap canvas{height:150px}
 @media (min-width:1100px){body.tv{zoom:1.18}}
 .syr{width:100%;height:58px;display:block;margin:4px 0}
-.scen{display:block;width:100%;text-align:left;padding:12px 14px;margin-bottom:8px;background:var(--deck);border:0;border-left:4px solid var(--acc);border-radius:6px}.scen b{display:block;font-family:"Saira Condensed";font-size:21px;font-weight:600}.scen span{font-size:15px;color:var(--soft)}
+.scen{display:block;width:100%;text-align:left;padding:12px 70px 12px 14px;margin-bottom:8px;position:relative;background:var(--deck);border:0;border-left:4px solid var(--acc);border-radius:6px}
+.scen .bchip{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:"Saira Condensed";font-weight:600;font-size:14px;letter-spacing:.5px;padding:2px 8px;border-radius:4px;background:var(--acc);color:var(--acc-ink,#0a0c0f);white-space:nowrap;line-height:1.5}.bchip.dim{background:var(--deck2);color:var(--soft)}.bchip.due{background:#ffc23d;color:#0a0c0f}
+.card.rdy{background:linear-gradient(135deg,rgba(255,122,26,.22),var(--deck) 70%);border-left:4px solid var(--acc)}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.slide h2{font-size:30px}.slide ul{margin:0 0 12px;padding-left:20px;font-size:16px;line-height:1.5}.slide li{margin-bottom:4px}.dots{display:flex;gap:4px;justify-content:center;margin:8px 0}.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.dots i.on2{background:var(--acc)}.scen b{display:block;font-family:"Saira Condensed";font-size:21px;font-weight:600}.scen span{font-size:15px;color:var(--soft)}
 textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1a2e;color:var(--ink);width:100%}
 </style>
 </head>
@@ -262,7 +265,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.19.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.20.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -276,23 +279,26 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <div class="overlay hidden" id="menu"><div class="box">
   <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-block;font-size:14px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="font-size:14px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a><button class="gear" id="h-set" style="margin-left:12px">Settings</button></div>
-  <h2>Calls</h2>
+  <div class="card rdy" id="rdy"><div class="flex"><div style="min-width:0"><div class="small">Your readiness</div><b id="rdy-t" style="display:block;font-family:'Saira Condensed';font-size:22px;line-height:1.05"></b><div class="small" id="rdy-s"></div></div><div class="sp"></div><div class="num" id="rdy-n"></div></div></div>
+  <button id="b-resume" class="go hidden" style="width:100%;margin-bottom:8px">Resume call</button>
+  <div class="sec" style="margin-top:6px">1 · Learn</div>
+  <button class="scen" id="b-lesson"><span class="bchip dim" id="chip-lesson">—</span><b>The lesson</b><span>Medical first response in 12 slides, each with a check · about 10 minutes</span></button>
+  <div class="sec">2 · Calls</div>
   <div class="tiers"><button data-tier="0">Guided</button><button data-tier="1">Recall</button><button data-tier="2">Chaos</button></div>
   <p class="stat" id="tierhelp" style="margin:0 0 10px"></p>
-  <button class="scen" id="b-call1"><b>62-year-old man down</b><span>Witnessed collapse at home. His wife is doing CPR. Medic 1 is nine minutes out.</span></button>
-  <button class="scen" id="b-call2"><b>Car versus tree, driver pinned</b><span>Single-vehicle crash on a county road, early morning, 41°F. Driver trapped, bleeding. Your engine crew is cutting. Medic 1 is seven minutes out.</span></button>
-  <button class="scen" id="b-call3"><b>Unresponsive in the bathroom</b><span>11:47 p.m. A roommate found him on the bathroom floor, barely breathing. Suspected fentanyl. Medic 1 is eight minutes out.</span></button>
-  <button class="scen" id="b-call4"><b>Stung in the orchard</b><span>A yellow jacket sting, and now he can't catch his breath. No auto-injectors in Bay County — you draw up the epi. Medic 1 is eight minutes out.</span></button>
-  <button class="scen" id="b-call5"><b>Something's wrong with Mom</b><span>10:07 a.m. Her husband found her slumped at the kitchen table, slurring and weak on one side. Medic 1 is six minutes out — and East Side Hospital is across the river.</span></button>
-  <button class="scen" id="b-call6"><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
-  <button class="scen" id="b-call7"><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
-  <button class="scen" id="b-call8"><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
-  <button id="b-drills" class="go" style="width:100%;margin:2px 0 8px;font-size:17px">Quick drills — 60-second skill practice</button>
-  <div style="display:flex;gap:8px;margin:2px 0 8px"><button id="b-prog" style="flex:1">My progress</button><button id="b-sound" style="flex:1">Sound: off</button><button id="b-howto" style="flex:1">How to play</button></div>
-  <button id="b-rand" style="width:100%;margin-bottom:8px">Patients: varied</button>
-  <button id="b-inst" style="width:100%;margin-bottom:8px">Instructor mode: off</button>
-  <button class="guidebtn" id="b-gindex" style="width:100%;padding:11px;font-size:16px">Protocol guide — every skill on this call</button>
-  <button id="b-resume" class="go hidden" style="width:100%;margin-top:8px">Resume call</button>
+  <button class="scen" id="b-call1"><span class="bchip dim" id="chip-arrest">—</span><b>62-year-old man down</b><span>Witnessed collapse at home. His wife is doing CPR. Medic 1 is nine minutes out.</span></button>
+  <button class="scen" id="b-call2"><span class="bchip dim" id="chip-mva">—</span><b>Car versus tree, driver pinned</b><span>Single-vehicle crash on a county road, early morning, 41°F. Driver trapped, bleeding. Your engine crew is cutting. Medic 1 is seven minutes out.</span></button>
+  <button class="scen" id="b-call3"><span class="bchip dim" id="chip-od">—</span><b>Unresponsive in the bathroom</b><span>11:47 p.m. A roommate found him on the bathroom floor, barely breathing. Suspected fentanyl. Medic 1 is eight minutes out.</span></button>
+  <button class="scen" id="b-call4"><span class="bchip dim" id="chip-ep">—</span><b>Stung in the orchard</b><span>A yellow jacket sting, and now he can't catch his breath. No auto-injectors in Bay County — you draw up the epi. Medic 1 is eight minutes out.</span></button>
+  <button class="scen" id="b-call5"><span class="bchip dim" id="chip-st">—</span><b>Something's wrong with Mom</b><span>10:07 a.m. Her husband found her slumped at the kitchen table, slurring and weak on one side. Medic 1 is six minutes out — and East Side Hospital is across the river.</span></button>
+  <button class="scen" id="b-call6"><span class="bchip dim" id="chip-fl">—</span><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
+  <button class="scen" id="b-call7"><span class="bchip dim" id="chip-cb">—</span><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
+  <button class="scen" id="b-call8"><span class="bchip dim" id="chip-dm">—</span><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
+  <div class="sec">3 · Drills and tools</div>
+  <div class="row2"><button id="b-drills" class="go">Quick drills</button><button id="b-prog">My progress</button><button id="b-gindex">Protocol guide</button><button id="b-howto">How to play</button></div>
+  <div class="sec">Drill night</div>
+  <div class="row2"><button id="b-rand">Patients: varied</button><button id="b-inst">Instructor mode: off</button></div>
+  <p class="stat" style="margin:8px 0 0">Standard patients give everyone the same case. Instructor mode adds live injects and a freeze. Start a full Drill Night from the home page.</p>
 </div></div>
 
 <div class="overlay hidden" id="briefov"><div class="box">
@@ -328,6 +334,8 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 </div></div>
 <button id="inst-fab" class="fab hidden">Instructor</button>
 <div class="overlay hidden" id="pc-drillov" style="z-index:25"><div class="box" id="pc-drillbox"></div></div>
+<div class="overlay hidden" id="lessonov" style="z-index:12"><div class="box slide" id="lesson-box"></div></div>
+<div class="overlay hidden" id="ldone" style="z-index:13"><div class="box"><h2>Lesson complete</h2><div class="big" id="ld-score"></div><div id="ld-body"></div><div class="row2" style="margin-top:10px"><button id="ld-again">Again</button><button class="go" id="ld-menu">Menu</button></div></div></div>
 <div class="overlay hidden" id="instov" style="z-index:22"><div class="box">
   <div style="display:flex;justify-content:space-between;align-items:center"><span class="tag" style="background:#7a5cff;color:#fff;margin:0">Instructor</span><button id="inst-close" class="go">Close — resume</button></div>
   <div id="inst-body" style="margin-top:10px"></div>
@@ -376,7 +384,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.19.0';
+const APP_VERSION='0.20.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -2053,8 +2061,7 @@ function progressShow(){const p=load();const runs=p.runs||[];$('prog-body').inne
 $('b-prog').onclick=progressShow;$('prog-close').onclick=()=>$('progov').classList.add('hidden');
 $('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Patient','Date','Tier','Score','Instructor']].concat((p.runs||[]).flatMap(r=>(r.who&&r.who.length?r.who:[p.name||'']).map(n=>[n,p.dept||'',CALLNAME[r.call||'arrest'],r.variant||'',r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score,r.inst||'']))).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),'',r.d.slice(0,16).replace('T',' '),'Drill',r.score,'']));const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='patient-contact-training-record.csv';a.click();}catch(e){}};
-$('b-rand').onclick=()=>{RANDOM=!RANDOM;const p=load();p.standard=!RANDOM;save(p);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);};
-$('b-sound').onclick=()=>{SOUND=!SOUND;setSetting('sound',SOUND?'on':'off');const p=load();p.sound=SOUND;save(p);$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);if(SOUND){tone(960,.08,.06);speak('Sound on.');}};
+$('b-rand').onclick=()=>{RANDOM=!RANDOM;const p=load();p.standard=!RANDOM;save(p);$('b-rand').textContent=RANDOM?'Patients: varied':'Patients: standard';$('b-rand').classList.toggle('on',RANDOM);};
 window.addEventListener('resize',()=>{MV.kind='';});
 
 function insertStep(Ms,mi,beforeText,step){const st=Ms[mi].steps;let j=beforeText?st.findIndex(x=>x.t.startsWith(beforeText)):-1;if(j<0)j=st.length;st.splice(j,0,step);}
@@ -2226,7 +2233,48 @@ function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
 function record(){const p=load();pca('end',`${['guided','recall','chaos'][TIER]}/${pca('att',(p.runs||[]).filter(r=>(r.call||'arrest')===CALL).length+1)}/${pca('bkt',S.score)}`);p.runs.push(pcDrillStamp({who:INST&&p.crew&&p.crew.length?p.crew.slice():null,inst:INST?(p.instName||''):'',variant:V.label||'',call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc}));p.runs=p.runs.slice(-500);save(p);}
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
-function showMenu(){keepAwake(false);S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
+/* =================== Home readiness and the lesson (shared lesson engine). The lesson is generic medical first response in our own words; your Medical Control Authority's protocols are what you follow on a real call. =================== */
+const PC_ACTS=[['lesson','lesson'],...Object.keys(CALLNAME).map(k=>['call',k]),...DRILLS.map(d=>['drill',d.id])];
+function readiness(){const p=load();const best={};(p.runs||[]).forEach(r=>{const k='call:'+(r.call||'arrest');best[k]=Math.max(best[k]||0,+r.score||0);});(p.drillRuns||[]).forEach(r=>{const k=(r.drill==='lesson'?'lesson:':'drill:')+r.drill;best[k]=Math.max(best[k]||0,+r.score||0);});
+  const done=PC_ACTS.filter(([k,i])=>best[k+':'+i]!==undefined).length;return {done,total:PC_ACTS.length,pct:Math.round(done/PC_ACTS.length*100),best};}
+function homeRender(){const R=readiness();const p=load();let ndue=0;const set=(id,v)=>{const e=$(id);if(e&&e.textContent!==v)e.textContent=v;};
+  const chip=(id,k,runs)=>{const e=$('chip-'+id);if(!e)return;const b=R.best[k+':'+id];const sp=pcSpacing(runs);const dueNow=sp.status==='due'||sp.status==='missed';if(dueNow)ndue++;const t=b===undefined?'—':dueNow?(sp.status==='missed'?'Again':'Due'):String(b);if(e.textContent!==t)e.textContent=t;e.classList.toggle('dim',b===undefined);e.classList.toggle('due',dueNow);};
+  Object.keys(CALLNAME).forEach(k=>chip(k,'call',(p.runs||[]).filter(r=>(r.call||'arrest')===k)));chip('lesson','lesson',(p.drillRuns||[]).filter(r=>r.drill==='lesson'));
+  set('rdy-t',`${R.done} of ${R.total} activities`);set('rdy-n',R.pct+'%');
+  set('rdy-s',R.done?`${ndue?ndue+' due for review · ':''}${['Guided','Recall','Chaos'][TIER]} mode · ${RANDOM?'varied patients':'standard patients'}`:'Start with the lesson or any call. Your best scores show up here.');}
+const LESSON=[
+ {t:'Before you touch the patient',pts:['Scene size-up starts in the truck: what did dispatch say, what do you see, what could hurt you?','Gloves and eye protection every time. Add a mask when someone is coughing.','Count patients and decide early whether you need more help.','A hurt responder is one more patient and one fewer rescuer.'],
+  q:'You arrive at a one-car crash with power lines down across the hood. First?',o:[['Stay back; have dispatch send the utility','good'],['Go to the driver, she may be hurt','bad'],['Pull the wires off the hood with a dry tool','bad']],why:'Nobody approaches until the line is confirmed dead. Talk to the driver from a distance and tell her to stay put.'},
+ {t:'The primary survey',pts:['General impression from the doorway: sick or not sick?','Life-threatening bleeding first, then airway, breathing, circulation.','Fix what you find before you move on. The primary survey is treatment, not paperwork.','Repeat it whenever the patient changes.'],
+  q:'Unresponsive man, blood pouring from his thigh, gurgling breathing. What first?',o:[['Stop the bleeding, then open the airway','good'],['Open the airway first; airway always comes first','bad'],['Get a full set of vitals','bad']],why:'Life-threatening bleeding is the one thing that kills faster than an airway problem. Control it, then the airway.'},
+ {t:'Responsiveness and the airway',pts:['AVPU: Alert, responds to Voice, responds to Pain, Unresponsive.','Snoring, gurgling or silence in an unresponsive patient means the airway needs you.','Head tilt–chin lift when there is no reason to suspect a neck injury. Jaw thrust when there is.','Suction what you can see. Position matters as much as any tool.'],
+  q:'Found at the bottom of a ladder, snoring respirations. How do you open the airway?',o:[['Jaw thrust, holding the head still','good'],['Head tilt and chin lift, it is quicker','bad'],['Sit him up to help him breathe','bad']],why:'A fall means a possible neck injury: jaw thrust while someone holds the head. If the jaw thrust fails, the airway still wins.'},
+ {t:'Breathing: enough or not enough?',pts:['Rate, depth, effort. Count for at least 15 seconds.','Adult normal is about 12 to 20 a minute. Very slow, very fast, shallow or labored breathing is inadequate.','Inadequate breathing gets assisted with a bag-mask: one breath every 6 seconds for an adult, every 2 to 3 for a child or infant.','Watch the chest rise. Too much air does harm.'],
+  q:'Adult breathing 6 times a minute, shallow, blue lips. What do you do?',o:[['Bag-mask breaths, one every 6 seconds','good'],['Nonrebreather mask and watch','bad'],['Recovery position; recheck in five minutes','bad']],why:'Six shallow breaths a minute is not enough. Breathe for him with the bag-mask and call for ALS.'},
+ {t:'Circulation and shock',pts:['Pulse rate and quality, skin color, temperature and moisture, capillary refill in children.','Shock looks like pale, cool, sweaty skin, a fast pulse, anxiety or confusion. Blood pressure falls late.','Treat the cause you can see, lie the patient flat, keep them warm, and get ALS coming.','Nothing by mouth for a patient who may need surgery.'],
+  q:'Pale, cool, sweaty, pulse 128 and anxious after a fall from a roof. What now?',o:[['Shock: lie him flat, keep him warm, call ALS','good'],['Sit him up and offer sips of water to settle him','bad'],['Walk him to the rig to save time','bad']],why:'Those skin signs and that pulse are shock until proven otherwise. Flat, warm, ALS early, nothing by mouth.'},
+ {t:'Vital signs and what is normal',pts:['Adult at rest: pulse about 60 to 100, breathing 12 to 20, systolic pressure roughly 90 to 140.','Children breathe faster and have faster pulses; infants faster still. Know the ranges for the ages you see.','One set of vitals is a snapshot. The trend over three sets is the story.','Write the time next to every set.'],
+  q:'Which set is normal for a resting adult?',o:[['Pulse 72, breathing 16, pressure 118 over 76','good'],['Pulse 130, breathing 28, pressure 88/50','bad'],['Pulse 48, breathing 8, pressure 150 over 100','bad']],why:'72, 16 and 118/76 sit inside every adult range. The other two sets are a patient in trouble.'},
+ {t:'History: SAMPLE and OPQRST',pts:['SAMPLE: Signs and symptoms, Allergies, Medications, Past history, Last oral intake, Events leading up.','OPQRST for pain: Onset, Provocation, Quality, Radiation, Severity, Time.','The medication list often tells you the diagnosis before the patient does.','Ask the family and look at the scene: pill bottles, oxygen, a walker, a glucose meter.'],
+  q:'What does the M in SAMPLE stand for?',o:[['Medications they take','good'],['Mechanism of injury','bad'],['Mental status on arrival','bad']],why:'Medications. A blood thinner, insulin or a heart pill changes what you worry about.'},
+ {t:'Oxygen',pts:['Give oxygen for low saturation (below about 94 percent), breathing distress, shock, or when your protocol says so.','Nasal cannula 2 to 6 liters for mild need; nonrebreather 10 to 15 liters for serious need; bag-mask when breathing is inadequate.','A comfortable patient with a normal saturation does not need routine oxygen.','Never withhold oxygen from a patient in distress because of a lung disease. Follow your protocol and watch them.'],
+  q:'Saturation 97 percent, comfortable, chest pain. Oxygen?',o:[['Not routinely; watch the saturation','good'],['Nonrebreather at 15 liters, always, for chest pain','bad'],['Cannula at 2 liters, just in case','bad']],why:'Current guidance is to give oxygen when the saturation is low or the patient is in distress, not to everyone with chest pain.'},
+ {t:'Positioning and comfort',pts:['Unresponsive and breathing, no trauma: recovery position so vomit drains out, not in.','Trouble breathing: sitting up, the position they choose.','Shock: flat, warm, still.','Suspected spine injury: keep the head still and move as a unit; follow your protocol on immobilization.'],
+  q:'Unresponsive, breathing well, no trauma, likely to vomit. Position?',o:[['Recovery position, on the side','good'],['Flat on the back with a pillow','bad'],['Sitting up against the wall so you can watch the airway','bad']],why:'On the side, the airway drains itself. Flat on the back, a vomiting unresponsive patient aspirates.'},
+ {t:'Calling for help early',pts:['Ask for ALS as soon as you see an airway problem, inadequate breathing, shock, altered mental status, chest pain, stroke signs or an overdose.','Dispatch needs the address, the number of patients, what is wrong and what you need. Update them when it changes.','Early is free. Late costs minutes you cannot get back.','Know your district: bridges, trains and long driveways change the plan.'],
+  q:'First impression: unresponsive and gasping. When do you ask for ALS?',o:[['Now, before the rest of the assessment','good'],['After vitals confirm the problem','bad'],['Only when the officer arrives and agrees','bad']],why:'Gasping and unresponsive is a cardiac arrest until proven otherwise. ALS goes out on the first impression.'},
+ {t:'The handoff',pts:['Age and sex, chief complaint, what you found, what you did, how the patient responded, and the times.','Lead with the one thing that matters most.','Hand over face to face, and keep working until the medic says they have the patient.','Write down what you gave and when. Memory fails under stress.'],
+  q:'Medic 1 walks in. What do they need first?',o:[['Age, complaint, findings, what you did, times','good'],['His full address and insurance','bad'],['Everything, starting from when you were dispatched','bad']],why:'A tight report in that order lets the medic start where you left off instead of starting over.'},
+ {t:'Protocols and this app',pts:['Your Medical Control Authority\'s protocols are the rules you work under. They decide doses, devices and destinations.','This app models national guidance with generic names. Where your protocol differs, your protocol wins.','Practice builds the habit so the real call feels like the hundredth time, not the first.','Tell us when something here does not match what you are taught.'],
+  q:'The app and your protocol disagree on a dose. What do you do?',o:[['Follow your protocol and tell us','good'],['Follow the app, it is newer','bad'],['Split the difference between the two','bad']],why:'Your protocol is what you are authorized to do. Report the difference so we can fix the app or add the caveat.'}];
+let LS=null;
+function lessonStart(){keepAwake(true);$('menu').classList.add('hidden');pca('begin','pc','lesson',()=>LS?`slide-${LS.i+1}`:'');LS=pcLessonStart({slides:LESSON,label:'MFR lesson',onDone:lessonDone,onQuit:()=>{pca('abandon');LS=null;keepAwake(false);showMenu();}});}
+function lessonAct(ds){pcLessonAct(LS,ds);}
+function lessonDone(score,right,n){keepAwake(false);pcFx('done');pca('end',pca('bkt',score));const p=load();const prev=(p.drillRuns||[]).filter(x=>x.drill==='lesson');p.drillRuns=(p.drillRuns||[]).concat([pcDrillStamp({drill:'lesson',d:new Date().toISOString(),score})]).slice(-200);save(p);LS=null;
+  $('ld-score').textContent='';countUp($('ld-score'),score,600);$('ld-body').innerHTML=pcDebriefBody({score,compare:pcBestPrev(prev),kicker:'Next: run a call and put it to work.',metrics:[['Right on the first try',`${right} of ${n}`]],clean:false});$('ldone').classList.remove('hidden');}
+$('lesson-box').onclick=e=>{const b=e.target.closest&&e.target.closest('[data-l]');if(b)lessonAct(b.dataset);};
+$('b-lesson').onclick=lessonStart;$('ld-again').onclick=()=>{$('ldone').classList.add('hidden');lessonStart();};$('ld-menu').onclick=()=>{$('ldone').classList.add('hidden');showMenu();};
+function showMenu(){keepAwake(false);S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');homeRender();$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
 $('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-call7').onclick=()=>loadCall('cb');$('b-call8').onclick=()=>loadCall('dm');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
 $('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
@@ -2243,13 +2291,13 @@ $('r-cancel').onclick=()=>$('repov').classList.add('hidden');
 $('r-send').onclick=async()=>{const p=load();p.name=$('r-name').value.trim();p.dept=$('r-dept').value.trim();save(p);const text=`From: ${p.name||'—'} (${p.dept||'—'})\nNote: ${$('r-note').value.trim()||'—'}\n\n${snapshot()}`;
   if(navigator.share){try{await navigator.share({title:'Patient Contact report',text});$('repov').classList.add('hidden');return;}catch(e){if(e.name==='AbortError')return;}}
   try{await navigator.clipboard.writeText(text);$('r-msg').textContent='Report copied — paste it into a text or email.';}catch(e){$('r-note').value=text;$('r-msg').textContent='Copy the text above and send it.';}};
-applySettings();settingsBind();window.onPreconnectSettings=s=>{SOUND=s.sound==='on';$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);};
+applySettings();settingsBind();window.onPreconnectSettings=s=>{SOUND=s.sound==='on';};
 $('b-howmore').onclick=()=>$('howov').classList.remove('hidden');$('how-close').onclick=()=>$('howov').classList.add('hidden');$('b-howto').onclick=()=>$('howov').classList.remove('hidden');
 if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
 /* ================= boot ================= */
 fresh();render();
-{const pr=load();INST=!!pr.inst;if(pr.tv)document.body.classList.add('tv');SOUND=settings().sound==='on'||!!pr.sound;if(SOUND&&settings().sound!=='on')setSetting('sound','on');RANDOM=!pr.standard&&!pcDrill();$('b-sound').textContent='Sound: '+(SOUND?'on':'off');$('b-sound').classList.toggle('on',SOUND);$('b-rand').textContent=RANDOM?'Patients: varied — each run is different':pcDrill()?'Patients: standard (Drill Night)':'Patients: standard — same patient every time';$('b-rand').classList.toggle('on',RANDOM);pcDrillBind();instSync();}
+{const pr=load();INST=!!pr.inst;if(pr.tv)document.body.classList.add('tv');SOUND=settings().sound==='on'||!!pr.sound;if(SOUND&&settings().sound!=='on')setSetting('sound','on');RANDOM=!pr.standard&&!pcDrill();$('b-rand').textContent=RANDOM?'Patients: varied':pcDrill()?'Patients: standard (Drill Night)':'Patients: standard';$('b-rand').classList.toggle('on',RANDOM);pcDrillBind();instSync();}
 if(load().seen){$('intro').classList.add('hidden');showMenu();}
 let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();},250);
 requestAnimationFrame(drawWave);
