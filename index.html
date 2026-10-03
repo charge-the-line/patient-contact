@@ -261,7 +261,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
   <p>When the medic arrives, you'll help put the patient on the cardiac monitor — and turn on <b>Sound</b> in the menu for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:15px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.15.0 · prototype.</p>
+  <p style="font-size:15px;color:var(--soft)">A training aid built on current adult BLS guidelines. Your Medical Control Authority's protocols are what you follow on a real call. Units, hospitals, and equipment behavior are generic or simulated. Version 0.16.0 · prototype.</p>
   <button class="go" id="b-start" style="width:100%;font-size:18px">Continue</button>
 </div></div>
 
@@ -350,10 +350,11 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p id="r-msg" style="font-size:15px;margin:10px 0 0"></p>
 </div></div>
 
+<script src="preconnect-core.js"></script>
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.15.0';
+const APP_VERSION='0.16.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -649,9 +650,10 @@ $('dec-opts').onclick=e=>{const b=e.target.closest('[data-i]');if(!b||!DEC_OPEN)
   $('dec-opts').classList.add('hidden');$('dec-fb').classList.remove('hidden');};
 $('dec-chips').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
 $('dec-go').onclick=()=>{if(!DEC_OPEN)return;const d=DEC[DEC_OPEN.key];$('decov').classList.add('hidden');if(DEC_OPEN.j>=0)stepsDone[DEC_OPEN.j]=true;const el=$('st-'+DEC_OPEN.j);if(el)el.classList.add('done');if(d.after)d.after();DEC_OPEN=null;S.running=true;};
-function finish(){keepAwake(false);const last=S.mission===M.length-1;$('done-t').textContent=vtf(M[S.mission].title)+(last?' — call complete':' — complete');$('done-s').textContent=S.score;
+function finish(){keepAwake(false);const last=S.mission===M.length-1;$('done-t').textContent=vtf(M[S.mission].title)+(last?' — call complete':' — complete');countUp($('done-s'),S.score,600);
   const keys=[...new Set(S.incidents.map(incidentKey).filter(Boolean))];
-  let h=S.incidents.length?`<p><b>Feedback:</b> ${S.incidents.map(esc).join(' · ')}</p>`+(keys.length?`<div class="chips">${keys.map(k=>`<button class="chip warn" data-k="${k}">${esc(GUIDE[k].name)}</button>`).join('')}</div>`:''):'<p>Clean — no feedback items.</p>';
+  const compare=last?pcBestPrev((load().runs||[]).filter(r=>r.call===CALL).map(r=>({d:r.d,score:r.score}))):null;
+  let h=pcDebriefBody({score:S.score,compare,feedback:S.incidents,lessons:keys.map(k=>({k,name:GUIDE[k].name})),steps:M[S.mission].steps.map((st,j)=>({name:st.t,ok:!!stepsDone[j],missed:!stepsDone[j]}))});
   if(last&&CALL==='mva'){h+=mvaDebrief();record();}
   else if(last&&CALL==='od'){h+=odDebrief();record();}
   else if(last&&CALL==='ep'){h+=epDebrief();record();}
