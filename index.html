@@ -262,7 +262,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.18.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.19.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -367,7 +367,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
  <div class="set"><div class="k">High contrast<small>Black background, brighter text: for daylight.</small></div><div class="seg2" data-set="contrast"><button data-val="normal">Off</button><button data-val="high">On</button></div></div>
  <div class="set"><div class="k">Motion<small>Auto follows your phone's Reduce Motion setting.</small></div><div class="seg2" data-set="motion"><button data-val="auto">Auto</button><button data-val="off">Off</button></div></div>
  <div class="sec">Feedback</div>
- <div class="set"><div class="k">Sound<small>Monitor beeps, metronome, voice prompts, in modules that have them.</small></div><div class="seg2" data-set="sound"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
+ <div class="set"><div class="k">Sound<small>A metronome for compressions, a tone for right and wrong, a chime when you finish, and Patient Contact's monitor.</small></div><div class="seg2" data-set="sound"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
  <div class="set"><div class="k">Haptics<small>A tap you can feel on compressions and mistakes.</small></div><div class="seg2" data-set="haptics"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
  <div class="sec">Privacy</div>
  <div class="set"><div class="k">Anonymous statistics<small>Counts like "someone finished the infant station." Never names. <a href="../privacy.html" style="color:var(--acc)">Details</a></small></div><div class="seg2" data-set="stats"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
@@ -376,7 +376,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.18.0';
+const APP_VERSION='0.19.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -400,7 +400,7 @@ function fresh(){S={mon:{four:false,twelve:false,placing:null,err4:0,err12:0,acq
   tx:{t:0,total:600,bridge:0,arrived:false,reassess:0,lastReass:-999},
   etco2:0,chaos:{vomitDone:false,etaHit:false},rateSum:0,rateN:0,Qm:0,manT:0};}
 function radio(who,msg,cls=''){msg=vt(msg);const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">${esc(who)}:</span> <span class="${cls}">${esc(msg)}</span>`;r.prepend(d);while(r.children.length>18)r.lastChild.remove();if(typeof radioHook==='function')radioHook(who,msg);}
-function ding(p,why){S.score=Math.max(0,S.score-p);S.incidents.push(why);radio('Feedback',`${why} (−${p})`,'bad');if(TIER===0){const k=incidentKey(why);if(k)radio('Guide',`Why it matters: Protocol guide → ${GUIDE[k].name}`);}}
+function ding(p,why){S.score=Math.max(0,S.score-p);S.incidents.push(why);radio('Feedback',`${why} (−${p})`,'bad');pcFx('bad');if(TIER===0){const k=incidentKey(why);if(k)radio('Guide',`Why it matters: Protocol guide → ${GUIDE[k].name}`);}}
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
 let CALL0=14*3600+41*60;
 function clockStr(at){const s=CALL0+(at===undefined?S.t:at);const h=Math.floor(s/3600)%24,m=Math.floor(s%3600/60);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
@@ -672,7 +672,7 @@ $('dec-opts').onclick=e=>{const b=e.target.closest('[data-i]');if(!b||!DEC_OPEN)
   $('dec-opts').classList.add('hidden');$('dec-fb').classList.remove('hidden');};
 $('dec-chips').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
 $('dec-go').onclick=()=>{if(!DEC_OPEN)return;const d=DEC[DEC_OPEN.key];$('decov').classList.add('hidden');if(DEC_OPEN.j>=0)stepsDone[DEC_OPEN.j]=true;const el=$('st-'+DEC_OPEN.j);if(el)el.classList.add('done');if(d.after)d.after();DEC_OPEN=null;S.running=true;};
-function finish(){keepAwake(false);const last=S.mission===M.length-1;$('done-t').textContent=vtf(M[S.mission].title)+(last?' — call complete':' — complete');countUp($('done-s'),S.score,600);
+function finish(){keepAwake(false);pcFx('done');const last=S.mission===M.length-1;$('done-t').textContent=vtf(M[S.mission].title)+(last?' — call complete':' — complete');countUp($('done-s'),S.score,600);
   const keys=[...new Set(S.incidents.map(incidentKey).filter(Boolean))];
   const compare=last?pcBestPrev((load().runs||[]).filter(r=>r.call===CALL).map(r=>({d:r.d,score:r.score}))):null;
   let h=pcDebriefBody({score:S.score,compare,feedback:S.incidents,lessons:keys.map(k=>({k,name:GUIDE[k].name})),steps:M[S.mission].steps.map((st,j)=>({name:st.t,ok:!!stepsDone[j],missed:!stepsDone[j]}))});

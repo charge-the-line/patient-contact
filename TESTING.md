@@ -97,3 +97,7 @@ Foundation fixes: fonts served from this site, screen wake lock, finger-sized bu
 
 - `drill` section: with a session on, eight loads of the arrest call give the same patient, `RANDOM` is off, instructor mode is effective without the switch, both menu buttons say Drill Night, the bar reads "Up: Jo", and the saved call is stamped with who, instructor and night.
 - Browser check: with a session in storage the picker opens on load and the bar shows after a pick.
+
+## Milestone 6 checks (added October 2026)
+
+- `drill` section: a penalty plays the bad tone and buzzes, finishing a call chimes.
