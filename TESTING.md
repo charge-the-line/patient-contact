@@ -115,3 +115,10 @@ Foundation fixes: fonts served from this site, screen wake lock, finger-sized bu
 ## Milestone 10 checks (added October 2026)
 
 - Browser check: landscape, Daylight and landscape-settings rows.
+
+## Bay County arrest protocol (0.23.0, October 4, 2026)
+The arrest call was redesigned around Bay County practice (see CLAUDE.md; pending MCA review). What the suite now proves, and why:
+- **`protocol` section (32 checks).** The 25 minutes is one setting (`COUNTY.torMin`); a planted "about 25 minutes into the arrest" in arrest text fails the check. The consult starts at the county time with CPR running (the share of the consult with compressions is measured), the stop order comes about two minutes later, and the patient is never loaded; changing the setting to 20 moves the consult. ROSC happens only on scene (`S.roscPh`), then the 12-lead, a cath lab alert and transport. A ROSC patient whose pulse never comes (`roscAt: 99`) ends in the consult, not the ambulance. **Perfect care that ends in termination scores 100, and the debrief says so.**
+- **Signs of death and DNRs.** Withholding CPR without definite signs (found down and warm, the hypothermia trap, a DNR nobody can produce) costs 50 and the partner starts CPR anyway; starting on an obvious death costs 5; a valid DNR in hand means no CPR; the DNR mid-code is verified by the medic.
+- **The human bot plays every one of the eleven arrest patients on every tier to 100.** Arrest runs now take 8 to 13 real minutes at human pace (the long on-scene stretch runs at 4× game time), so the bot's 150-second "stalled" marker appears during the on-scene wait and is not a failure.
+- **Bugs found while building it:** the monitor panel hid itself after mission 4 (`S.mission<=3`), so a 12-lead after a long first-look call could never be taken; the browser check read the score mid count-up (it counts from 0) and now reads `data-final`.

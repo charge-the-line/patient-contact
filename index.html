@@ -203,7 +203,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <div class="deck" id="deck">
   <div class="grp hidden" id="g-monitor" style="background:#0d2a1d;border:1px solid #2f9e66;border-radius:10px;padding:8px"><h3 style="color:#7fe3a4">Help the medic: cardiac monitor</h3><div class="row"><button id="mon-4" class="hot">Place the 4-lead</button><button id="mon-12" class="hot">Place the 12-lead</button></div><div class="stat" id="mon-txt"></div></div>
-  <div class="grp" id="g-assess"><h3>Assess</h3><div class="row"><button id="a-check">Check: responsive, breathing, pulse</button><button id="a-suction" class="hidden">Suction the airway</button></div></div>
+  <div class="grp" id="g-assess"><h3>Assess</h3><div class="row"><button id="a-check">Check: responsive, breathing, pulse</button><button id="a-dnr">Ask: is there a DNR?</button><button id="a-suction" class="hidden">Suction the airway</button></div></div>
   <div class="grp" id="g-cpr"><h3>Compressions</h3>
     <div class="row three"><button id="a-cpr">Start CPR</button><button id="a-switch">Switch</button><button id="a-met">Metronome</button></div>
     <div class="stat" id="cycle"></div></div>
@@ -265,7 +265,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.22.1 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.23.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -386,7 +386,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.22.1';
+const APP_VERSION='0.23.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -399,7 +399,7 @@ const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 let TIER=0,S={},stepsDone=[],CALL='arrest';
 function fresh(){S={mon:{four:false,twelve:false,placing:null,err4:0,err12:0,acqT:0},log:[],t:0,mStart:0,mission:0,running:false,active:false,briefing:false,score:100,incidents:[],decisions:[],lastChoice:null,
-  checked:false,arrest:true,rosc:false,roscAt:null,Q:0,
+  checked:false,arrest:true,rosc:false,roscAt:null,Q:0,resus0:null,terminated:false,noRes:false,startChoice:null,torT:null,torEl:null,tor:{calling:false,callT:null,extended:false},dnr:{asked:false,produced:false,verifyT:null,stop:false},nores:{confirmed:false},
   cpr:{on:false,who:'Wife',met:false,count:0,rate:0,depth:0},fat:{You:0,Partner:0,Wife:.55},switches:0,sinceSwitch:0,
   vent:{mode:'302',waiting:false,waitT:0,breathT:0,cycles:0,missed:0,last:-99,good:0,hyper:0,under:0},
   pause:{on:true,t:0,longest:0,over10:0,count:0},compT:0,arrestT:0,
@@ -418,8 +418,37 @@ function clockStr(at){const s=CALL0+(at===undefined?S.t:at);const h=Math.floor(s
 /* ================= Randomized patients ================= */
 let V={id:'base',label:'',sub:[]};let RANDOM=true;
 function pickW(list){const t=list.reduce((a,b)=>a+b.w,0);let r=Math.random()*t;for(const x of list){r-=x.w;if(r<=0)return x;}return list[0];}
+/* ================= Bay County arrest protocol (pending MCA review) =================
+   One place to change the county setting: minutes worked on scene before the medic consults medical control. */
+const COUNTY={name:'Bay County',torMin:25};
+/* Unwitnessed openings: what you find, what the family says about a DNR, and dispatch. Kept non-graphic. */
+const LOOKS={
+ obvious:{dispatch:'Unit responding — 62-year-old male, found unresponsive in bed by his wife, not breathing. Medic 1 responding, nine minutes.',brief:'His wife woke up and found him in bed. She called 911 and says he isn\'t breathing. Nobody is doing CPR. Before you start, you look.',check:'Sir? … No response. Not breathing, no pulse. His jaw and arms are stiff, his skin is cold in a warm bedroom, and the color has settled dark purple along his back where it rests on the mattress.',dnr:'A DNR? No. He was fine last night.',dec:'startObvious'},
+ cold:{dispatch:'Unit responding — 62-year-old male, found unresponsive in the snow in his driveway by his wife. Medic 1 responding, nine minutes.',brief:'His wife found him in the driveway at first light, face down in the snow next to the snowblower. It is 9°F. Nobody is doing CPR. Before you start, you look.',check:'Sir? … No response. Not breathing, no pulse I can find. He is ice-cold and pale, and his muscles feel stiff — but it is 9 degrees out here. No settled color that I can see.',dnr:'No, nothing like that. Please — he was just out here clearing the drive.',dec:'startCold'},
+ warm:{dispatch:'Unit responding — 62-year-old male, found down on the kitchen floor by his wife, not breathing. Medic 1 responding, nine minutes.',brief:'His wife came home from the store and found him on the kitchen floor. She was gone about forty minutes. Nobody is doing CPR. Before you start, you look.',check:'Sir? … No response. Not breathing, no pulse. He is warm, his arms move freely, and there is no settled color. His coffee on the table is cold and the TV is still on.',dnr:'A DNR? No. No, nothing like that — please help him.',dec:'startWarm'},
+ dnrok:{dispatch:'Unit responding — 62-year-old male, hospice patient, not breathing. Wife on scene. Medic 1 responding, nine minutes.',brief:'His wife meets you at the door. He has been in hospice for lung cancer and stopped breathing a few minutes ago. She is holding a form. Nobody is doing CPR.',check:'Sir? … No response. Not breathing, no pulse. He is warm.',dnr:'Yes — here. It\'s his DNR. (She hands you a Michigan do-not-resuscitate order on the state form with his name on it, signed, dated and witnessed.)',dec:'dnrValid'},
+ dnrgone:{dispatch:'Unit responding — 62-year-old male, collapsed, not breathing. Caller has not started CPR, says he has a DNR. Medic 1 responding, nine minutes.',brief:'His wife says he collapsed a few minutes ago. She did not start CPR because "he has a DNR." Nobody is doing CPR. Before you start, you look.',check:'Sir? … No response. Not breathing, no pulse. He is warm and limp.',dnr:'He has one — we signed it at the doctor\'s last spring. I can\'t find it… it was in the kitchen drawer… (She is searching.)',dec:'dnrMissing'}};
+const DNR_NONE='No — no, nothing like that. Please help him.',DNR_LATE='I… I think he signed something with his doctor last year. Our daughter would know. Please keep going.';
+function arrestV(v){v.sub=[];const H='witnessed collapse, wife CPR about 4 minutes. Pulseless, agonal breaths.';
+  if(v.open==='look'){const h={warm:'found down by his wife, unknown downtime, no bystander CPR. Pulseless, apneic, warm.',cold:'found in the snow, unknown downtime, no bystander CPR. Pulseless, apneic, cold.',dnrgone:'collapsed in front of his wife, no bystander CPR, DNR claimed but not produced. Pulseless, apneic.'}[v.look];
+    if(h)v.sub.push([H,h]);v.sub.push(['Witnessed cardiac arrest, about ten minutes down','Unwitnessed cardiac arrest, about ten minutes into it'],['His wife says he was watching TV and slumped over, so she called 911. When we got here she was doing CPR, so we took over and put the AED on him…','His wife says she found him like this and called 911. When we got here nobody was doing CPR, so we checked him, started, and put the AED on him…']);}
+  if(v.look==='cold')v.sub.push(['is through the door','pulls up beside you'],['The cot is in the living room, the rig is in the driveway','The rig is right here in the driveway'],['all over the living room floor','all over the driveway']);
+  return v;}
+const aPh=()=>CALL==='arrest'&&M[S.mission]?M[S.mission].tag:null;
+function stopEfforts(msg){S.torComp=S.compT;S.arrest=false;S.terminated=true;S.torT=S.t;S.torEl=S.resus0===null?0:S.t-S.resus0;S.cpr.on=false;S.pause.on=false;S.vent.waiting=false;S.als.rc=null;if(S.als.lucas===2)S.als.lucas=3;S.act=null;radio('Medic 1',msg);}
 const VARIANTS={
- arrest:()=>pickW([{w:65,shock:true,label:'Shockable rhythm (VF)'},{w:35,shock:false,label:'Non-shockable rhythm (PEA) — no shocks advised'}]),
+ arrest:()=>{const r=13+Math.floor(Math.random()*5);return arrestV(pickW([
+  {w:22,open:'cpr',look:null,dnr:null,shock:true,outcome:'rosc',roscAt:r,label:'Witnessed · shockable rhythm (VF) · ROSC on scene'},
+  {w:8,open:'cpr',look:null,dnr:null,shock:false,outcome:'rosc',roscAt:r+2,label:'Witnessed · non-shockable rhythm (PEA) — no shocks advised · ROSC on scene'},
+  {w:12,open:'cpr',look:null,dnr:null,shock:true,outcome:'tor',label:'Witnessed · VF · no ROSC even with excellent CPR — medical control ordered a stop'},
+  {w:9,open:'cpr',look:null,dnr:null,shock:false,outcome:'tor',label:'Witnessed · PEA — no shocks advised · no ROSC — medical control ordered a stop'},
+  {w:6,open:'cpr',look:null,dnr:null,shock:true,outcome:'extend',roscAt:29,extendTo:35,label:'Witnessed · refractory VF with a strong EtCO₂ — the medic kept working past the usual consult time · ROSC at about 29 minutes'},
+  {w:5,open:'cpr',look:null,dnr:'late',shock:true,outcome:'tor',label:'Witnessed · VF · a valid DNR turned up in the middle of the resuscitation'},
+  {w:8,open:'look',look:'obvious',dnr:null,shock:false,outcome:'none',label:'Unwitnessed · definite signs of death — no resuscitation'},
+  {w:6,open:'look',look:'cold',dnr:null,shock:false,outcome:'extend',roscAt:30,extendTo:40,label:'Unwitnessed · found outside in the cold (the hypothermia trap) · the medic kept working · ROSC at about 30 minutes'},
+  {w:8,open:'look',look:'warm',dnr:null,shock:false,outcome:'tor',label:'Unwitnessed · found down, warm, no definite signs — start CPR · no ROSC'},
+  {w:5,open:'look',look:'dnrok',dnr:'valid',shock:false,outcome:'none',label:'A valid Michigan DNR produced right away — no resuscitation'},
+  {w:5,open:'look',look:'dnrgone',dnr:'missing',shock:true,outcome:'tor',label:'Family says there is a DNR but cannot produce it — start CPR · no ROSC'}]));},
  od:()=>pickW([{w:30,L:.65,label:'Breathing returned after one naloxone dose'},{w:45,L:1,label:'Needed two naloxone doses'},{w:25,L:1.3,label:'High-potency opioid — needed three doses'}]),
  ep:()=>{const r=Math.random()<.6,sev=Math.random()<.35?.55:.42;return {rebound:r,sev,label:(sev>.5?'Severe, fast-moving reaction':'Moderate reaction')+' · '+(r?'symptoms returned in transport':'stayed stable after one dose')};},
  st:()=>{const side=Math.random()<.5?'R':'L',wake=Math.random()<.35,lvo=Math.random()<.35;const v={side,wake,lvo,label:`${side==='R'?'Right':'Left'}-sided weakness · ${wake?'woke up with symptoms (wake-up stroke)':'found down after a witnessed normal time'} · ${lvo?'signs of a large-vessel clot → thrombectomy center':'no large-vessel signs → closest stroke center'}`,sub:[]};
@@ -435,7 +464,7 @@ const VARIANTS={
  cb:()=>{const nuchal=Math.random()<.6,vig=Math.random()<.35;const v={nuchal,vig,label:`${nuchal?'Cord around the neck':'No nuchal cord'} · ${vig?'baby vigorous at birth':'baby needed breaths'}`,sub:[]};
    if(vig)v.sub.push(['limp — we bagged her, crying by about 90 seconds','crying at birth — dried, warmed, skin-to-skin'],['needed breaths','vigorous at birth'],['came out limp','came out crying']);if(!nuchal)v.sub.push(['nuchal cord, ','']);return v;}
 };
-function baseVariant(id){return {arrest:{shock:true,label:'Shockable rhythm (VF)'},od:{L:1,label:'Needed two naloxone doses'},ep:{rebound:true,sev:.42,label:'Moderate reaction · symptoms returned in transport'},st:{side:'R',wake:false,lvo:false,label:'Right-sided weakness · found down · no large-vessel signs',sub:[]},fl:{label:'On Eliquis · down about 9½ hours · right hip',sub:[]},dm:{pill:false,low:false,label:'Type 1 on insulin · awake enough to swallow',sub:[]},mva:{warm:false,loss:300,label:'Cold, wet morning · bleeding started recently',sub:[]},cb:{nuchal:true,vig:false,label:'Cord around the neck · baby needed breaths',sub:[]}}[id]||{label:''};}
+function baseVariant(id){return {arrest:{open:'cpr',look:null,dnr:null,shock:true,outcome:'rosc',roscAt:15,label:'Witnessed · shockable rhythm (VF) · ROSC on scene',sub:[]},od:{L:1,label:'Needed two naloxone doses'},ep:{rebound:true,sev:.42,label:'Moderate reaction · symptoms returned in transport'},st:{side:'R',wake:false,lvo:false,label:'Right-sided weakness · found down · no large-vessel signs',sub:[]},fl:{label:'On Eliquis · down about 9½ hours · right hip',sub:[]},dm:{pill:false,low:false,label:'Type 1 on insulin · awake enough to swallow',sub:[]},mva:{warm:false,loss:300,label:'Cold, wet morning · bleeding started recently',sub:[]},cb:{nuchal:true,vig:false,label:'Cord around the neck · baby needed breaths',sub:[]}}[id]||{label:''};}
 function pickVariant(id){const F=typeof window!=='undefined'&&window.FORCE_V&&window.FORCE_V[id];const v=F?Object.assign(baseVariant(id),F,{sub:[]}):RANDOM&&VARIANTS[id]?VARIANTS[id]():baseVariant(id);if(F&&VARIANTS[id]){const ref=VARIANTS[id];for(let k=0;k<400;k++){const c=ref();if(Object.keys(F).every(q=>c[q]===F[q])){Object.assign(v,c);break;}}}v.sub=v.sub||[];v.id=id;return v;}
 function vt(s){if(typeof s!=='string')return s;for(const [a,b] of (V.sub||[]))s=s.split(a).join(b);
   if(s.includes('{doses}')&&S.o)s=s.split('{doses}').join(String(S.o.doses||0));return s;}
@@ -443,7 +472,7 @@ const vtf=x=>vt(typeof x==='function'?x():x);
 
 /* ================= compressions ================= */
 function compressorNow(){return S.als.lucas===2?'LUCAS':S.cpr.who;}
-function startCPR(){if(!S.checked){radio('Partner','Check him first — responsive? breathing? pulse?','bad');return;}if(S.aed.state==='analyzing'||S.aed.state==='charging'||S.aed.state==='ready'){radio('AED','Do not touch the patient. Analyzing.','bad');return;}
+function startCPR(){if(S.terminated){radio('Medic 1','Efforts have stopped. Leave him as he is.');return;}if(S.noRes){radio('Partner','We are not starting. Stay with his wife and keep the scene as it is.');return;}if(V.open==='look'&&S.checked&&!S.startChoice){radio('Partner','Hold on — is there a DNR? Any definite signs? Make the call first.','bad');return;}if(!S.checked){radio('Partner','Check him first — responsive? breathing? pulse?','bad');return;}if(S.aed.state==='analyzing'||S.aed.state==='charging'||S.aed.state==='ready'){radio('AED','Do not touch the patient. Analyzing.','bad');return;}
   if(S.cpr.on)return;S.cpr.on=true;endPause();if(S.cpr.who==='Wife'){S.cpr.who='You';radio('You','I\'ve got compressions — thank you, ma\'am, you did great.');}
   if(S.aed.noShockRt&&!S.aed.nsResumed){S.aed.nsResumed=true;const lag=S.rt-S.aed.noShockRt;if(lag>5)ding(5,'Slow back on the chest after "no shock advised" — no shock means CPR, right away');else S.aed.nsGood=(S.aed.nsGood||0)+1;}
   if(S.aed.state==='shocked'&&S.aed.resumeAfterShock===null){S.aed.resumeAfterShock=S.rt-S.aed.lastShockRt;if(S.aed.resumeAfterShock<=5)S.aed.firstResumeOK=true;else ding(5,'Slow to resume compressions after the shock');S.aed.state='idle';}
@@ -457,13 +486,14 @@ $('a-switch').onclick=()=>{if(S.als.lucas===2){radio('You','The LUCAS is doing c
   if(S.cpr.on){S.cpr.on=false;startPause();S.act={k:'switch',t:3};}radio('You',`Switch — ${next==='You'?'I\'m on':'partner\'s on'} compressions.`);};
 $('a-met').onclick=()=>{S.cpr.met=!S.cpr.met;radio('You',S.cpr.met?'Metronome on — pushing to the beat at 110.':'Metronome off.');};
 /* ================= airway ================= */
-$('a-check').onclick=()=>{if(S.checked){radio('You','He\'s pulseless — keep working.');return;}S.checked=true;S.act={k:'check',t:8};stopCPR();S.cpr.who='Wife';radio('You','Sir, can you hear me? … Unresponsive. Gasping breaths — no pulse. Ma\'am, keep pushing for one more second.');};
+$('a-check').onclick=()=>{if(S.checked){radio('You',S.noRes||S.terminated?'No signs of life.':'He\'s pulseless — keep working.');return;}S.checked=true;S.act={k:'check',t:8};stopCPR();if(V.open==='look'){radio('You',LOOKS[V.look].check);return;}S.cpr.who='Wife';radio('You','Sir, can you hear me? … Unresponsive. Gasping breaths — no pulse. Ma\'am, keep pushing for one more second.');};
+$('a-dnr').onclick=()=>{if(S.dnr.asked)return;if(!S.checked){radio('Partner','Check him first.');return;}S.dnr.asked=true;radio('You','Ma\'am — does he have a DNR, a do-not-resuscitate order?');radio('Wife',V.open==='look'?LOOKS[V.look].dnr:V.dnr==='late'?DNR_LATE:DNR_NONE);if(V.dnr==='valid')S.dnr.produced=true;};
 $('a-opa').onclick=()=>{if(S.air.opa)return;if(!S.checked)return;S.air.opa=true;radio('Partner','Measured corner of the mouth to the earlobe — OPA in, no gag.');};
 $('a-bvm').onclick=()=>{if(S.air.bvm)return;S.air.bvm=true;radio('Partner','BVM is set — I\'ll bag at the end of each 30.');};
 $('a-o2').onclick=()=>{if(S.air.o2)return;if(!S.air.bvm){radio('Partner','Get the BVM ready first, then hook up the oxygen.','bad');return;}S.air.o2=true;radio('Partner','Oxygen on the bag at 15.');};
 $('a-breaths').onclick=()=>{if(!S.air.bvm){radio('Partner','BVM isn\'t ready.','bad');return;}if(!S.vent.waiting){radio('Partner','Not yet — wait for the 30.','bad');return;}
   if(S.air.vomit){radio('Partner','Breaths aren\'t going in — there\'s vomit in the airway! Suction!','bad');return;}S.vent.waiting=false;S.act={k:'breaths',t:4};S.vent.cycles++;radio('Partner','Two breaths, chest rise both. Back on.');};
-$('a-breath').onclick=()=>{if(!S.air.adv)return;const iv=S.rt-S.vent.lastRt;S.vent.last=S.t;S.vent.lastRt=S.rt;if(iv>=3.5){S.vent.delivered=(S.vent.delivered||0)+1;if(iv>10&&S.vent.lastRt>0&&iv<900)radio('Medic 1',`That one was ${Math.round(iv)} seconds late — aim for one every 6.`);}if(iv<3.5){S.vent.hyper++;if(S.vent.hyper%3===1)ding(3,'Bagging too fast — that is hyperventilation');}else if(iv<=10)S.vent.good++;};
+$('a-breath').onclick=()=>{if(!S.air.adv||S.terminated)return;const iv=S.rt-S.vent.lastRt;S.vent.last=S.t;S.vent.lastRt=S.rt;if(iv>=3.5){S.vent.delivered=(S.vent.delivered||0)+1;if(iv>10&&S.vent.lastRt>0&&iv<900)radio('Medic 1',`That one was ${Math.round(iv)} seconds late — aim for one every 6.`);}if(iv<3.5){S.vent.hyper++;if(S.vent.hyper%3===1)ding(3,'Bagging too fast — that is hyperventilation');}else if(iv<=10)S.vent.good++;};
 $('a-swap').onclick=()=>{if(S.o2psi>600)return;S.o2psi=2000;S.o2ok=true;S.swapped=(S.swapped||0)+1;radio('Partner','Spare D cylinder on — full at 2,000.','good');};
 $('a-suction').onclick=()=>{if(!S.air.vomit)return;S.air.vomit=false;S.act={k:'suction',t:5};stopCPR();radio('You','Roll him, suction — airway\'s clear. Back on the chest.','good');$('a-suction').classList.add('hidden');};
 /* ================= AED ================= */
@@ -479,10 +509,10 @@ $('a-hands').onclick=()=>{const rc=S.als.rc;if(!rc||rc.phase!=='call')return;con
 $('a-lucas1').onclick=()=>{if(S.als.lucas>0)return;if(!S.als.rc||S.als.rc.phase!=='check'){radio('Medic 1','Back plate goes in during the rhythm-check pause — not before.','bad');return;}S.als.lucas=1;radio('You','Back plate is in.','good');};
 $('a-lucas2').onclick=()=>{if(S.act||S.als.lucas!==1)return;if(S.cpr.on)stopCPR();S.act={k:'lucas',t:7};radio('You','Upper part on, locked — suction cup down — start!');};
 /* ================= move ================= */
-$('a-cot').onclick=()=>{if(S.act||S.cot||S.mission!==2||S.briefing)return;if(S.ride===0){radio('Medic 1','How many are you sending with me?','bad');return;}S.act={k:'cot',t:12};radio('You','On three — one, two, three. On the cot, LUCAS still running.');};
+$('a-cot').onclick=()=>{if(S.act||S.cot||aPh()!=='pack'||S.briefing)return;if(S.ride===0){radio('Medic 1','How many are you sending with me?','bad');return;}S.act={k:'cot',t:12};radio('You','On three — one, two, three. On the cot, LUCAS on his chest, paused.');};
 $('a-straps').onclick=()=>{if(S.act||!S.cot||S.straps)return;S.act={k:'straps',t:6};};
 $('a-load').onclick=()=>{if(S.act||!S.straps||S.loaded)return;S.act={k:'load',t:8};radio('EMT','Power load engaged — cot\'s locked in.');};
-$('a-reassess').onclick=()=>{if(S.mission!==3)return;if(S.t-S.tx.lastReass<40){radio('Medic 1','Just did one — next one in a bit.');return;}S.tx.lastReass=S.t;S.tx.reassess++;radio('You',S.rosc?`Pulse is there. EtCO₂ ${Math.round(S.etco2)}. SpO₂ climbing.`:`LUCAS running, chest rise with each breath, EtCO₂ ${Math.round(S.etco2)}.`);};
+$('a-reassess').onclick=()=>{if(aPh()!=='tx')return;if(S.t-S.tx.lastReass<40){radio('Medic 1','Just did one — next one in a bit.');return;}S.tx.lastReass=S.t;S.tx.reassess++;radio('You',S.rosc?`Pulse is there. EtCO₂ ${Math.round(S.etco2)}. SpO₂ climbing.`:`LUCAS running, chest rise with each breath, EtCO₂ ${Math.round(S.etco2)}.`);};
 
 /* ================= tick ================= */
 function tick(dtReal){
@@ -494,12 +524,13 @@ function tick(dtReal){
   if(CALL==='fl'){tickFL(dtReal);return;}
   if(CALL==='cb'){tickCB(dtReal);return;}
   if(CALL==='dm'){tickDM(dtReal);return;}
-  const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;
+  const ph=aPh(),F=ph==='tx'||ph==='work'||ph==='ext'||ph==='tor'?4:ph==='nores'?6:3;const dt=dtReal*F;S.t+=dt;
   if(S.act){S.act.t-=dt;if(S.act.t<=0){const k=S.act.k;S.act=null;
     if(k==='breaths'||k==='suction'||k==='switch')startCPR();
     if(k==='lucas'){S.als.lucas=2;S.cpr.on=true;endPause();radio('Medic 1','LUCAS is running. Nice and quick.','good');}
     if(k==='cot'){S.cot=true;}if(k==='straps'){S.straps=true;radio('You','Straps on, LUCAS strapped.');}if(k==='load'){S.loaded=true;}}}
   /* arrest + compressions */
+  if(S.arrest&&S.checked&&S.cpr.on&&S.resus0===null)S.resus0=S.t;
   if(S.arrest&&S.checked){S.arrestT+=dt;
     if(S.cpr.on){S.compT+=dt;const who=compressorNow();
       if(who==='LUCAS'){S.cpr.rate=102;S.cpr.depth=1;}
@@ -538,16 +569,27 @@ function tick(dtReal){
       if(rc.phase==='call'&&S.rt-rc.callRt>6){ding(5,'Never came off the chest for the rhythm check');stopCPR();rc.phase='check';rc.t=0;}
       if(rc.phase==='check'){rc.t+=dt;if(rc.t>5){
         const mq=S.manT?S.Qm/S.manT:0,ccf=S.arrestT?S.compT/S.arrestT:0;S.mq=mq;
-        const canROSC=S.mission===3&&(V.shock===false?S.als.epi>=2:S.aed.shocks>=2)&&S.als.epi>=1&&mq>=.85&&ccf>=.6&&S.tx.t>200;
-        if(canROSC&&!S.rosc){S.rosc=true;S.arrest=false;S.roscAt=S.t;S.als.rc=null;S.cpr.on=false;S.pause.on=false;if(S.als.lucas===2)S.als.lucas=3;radio('Medic 1','I\'ve got a pulse! ROSC! Hold compressions — keep bagging.','good');}
+        const el=S.resus0===null?0:S.t-S.resus0;/* ROSC happens on scene only, never in the ambulance; quality still decides whether it can */
+        const canROSC=(V.outcome==='rosc'||(V.outcome==='extend'&&S.tor.extended))&&(ph==='work'||ph==='ext')&&!S.tor.calling&&el>=(V.roscAt||15)*60&&(V.shock===false?S.als.epi>=2:S.aed.shocks>=2)&&S.als.epi>=1&&mq>=.85&&ccf>=.6;
+        if(canROSC&&!S.rosc){S.roscPh=ph;S.rosc=true;S.arrest=false;S.roscAt=S.t;S.als.rc=null;S.cpr.on=false;S.pause.on=false;if(S.als.lucas===2)S.als.lucas=3;radio('Medic 1','I\'ve got a pulse! ROSC! Hold compressions — keep bagging.','good');}
         else{if(S.als.lucas===2){S.cpr.on=true;endPause();S.als.rc=null;S.als.rcDone++;radio('Medic 1',V.shock===false?'PEA — no shock. Resume, LUCAS on. Epi\'s going in.':'Still VF — shocking — clear!… Resume, LUCAS on.');}
           else{rc.phase='resume';rc.resumeCall=S.t;rc.resumeCallRt=S.rt;radio('Medic 1',V.shock===false?'PEA — organized rhythm, no pulse. No shock — resume compressions!':'VF — shock delivered — resume compressions!');}}
         S.als.rcNext=S.t+120;}}}}
   if(S.arrest&&S.als.lucas===2&&!S.cpr.on&&!S.als.rc&&!S.act){S.cpr.on=true;endPause();}
+  /* Bay County: worked on scene; about COUNTY.torMin minutes in without ROSC the medic consults medical control (or, at the medic's discretion, keeps working) */
+  {const el=S.resus0===null?0:S.t-S.resus0;
+   if(S.arrest&&S.als.arrived&&(ph==='work'||ph==='ext')&&!S.tor.calling&&!S.dnr.stop){
+    if(!S.tor.extended&&el>=COUNTY.torMin*60){if(V.outcome==='extend'){S.tor.extended=true;radio('Medic 1',V.look==='cold'?'He\'s cold. Not dead until he\'s warm and dead — we keep working. I\'ll update medical control.':'His EtCO₂ is still in the 30s and he keeps going in and out of VF. It\'s my call — we\'re going to keep working.');}
+     else{S.tor.calling=true;S.tor.callT=S.t;S.tor.comp0=S.compT;radio('Medic 1',`That\'s ${COUNTY.torMin} minutes with no pulse. I\'m calling medical control. Keep compressions going — nothing changes until I tell you.`);}}
+    else if(S.tor.extended&&el>=(V.extendTo||COUNTY.torMin+10)*60){S.tor.calling=true;S.tor.callT=S.t;S.tor.comp0=S.compT;radio('Medic 1','Still no pulse. I\'m calling medical control now. Keep going.');}}
+   if(S.tor.calling&&S.arrest&&ph==='tor'&&S.t-S.tor.callT>=120)stopEfforts(`Medical control has ordered us to stop. Time of death ${clockStr()}. Hold compressions.`);
+   if(V.dnr==='late'&&S.als.arrived&&S.arrest&&!S.dnr.produced&&S.als.epi>=1&&S.t-S.als.arrT>150){S.dnr.produced=true;radio('Daughter','I found it — Dad\'s DNR. It was in the kitchen drawer. He didn\'t want this.');}
+   if(S.dnr.verifyT!==null&&!S.dnr.stop&&S.arrest&&S.t-S.dnr.verifyT>40){S.dnr.stop=true;stopEfforts(`It\'s the state form — his name, signed and witnessed. It\'s valid. We\'re stopping. Time ${clockStr()}.`);}
+   if(S.noRes&&S.als.arrived&&!S.nores.confirmed&&S.t-S.als.arrT>20){S.nores.confirmed=true;radio('Medic 1',S.dnr.produced?'I\'ve read the form. It\'s valid. No resuscitation. I\'m calling the coroner now.':`I confirm it — definite signs of death. Time noted, ${clockStr()}. I\'m calling the coroner now.`);}}
   /* EtCO2 */
   if(S.air.adv&&S.als.zoll){const tgt=S.rosc?42:(S.cpr.on?8+S.cpr.depth*10+(S.Q/600)*4:4);S.etco2+=(tgt-S.etco2)*Math.min(1,dt/4);}
   /* transport */
-  if(S.mission===3&&!S.briefing){S.tx.t+=dt;
+  if(ph==='tx'&&!S.briefing){S.tx.t+=dt;
     if(S.tx.bridge===0&&S.tx.t>140){S.tx.bridge=1;radio('EMT','Dispatch, Medic 1 — two minutes from Liberty. Request it be held down for a priority patient.');}
     if(S.tx.bridge===1&&S.tx.t>165){S.tx.bridge=2;S.tx.total+=150;radio('Dispatch','Medic 1, Liberty is going up for a freighter — the operator can\'t hold. Veterans Memorial is down.','bad');radio('EMT','Rerouting to Veterans Memorial — adds about two and a half minutes. Hang on back there.');}
     if(!S.tx.arrived&&S.tx.t>=S.tx.total){S.tx.arrived=true;radio('EMT','We\'re at the doors — East Side Hospital.','good');}}
@@ -576,35 +618,94 @@ const DEC={
         {t:'"Okay so his wife said he was watching TV and then he kind of slumped over, and she called, and when we got here she was doing CPR, and then we…"',r:'bad',why:'Every detail may be true, but the medic needs the shape of the call first. Long stories stall the hands-off decisions.'},
         {t:'"Cardiac arrest. We\'re working it."',r:'partial',why:'True, but it leaves out downtime, shocks, and interventions — the things that drive the medic\'s next decisions.'}],
   why:'A good handoff is short, structured, and given without stopping compressions. Many systems teach a format like MIST or SBAR.',g:'handoff'},
- ride:{tag:'How many ride',q:'Medic 1, as you get ready to move him: "I need hands in the back. How many are you sending?" The LUCAS is running.',
-  opts:[{t:'Two of us — one on the airway, one assisting the medic and watching the LUCAS',r:'good',why:'A working arrest needs the airway managed continuously and a free set of hands for the medic. Two riders covers both — at the cost of your engine\'s staffing.'},
-        {t:'One — the LUCAS is doing compressions, so that\'s enough',r:'partial',why:'Workable with the LUCAS running, but one rider is now the airway, the extra hands, and the backup if the LUCAS fails.'},
+ ride:{tag:'How many ride',q:'Medic 1, as you get ready to move him: "I need hands in the back. How many are you sending?" He has a pulse; the LUCAS is on his chest, paused, in case he re-arrests.',
+  opts:[{t:'Two of us — one on the airway, one assisting the medic and watching the LUCAS',r:'good',why:'A fresh ROSC can re-arrest on the way. The airway needs one person continuously and the medic needs a free set of hands. Two riders covers both — at the cost of your engine\'s staffing.'},
+        {t:'One — the LUCAS is ready if he re-arrests, so that\'s enough',r:'partial',why:'Workable, but one rider is now the airway, the extra hands, and the backup if he re-arrests and the LUCAS fails.'},
         {t:'None — the medic can handle it with the LUCAS',r:'bad',why:'A medic alone can\'t ventilate, manage drugs, and watch the monitor at once in a moving rig.'}],
-  why:'How many firefighters ride in is a judgment call by the officer and medic based on severity. A working cardiac arrest is about as severe as it gets.',g:'crew',after:()=>{S.ride=S.lastChoice==='good'?2:S.lastChoice==='partial'?1:1;if(S.lastChoice==='bad')radio('Medic 1','No — I need at least one of you. Jump in.','bad');}},
+  why:'How many firefighters ride in is a judgment call by the officer and medic based on severity. A patient minutes after ROSC is about as unstable as it gets.',g:'crew',after:()=>{S.ride=S.lastChoice==='good'?2:S.lastChoice==='partial'?1:1;if(S.lastChoice==='bad')radio('Medic 1','No — I need at least one of you. Jump in.','bad');}},
  rosc:{tag:'ROSC care',q:'"Pulse! ROSC!" The LUCAS is paused. His SpO₂ is climbing past 90. What is your job now?',
   opts:[{t:'Keep bagging at one breath every six seconds, watch the monitor, and be ready to restart compressions',r:'good',why:'Post-ROSC patients often re-arrest. Steady ventilation without overdoing it, and hands ready.'},
         {t:'Bag faster to get his oxygen up quickly',r:'bad',why:'Hyperventilation raises chest pressure and lowers blood flow back to the heart — the opposite of what a fresh pulse needs.'},
         {t:'Stop bagging — he has a pulse now',r:'bad',why:'A pulse is not breathing. He still needs ventilation through the airway.'}],
-  why:'After ROSC, guidelines call for avoiding hyperventilation and targeting an SpO₂ of about 92–98%. Re-arrest is common, so stay ready.',g:'rosc'},
- noRosc:{tag:'Arriving in arrest',q:'You are backing into the bay. He is still in arrest — LUCAS running, epi given, no ROSC. What matters most in these last minutes?',
-  opts:[{t:'Keep the LUCAS running and the bagging steady through the move to the ER bed, and give the receiving team a clean handoff',r:'good',why:'Every interruption costs perfusion. Continuous, high-quality CPR through the doors is the job.'},
-        {t:'Stop the LUCAS for the move to make it easier',r:'bad',why:'A mechanical device exists exactly so compressions continue during moves.'},
-        {t:'Start bagging faster to make up for it',r:'bad',why:'Faster ventilation hurts circulation during CPR.'}],
-  why:'Not every arrest gets a pulse back in the field. What you control is quality and continuity. Your debrief shows what drove the outcome.',g:'lucas'},
+  why:'After ROSC, guidelines call for avoiding hyperventilation and targeting an SpO₂ of about 92–98%. Re-arrest is common, so stay ready. In Bay County, ROSC is what makes transport happen: post-ROSC care and the 12-lead start here, on scene.',g:'rosc'},
+ startObvious:{tag:'Signs of death',q:'He was last seen at bedtime. He is stiff, cold in a warm bedroom, and the color has settled along his back. Yesterday\'s newspaper is still on the porch. What do you do?',
+  opts:[{t:'Don\'t start: definite signs. Tell the medic, protect the scene',r:'good',why:'Stiffness, settled color and a body cold in a warm room are definite signs of death. CPR cannot help him. The medic confirms and calls the coroner; you leave him and the room as they are and look after his wife.'},
+        {t:'Start CPR anyway until the medic can see him for himself',r:'partial',why:'Understandable — nobody wants to be wrong about this. But with definite signs, CPR cannot help, it is hard on his wife, and it disturbs what the coroner needs to see. The medic will have you stop.'},
+        {t:'Move him to the floor and straighten the room before Medic 1 gets here',r:'bad',why:'Moving him or tidying up changes the scene the coroner has to see. Leave everything as you found it.'}],
+  why:'Definite signs of death: rigor mortis (stiffness), dependent lividity (color settled to the low side), decomposition, or a body cold to the touch in a warm room. Context such as mail piling up, flies at the windows or an odor supports it but is never enough alone. With definite signs, do not start; the medic confirms and calls the coroner.',g:'death',
+  after:()=>{lookHold(S.lastChoice==='partial'?'Medic 1 (radio): With definite signs, hold CPR — I\'ll confirm when I get there.':'');}},
+ startCold:{tag:'Cold is not dead',q:'Cold, pale and stiff, no pulse, face down in the snow at 9°F. Your partner says, "He\'s been out here all night. He\'s gone." What do you do?',
+  opts:[{t:'Start CPR — out here, a cold body is not a sign of death',r:'good',why:'His cold comes from the weather, not from death. Cold can make muscles stiff, and it can protect the brain. Not dead until warm and dead. Start now; getting him out of the wind comes with the medic, without stopping compressions.'},
+        {t:'Don\'t start — cold and stiff means he died hours ago',r:'bad',hold:true,why:'In a cold environment, a cold body is not a definite sign of death, and the stiffness may be the cold. Withholding CPR here is the one mistake that can never be taken back.'},
+        {t:'Carry him inside to warm up first, then decide about CPR',r:'bad',why:'Warming him first means minutes with no circulation. Start CPR now; the move comes later, without stopping compressions.'}],
+  why:'In a cold environment, cold and stiff are not definite signs of death. Not dead until warm and dead: start CPR unless there are injuries no one survives or the body is frozen solid. Hypothermia guidance: to confirm with the medical director.',g:'death',after:()=>lookStart()},
+ startWarm:{tag:'Found down: start or not',q:'Warm, limp, no definite signs. But his coffee is cold and she was gone forty minutes. Your partner hesitates: "How long has he been down?" What do you do?',
+  opts:[{t:'Start CPR now — no definite signs means you start',r:'good',why:'Warm, no stiffness, no settled color: there are no definite signs of death. Clues about how long he has been down never decide it. Start.'},
+        {t:'Don\'t start — the cold coffee says he has been down too long',r:'bad',hold:true,why:'A cold cup of coffee is a clue, not a sign of death. Withholding CPR without definite signs is the one mistake that can never be taken back.'},
+        {t:'Call the medic for advice and wait to hear back before starting',r:'bad',why:'Every minute waiting for advice is a minute without circulation. Start now, and tell the medic what you found.'}],
+  why:'An unwitnessed arrest and an unknown downtime are not reasons to withhold CPR. Only definite signs of death (rigor, lividity, decomposition, cold in a warm environment) or a valid DNR produced on the spot let you hold.',g:'death',after:()=>lookStart()},
+ dnrValid:{tag:'DNR in hand',q:'The form is the state do-not-resuscitate order with his name on it, signed, dated and witnessed, handed to you the moment you asked. What do you do?',
+  opts:[{t:'Don\'t start; give the medic the form to confirm, stay with her',r:'good',why:'A valid DNR, produced right away, is his decision, and it is respected. Do not start. The medic confirms the form, and you look after his wife.'},
+        {t:'Start CPR anyway until the medic can read the form himself',r:'bad',why:'He made this decision ahead of time for exactly this moment. Starting CPR over a valid DNR goes against his wishes. The medic will have you stop.'},
+        {t:'Call his doctor\'s office to check the form before deciding',r:'bad',why:'The form in your hand is what counts, and the medic confirms it. Calling the office delays everything and is not how a DNR is checked.'}],
+  why:'A DNR only counts if it is produced right away and is valid: the proper signed Michigan form (what makes it valid is to confirm with MCA). Valid and in hand: do not start, and the medic confirms. Not produced: start CPR.',g:'death',
+  after:()=>{lookHold(S.lastChoice==='good'?'':'Medic 1 (radio): You have a valid DNR in hand — hold CPR. I\'ll confirm when I get there.');}},
+ dnrMissing:{tag:'DNR not produced',q:'She is sure there is a DNR, but she can\'t find it. He collapsed minutes ago and he is warm. What do you do?',
+  opts:[{t:'Start CPR now; if a valid form turns up, the medic will look at it',r:'good',why:'A DNR only counts if it is produced right away and is valid. Without the form in hand, start CPR. If it turns up, the medic verifies it and decides.'},
+        {t:'Take her word for it and don\'t start',r:'bad',hold:true,why:'Her word is not the form. Withholding CPR without a valid DNR in hand is the one mistake that can never be taken back.'},
+        {t:'Hold off a few minutes while she keeps searching the house for it',r:'bad',why:'Every minute of searching is a minute with no circulation. Start now; she can keep looking.'}],
+  why:'We always ask about a DNR, and it only counts if it is produced right away and valid (the proper signed Michigan form — details to confirm with MCA). A DNR someone remembers but cannot produce means you start CPR.',g:'death',after:()=>lookStart()},
+ dnrLate:{tag:'DNR mid-resuscitation',q:'His daughter hands the medic a form: a Michigan do-not-resuscitate order with his name on it. Compressions are going. What do you do?',
+  opts:[{t:'Keep compressions going while the medic checks the form',r:'good',why:'The form has to be checked: the right form, his name, signed and witnessed. Until the medic says stop, you keep doing quality CPR.'},
+        {t:'Stop compressions now — there is a DNR',r:'bad',why:'Not until the medic verifies it. A form handed over in the middle of a code still has to be the real thing.'},
+        {t:'Ignore it — once you start CPR, you have to finish the code',r:'bad',why:'A valid DNR still counts after CPR has started. The medic verifies it and decides.'}],
+  why:'A DNR that turns up mid-resuscitation goes to the medic, who verifies it and decides. Until then, nothing changes about your compressions. Form details: to confirm with MCA.',g:'death',after:()=>{S.dnr.verifyT=S.t;radio('Medic 1','Let me see it. Keep going.');}},
+ torConsult:{tag:'Medical control consult',q:()=>`${COUNTY.torMin} minutes and no pulse. The medic is on the phone with medical control. Your partner, on the bag, says quietly, "Should we ease off? It's over."`,
+  opts:[{t:'Full-quality CPR and switches until we are told to stop',r:'good',why:'Until the order comes, he is a patient in arrest. Rate, depth, recoil and short pauses still matter, and they are still scored.'},
+        {t:'Ease off a little — the call is almost over now',r:'bad',why:'Medical control may say keep going. Easing off decides the outcome for them.'},
+        {t:'Stop and let his wife say goodbye while the medic talks',r:'bad',why:'Not yet. Until the order is given, compressions continue.'}],
+  why:()=>`${COUNTY.name} works an arrest on scene for about ${COUNTY.torMin} minutes. Without ROSC, the medic consults medical control about stopping. Until the order, CPR continues at full quality. (Pending MCA review.)`,g:'tor'},
+ keepWorking:{tag:'Medic keeps working',q:()=>V.look==='cold'?`${COUNTY.torMin} minutes, still no pulse. The medic says, "He's cold. We keep working." Your partner looks at you.`:`${COUNTY.torMin} minutes, still no pulse. The medic says, "We're going to keep working." Your partner looks at you.`,
+  opts:[{t:'Keep quality CPR and switches until the medic says otherwise',r:'good',why:'The usual consult time is a default, not a hard stop. The medic decided to keep going for a reason; your compressions stay as good as the first ones.'},
+        {t:'Remind the medic that county protocol says to stop at this point',r:'bad',why:'That mark is when the medic usually consults medical control. Working longer is the medic\'s call, and a reasonable one here.'},
+        {t:'Ease off the depth to save your arms for a longer code',r:'bad',why:'Switch more often instead. Depth is the one thing you never trade away.'}],
+  why:'The default is the norm, but the medic may work longer for special cases: a cold (hypothermic) patient, a child, a pregnant woman, or signs the heart may still respond. The MFR keeps high-quality CPR going until told otherwise. (Medic\'s discretion; hypothermia guidance to confirm with the medical director.)',g:'tor'},
+ torStop:{tag:'After the order to stop',q:()=>S.dnr.stop?'The medic has stopped efforts on the DNR. The airway, the IO and the pads are still on him. What now?':'Efforts have stopped on medical control\'s order. The airway, the IO and the pads are still on him. What now?',
+  opts:[{t:'Stop, and leave the airway, IO and pads where they are',r:'good',why:'The coroner needs to see everything as it was used. Leave every device in place. The medic tells the coroner what was done.'},
+        {t:'Take the tube and the IO out so he looks peaceful for her',r:'bad',why:'Understandable, but the devices stay for the coroner.'},
+        {t:'Do a few more cycles quietly, just to be sure',r:'bad',why:'The order has been given. More compressions now are not care, and they are hard on his wife.'}],
+  why:'After efforts stop, leave the airway, the IV or IO, the pads and everything else in place for the coroner, and do not clean up. The medic notes the time and calls the coroner. (Bay County practice, pending MCA review.)',g:'tor'},
+ torScene:{tag:'The scene after a death',q:'Wrappers, the bag-mask packaging and his cut shirt are all over the living room floor. His wife asks if you can tidy up.',
+  opts:[{t:'Explain gently that it stays until the coroner sees it',r:'good',why:'Everything stays as it was until the coroner releases the scene. Say it kindly: "We have to leave things just as they are for now. I\'m sorry."'},
+        {t:'Clean the whole room up so she doesn\'t have to look at it',r:'bad',why:'Tidying changes what the coroner has to see. It can wait.'},
+        {t:'Lift him onto the couch so he looks more comfortable',r:'bad',why:'He stays where he is until the coroner says otherwise.'}],
+  why:'After a death, the scene belongs to the coroner until it is released: the patient, the devices and the room stay as they are.',g:'tor'},
+ torWife:{tag:'Telling his wife',q:()=>S.terminated?'His wife has been watching from the doorway. She asks you, "Is he gone?"':'His wife is standing in the doorway. She asks you, "Is he gone?"',
+  opts:[{t:'Sit with her: "I\'m so sorry. He died." Help her call family',r:'good',why:'Plain words are kinder than soft ones: "He died." Stay with her, let her ask questions, and help her call family or someone to be with her.'},
+        {t:'Tell her he "passed on to a better place," then step out',r:'bad',why:'Soft phrases leave people unsure. Use the word "died," and stay with her.'},
+        {t:'Tell her the medic will explain later, and pack up your gear',r:'bad',why:'She asked you. Answer her honestly and stay until someone is with her.'}],
+  why:'Supporting the family is part of the call: honest, simple language ("he died"), stay with them, and help them call family, a friend or clergy. Never leave them alone in the room.',g:'tor',after:()=>{S.wifeOK=S.lastChoice==='good';}},
+ noresScene:{tag:'No resuscitation: the scene',q:()=>S.dnr.produced?'The DNR is in your hand and Medic 1 is a few minutes out. What now?':'Definite signs of death. Medic 1 is a few minutes out. What now?',
+  opts:[{t:'Leave him as he is, keep the room as found, and stay with her',r:'good',why:'Nothing about him or the room changes before the medic confirms and the coroner sees it. Your job now is his wife.'},
+        {t:'Lay him flat and straighten the bed before the medic arrives',r:'bad',why:'Moving him or tidying changes what the coroner has to see. Leave him as you found him.'},
+        {t:'Head back to the engine — the medic and coroner take it from here',r:'bad',why:'His wife should not be left alone with this. Stay until the medic is there and family is coming.'}],
+  why:'With definite signs of death or a valid DNR, nothing more is done for the patient. Protect the scene for the coroner, notify through the medic (who calls the coroner), and look after the family.',g:'death'},
  erHand:{tag:'ER handoff',q:'The ER team is moving him to their bed. The charge nurse looks at you: "Give me the quick version."',
   opts:[{t:'Age, collapse time, CPR and shocks, airway, drugs, ROSC time, current status — in under 30 seconds',r:'good',why:'Structured and complete. The medic gives the full report; your piece fills in what you did and saw.'},
         {t:'Wait for the medic — it isn\'t your report',r:'partial',why:'The medic leads, but when you are asked directly, a concise answer helps.'},
         {t:'Tell the story from the moment you got the page',r:'bad',why:'The receiving team needs the key facts fast while they take over care.'}],
   why:'Handoffs at the ER follow the same rule as on scene: short, structured, complete.',g:'handoff'}
 };
-const M_ARREST=[
- {title:'Patient contact',sub:'Medic 1 is nine minutes out. The first minutes are yours.',
-  brief:'62-year-old man collapsed in his living room. His wife called 911 and is doing CPR the way dispatch told her. You and your partner are first on scene with an AED, a BVM, and a D cylinder of oxygen.',
-  skills:['cpr','agonal','aed','pause','bvm','o2math','rotate'],
-  steps:[{t:'Check: responsive, breathing, pulse — in 10 seconds',f:()=>S.checked},
-   {t:'Decision: is that breathing?',dec:'agonal',f:()=>S.checked&&!S.act},
-   {t:'Take over compressions from his wife',f:()=>S.cpr.who!=='Wife'&&S.compT>0},
-   {t:'Metronome on — 100 to 120 a minute',f:()=>S.cpr.met},
+function lookStart(){const o=S.lastOpt||{};S.startChoice='start';if(o.hold){ding(40,'Withheld CPR without definite signs of death or a valid DNR in hand — that cannot be undone');radio('Partner','No — there are no definite signs. I\'m starting compressions. Get on the chest with me.','bad');}}
+function lookHold(msg){S.startChoice='hold';S.noRes=true;S.arrest=false;S.cpr.on=false;S.pause.on=false;if(msg)radio('Medic 1',msg.replace(/^Medic 1 \(radio\): /,''));
+  radio('You',S.dnr.produced?'Medic 1, Engine — valid DNR in hand, we are not starting.':'Medic 1, Engine — definite signs of death, we are not starting.');radio('Medic 1','Copy. I\'ll confirm when I get there and make the coroner call.');S.als.eta=Math.min(S.als.eta,90);}
+/* PEA: no shocks — the AED steps become "no shock advised" steps */
+const peaSteps=steps=>V.shock!==false?steps:steps.flatMap(st=>{
+  if(st.t==='Clear! — then shock')return [{t:'"No shock advised" — back on the chest right away',f:()=>(S.aed.noShock||0)>=1&&S.aed.nsResumed}];
+  if(st.t==='Back on the chest within 5 seconds of the shock')return [];
+  if(st.t==='Rhythm check at two minutes: analyze, clear, shock')return [{t:'Rhythm check at two minutes: analyze again',wait:true,f:()=>(S.aed.noShock||0)>=2}];
+  return [st];});
+const A_AED=()=>[{t:'Metronome on — 100 to 120 a minute',f:()=>S.cpr.met},
    {t:'AED pads on',f:()=>S.aed.padsAsked},{t:'Decision: pad placement',dec:'pads',f:()=>S.aed.padsAsked},
    {t:'Analyze — everyone hands off',f:()=>S.aed.analyzedOnce},{t:'Clear! — then shock',f:()=>S.aed.shocks>=1},
    {t:'Back on the chest within 5 seconds of the shock',f:()=>S.aed.resumeAfterShock!==null},
@@ -613,8 +714,25 @@ const M_ARREST=[
    {t:'30:2 — give two breaths at each 30 (three cycles)',wait:true,f:()=>S.vent.cycles>=3},
    {t:'Switch compressors at about two minutes',wait:true,f:()=>S.switches>=1},
    {t:'Rhythm check at two minutes: analyze, clear, shock',wait:true,f:()=>S.aed.shocks>=2},
-   {t:'Keep quality CPR until Medic 1 is on scene',wait:true,f:()=>S.als.arrived}]},
- {title:'Medic 1 on scene',sub:'Now you work for the medic. Keep the compressions going.',
+   {t:'Keep quality CPR until Medic 1 is on scene',wait:true,f:()=>S.als.arrived}];
+const A_CPR=()=>({tag:'contact',title:'Patient contact',sub:'Medic 1 is nine minutes out. The first minutes are yours.',
+  brief:'62-year-old man collapsed in his living room. His wife called 911 and is doing CPR the way dispatch told her. You and your partner are first on scene with an AED, a BVM, and a D cylinder of oxygen.',
+  skills:['cpr','agonal','aed','pause','bvm','o2math','rotate','death'],
+  steps:peaSteps([{t:'Check: responsive, breathing, pulse — in 10 seconds',f:()=>S.checked},
+   {t:'Decision: is that breathing?',dec:'agonal',f:()=>S.checked&&!S.act},
+   {t:'Take over compressions from his wife',f:()=>S.cpr.who!=='Wife'&&S.compT>0},
+   {t:'Ask about a DNR — compressions keep going',f:()=>S.dnr.asked},...A_AED()])});
+const A_LOOK=()=>({tag:'look',title:'First look',sub:'Unwitnessed. Nobody is doing CPR. Look before you start.',brief:LOOKS[V.look].brief,
+  skills:['death','tor','cpr'],
+  steps:[{t:'Check: responsive, breathing, pulse — and look at him',f:()=>S.checked},
+   {t:'Ask the family: is there a DNR?',f:()=>S.dnr.asked},
+   {t:'Decision: start CPR or not?',dec:LOOKS[V.look].dec,f:()=>S.dnr.asked&&!S.act}],
+  next:()=>S.noRes?[A_NORES()]:[A_START(),A_ALS(),A_WORK()]});
+const A_START=()=>({tag:'contact',title:'Starting the resuscitation',sub:'Medic 1 is still minutes out. The first minutes are yours.',
+  brief:'You made the call to start. From here it is any other arrest: compressions, the AED, the airway, and short pauses.',
+  skills:['cpr','aed','pause','bvm','o2math','rotate'],
+  steps:peaSteps([{t:'Start compressions',f:()=>S.cpr.who!=='Wife'&&S.compT>0},...A_AED()])});
+const A_ALS=()=>({tag:'als',title:'Medic 1 on scene',sub:'Now you work for the medic. Keep the compressions going.',
   brief:'Medic 1 is through the door with the monitor, airway kit, and a LUCAS. Hand off without stopping compressions, then work the medic\'s plan: monitor pads, rhythm checks on the medic\'s call, and the LUCAS.',
   skills:['handoff','zoll','vent','etco2','lucas','pause'],
   steps:[{t:'Decision: your handoff',dec:'handoff',f:()=>true},
@@ -623,28 +741,53 @@ const M_ARREST=[
    {t:'Rhythm check: hands off on the call, back on when told',wait:true,f:()=>S.als.rcDone>=1||S.als.lucas>=1},
    {t:'LUCAS: back plate in during a rhythm-check pause',f:()=>S.als.lucas>=1},
    {t:'LUCAS: upper part on and running',f:()=>S.als.lucas>=2},
-   {t:'Medic gives epinephrine — keep the airway going',wait:true,f:()=>S.als.epi>=1}]},
- {title:'Package and load',sub:'LUCAS running. Get him to the rig without losing compressions.',
-  brief:'Medic 1 is ready to move. The cot is in the living room, the rig is in the driveway, and the LUCAS keeps compressions going the whole way.',
-  skills:['crew','lucas','cot'],
-  steps:[{t:'Decision: how many ride in?',dec:'ride',f:()=>true},{t:'Onto the cot — LUCAS stays running',f:()=>S.cot},{t:'Straps and LUCAS secured',f:()=>S.straps},{t:'Power load into Medic 1',f:()=>S.loaded}]},
- {title:'Transport — East Side Hospital',sub:'Across the river. About ten minutes if the bridge is down.',
-  brief:'You are in the back with the medic. The EMT is driving to East Side Hospital, across the Saginaw River. Keep ventilating, reassess with the medic, and be ready for anything.',
-  skills:['vent','etco2','rosc','bridge','lucas'],
-  steps:[{t:'Ventilate about one breath every 6 seconds (10 more)',wait:true,f:()=>(S.vent.delivered||0)>=15},
+   {t:'Medic gives epinephrine — keep the airway going',wait:true,f:()=>S.als.epi>=1},
+   ...(V.dnr==='late'?[{t:'Decision: a DNR turns up',dec:'dnrLate',f:()=>S.dnr.produced}]:[])]});
+const A_WORK=()=>({tag:'work',title:'Working it on scene',sub:()=>`${COUNTY.name} works an arrest where it happens. About ${COUNTY.torMin} minutes in, the medic decides with medical control.`,
+  brief:()=>`A patient in arrest is not transported. Medic 1 runs the code right here: rhythm checks every two minutes, epinephrine, the LUCAS. ROSC is the only ticket to the ambulance. Your job is the quality of every compression and every breath, and short pauses. If there is no pulse at about ${COUNTY.torMin} minutes, the medic calls medical control.`,
+  skills:['cpr','pause','lucas','etco2','tor'],
+  steps:[{t:'Work the arrest on scene — quality CPR, rhythm checks every two minutes',wait:true,f:()=>S.rosc||S.tor.calling||S.tor.extended||S.dnr.stop}],
+  next:()=>S.rosc?A_ROSC():S.dnr.stop?[A_AFTER('The DNR')]:S.tor.extended&&!S.tor.calling?[A_EXT()]:[A_TOR()]});
+const A_EXT=()=>({tag:'ext',title:'Still working',sub:'The medic\'s call: keep going.',
+  brief:()=>`The ${COUNTY.torMin}-minute mark is when the medic usually consults medical control. For some patients the medic decides to keep working. Until you are told otherwise, the compressions stay as good as the first ones.`,
+  skills:['tor','cpr','rotate'],
+  steps:[{t:'Decision: the medic keeps working',dec:'keepWorking',f:()=>true},
+   {t:'Keep quality CPR until the medic says otherwise',wait:true,f:()=>S.rosc||S.tor.calling}],
+  next:()=>S.rosc?A_ROSC():[A_TOR()]});
+const A_TOR=()=>({tag:'tor',title:'Medical control',sub:'No pulse. The medic is on the phone.',
+  brief:()=>`${COUNTY.torMin} minutes and no pulse. The medic is calling medical control to ask about stopping. Until someone tells you to stop, you are doing high-quality CPR, and it still counts.`,
+  skills:['tor','pause','cpr'],
+  steps:[{t:'Decision: while the medic is on the phone',dec:'torConsult',f:()=>true},
+   {t:'Keep quality CPR until the order comes',wait:true,f:()=>S.terminated},
+   {t:'Decision: after the order to stop',dec:'torStop',f:()=>S.terminated},
+   {t:'Decision: the scene',dec:'torScene',f:()=>true},
+   {t:'Decision: his wife',dec:'torWife',f:()=>true}]});
+const A_AFTER=title=>({tag:'tor',title,sub:'The medic verified the form and stopped efforts.',brief:'The DNR was valid. The medic stopped the resuscitation and noted the time. What you do now is for his family and the coroner.',
+  skills:['tor','death'],
+  steps:[{t:'Decision: after efforts stop',dec:'torStop',f:()=>true},{t:'Decision: the scene',dec:'torScene',f:()=>true},{t:'Decision: his wife',dec:'torWife',f:()=>true}]});
+const A_NORES=()=>({tag:'nores',title:'No resuscitation',sub:()=>S.dnr.produced?'A valid DNR, in hand.':'Definite signs of death.',
+  brief:()=>(S.dnr.produced?'He has a valid DNR, produced right away.':'He has definite signs of death.')+' Nothing you do now changes the outcome. What you do now matters to his wife, and to the coroner.',
+  skills:['death','tor'],
+  steps:[{t:'Decision: the scene',dec:'noresScene',f:()=>true},
+   {t:'Decision: his wife',dec:'torWife',f:()=>true},
+   {t:'Medic 1 confirms — and calls the coroner',wait:true,f:()=>S.nores.confirmed}]});
+const A_ROSC=()=>[{tag:'pack',title:'ROSC on scene',sub:'A pulse, here. Now the 12-lead, then package him.',
+  brief:'He has a pulse. Post-ROSC care starts on scene: steady ventilation, the medic\'s 12-lead, and a cath lab alert if it shows a STEMI. Then onto the cot with the LUCAS on his chest, paused, in case he re-arrests.',
+  skills:['rosc','vent','crew','cot'],
+  steps:[{t:'Decision: ROSC care',dec:'rosc',f:()=>true},
+   {t:'12-lead on scene — the medic reads it',f:()=>S.mon.twelve},
+   {t:'Decision: how many ride in?',dec:'ride',f:()=>S.mon.twelve},
+   {t:'Onto the cot — LUCAS stays on his chest',f:()=>S.cot},{t:'Straps and LUCAS secured',f:()=>S.straps},{t:'Power load into Medic 1',f:()=>S.loaded}]},
+ {tag:'tx',title:'Transport — East Side Hospital',sub:'Across the river with a pulse. About ten minutes if the bridge is down.',
+  brief:'You are in the back with the medic. The cath lab knows you are coming. The EMT is driving to East Side Hospital, across the Saginaw River. Keep ventilating, reassess with the medic, and be ready if he re-arrests.',
+  skills:['vent','etco2','rosc','bridge','lucas'],onStart:()=>{S.vent.txBase=S.vent.delivered||0;},
+  steps:[{t:'Ventilate about one breath every 6 seconds (10 more)',wait:true,f:()=>(S.vent.delivered||0)>=(S.vent.txBase||0)+10},
    {t:'Reassess with the medic (twice)',wait:true,f:()=>S.tx.reassess>=2},
-   {t:'Decision point on the way in',get dec(){return S.rosc?'rosc':'noRosc';},f:()=>S.rosc||S.tx.arrived},
    {t:'Arrive at East Side Hospital',wait:true,f:()=>S.tx.arrived},
-   {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}
-];
-
-const M_ARREST_PEA=M_ARREST.map((m,i)=>i!==0?m:Object.assign({},m,{steps:m.steps.flatMap(st=>{
-  if(st.t==='Clear! — then shock')return [{t:'"No shock advised" — back on the chest right away',f:()=>(S.aed.noShock||0)>=1&&S.aed.nsResumed}];
-  if(st.t==='Back on the chest within 5 seconds of the shock')return [];
-  if(st.t==='Rhythm check at two minutes: analyze, clear, shock')return [{t:'Rhythm check at two minutes: analyze again',wait:true,f:()=>(S.aed.noShock||0)>=2}];
-  return [st];})}));
-let M=M_ARREST;
-function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;pca('begin','pc',id,()=>`mission-${S.mission+1}`);V=pickVariant(id);M=id==='arrest'?(V.shock?M_ARREST:M_ARREST_PEA):id==='cb'?(V.vig?M_CB_VIG:M_CB):id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:id==='dm'?M_DM:M_ARREST;CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:id==='dm'?15*3600+40*60:14*3600+41*60;fresh();if(id==='dm')S.d=freshDM();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+   {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}];
+function arrestMissions(){return V.open==='look'?[A_LOOK()]:[A_CPR(),A_ALS(),A_WORK()];}
+let M=[];
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;pca('begin','pc',id,()=>`mission-${S.mission+1}`);V=pickVariant(id);M=id==='arrest'?arrestMissions():id==='cb'?(V.vig?M_CB_VIG:M_CB):id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:id==='dm'?M_DM:arrestMissions();CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:id==='dm'?15*3600+40*60:14*3600+41*60;fresh();if(id==='arrest'&&V.open==='look')S.cpr.who='You';if(id==='dm')S.d=freshDM();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
   $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':id==='cb'?'Childbirth':id==='dm'?'Altered driver':'Cardiac arrest';
   if(id==='dm')radio('Dispatch','Unit responding to assist PD — male driver slumped in a running vehicle, grocery store lot. Officer reports possible intoxication, combative. Medic 1 responding, nine minutes.');
   else if(id==='cb')radio('Dispatch','Unit responding — 27-year-old female in active labor, says the baby is coming. Third pregnancy. Medic 1 responding from across the county, ten minutes, slick roads.');
@@ -653,7 +796,7 @@ function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;pca('begin','pc',i
   else if(id==='ep')radio('Dispatch','Unit responding — 41-year-old male, stung by a bee, now short of breath and dizzy. Wife on the line. Medic 1 responding, eight minutes.');
   else if(id==='od')radio('Dispatch','Unit responding — 24-year-old male, unresponsive, breathing slow and snoring, possible overdose. Caller is his roommate. Medic 1 responding, eight minutes. PD notified.');
   else if(id==='mva')radio('Dispatch','Single-vehicle crash into a tree, county road. Caller reports the driver is trapped and bleeding. Medic 1 responding, seven minutes. Engine responding for extrication.');
-  else radio('Dispatch','Unit responding — 62-year-old male, unresponsive, CPR in progress by caller. Medic 1 responding, nine minutes.');loadMission(0);}
+  else radio('Dispatch',V.open==='look'?LOOKS[V.look].dispatch:'Unit responding — 62-year-old male, unresponsive, CPR in progress by caller. Medic 1 responding, nine minutes.');loadMission(0);}
 function loadMission(i){S.mission=i;S.mStart=S.t;stepsDone=M[i].steps.map(()=>false);const m=M[i];if(m.onStart)m.onStart();
   $('m-title').textContent=`${i+1}/${M.length} · ${vtf(m.title)}`;$('m-sub').textContent=vtf(m.sub);
   $('steps').innerHTML=TIER===0?m.steps.map((s,j)=>`<li id="st-${j}"><span class="box"></span><span>${esc(vtf(s.t))}</span></li>`).join(''):`<li id="rc"><span class="box"></span><span>Checklist hidden — ${m.steps.length} steps. <span id="rcn"></span></span></li>`;
@@ -676,13 +819,13 @@ function openDecision(key,j){const d=DEC[key];const opts=typeof d.optsFn==='func
   $('dec-opts').classList.remove('hidden');$('dec-fb').classList.add('hidden');$('decov').classList.remove('hidden');$('decov').scrollTop=0;}
 $('dec-opts').onclick=e=>{const b=e.target.closest('[data-i]');if(!b||!DEC_OPEN)return;const d=DEC[DEC_OPEN.key],o=DEC_OPEN.opts[+b.dataset.i];
   const col={good:'#7fe3a4',partial:'#ffc23d',bad:'#ff8f8a'}[o.r],lab={good:'Right call.',partial:'Workable — not the best call.',bad:'That would hurt your patient.'}[o.r];
-  $('dec-res').innerHTML=`<b style="color:${col}">${lab}</b> ${esc(o.why)}`;$('dec-why').textContent=vt(d.why);
+  $('dec-res').innerHTML=`<b style="color:${col}">${lab}</b> ${esc(o.why)}`;$('dec-why').textContent=vtf(d.why);
   $('dec-chips').innerHTML=d.g?`<button class="chip" data-k="${d.g}">Learn more: ${esc(GUIDE[d.g].name)}</button>`:'';
-  if(o.r==='bad')ding(10,'Decision — '+d.tag);else if(o.r==='partial')ding(5,'Decision — '+d.tag);S.decisions.push({tag:d.tag,r:o.r});S.lastChoice=o.r;
+  if(o.r==='bad')ding(10,'Decision — '+d.tag);else if(o.r==='partial')ding(5,'Decision — '+d.tag);S.decisions.push({tag:d.tag,r:o.r});S.lastChoice=o.r;S.lastOpt=o;
   $('dec-opts').classList.add('hidden');$('dec-fb').classList.remove('hidden');};
 $('dec-chips').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
 $('dec-go').onclick=()=>{if(!DEC_OPEN)return;const d=DEC[DEC_OPEN.key];$('decov').classList.add('hidden');if(DEC_OPEN.j>=0)stepsDone[DEC_OPEN.j]=true;const el=$('st-'+DEC_OPEN.j);if(el)el.classList.add('done');if(d.after)d.after();DEC_OPEN=null;S.running=true;};
-function finish(){keepAwake(false);pcFx('done');const last=S.mission===M.length-1;$('done-t').textContent=vtf(M[S.mission].title)+(last?' — call complete':' — complete');countUp($('done-s'),S.score,600);
+function finish(){keepAwake(false);pcFx('done');if(M[S.mission]&&M[S.mission].next&&!M[S.mission].branched){M[S.mission].branched=true;M=M.slice(0,S.mission+1).concat(M[S.mission].next());}const last=S.mission===M.length-1;$('done-t').textContent=vtf(M[S.mission].title)+(last?' — call complete':' — complete');countUp($('done-s'),S.score,600);
   const keys=[...new Set(S.incidents.map(incidentKey).filter(Boolean))];
   const compare=last?pcBestPrev((load().runs||[]).filter(r=>r.call===CALL).map(r=>({d:r.d,score:r.score}))):null;
   let h=pcDebriefBody({score:S.score,compare,feedback:S.incidents,lessons:keys.map(k=>({k,name:GUIDE[k].name})),steps:M[S.mission].steps.map((st,j)=>({name:st.t,ok:!!stepsDone[j],missed:!stepsDone[j]}))});
@@ -693,16 +836,23 @@ function finish(){keepAwake(false);pcFx('done');const last=S.mission===M.length-
   else if(last&&CALL==='fl'){h+=flDebrief();record();}
   else if(last&&CALL==='cb'){h+=cbDebrief();record();}
   else if(last&&CALL==='dm'){h+=dmDebrief();record();}
-  else if(last){const ccf=S.arrestT?Math.round(S.compT/S.arrestT*100):0,avg=S.rateN?Math.round(S.rateSum/S.rateN):0;
-    h+=`<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Outcome',S.rosc?'ROSC at '+mmss(S.roscAt)+' — delivered with a pulse':'Delivered in arrest, CPR continuous']].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div>`;
-    h+=`<p style="font-size:15px;color:var(--soft);margin-top:10px">${S.rosc?'High-quality, continuous compressions, early shocks, and steady ventilation are what make ROSC possible. You gave him the chance.':'This outcome is driven mostly by compression quality: rate, depth, compressor switches, and short pauses. Check the numbers above for where time was lost.'}</p>`;
-    record();}
+  else if(last){h+=arrestDebrief();record();}
   if(last&&V.label)h=`<p style="font-size:15px;margin:4px 0 8px"><b>This patient:</b> ${esc(V.label)}</p>`+h;
   if(last)h+=timelineHTML();
   $('done-b').innerHTML=vt(h);$('b-next').textContent=last?'Back to calls':'Next';$('done').classList.remove('hidden');}
 $('done-b').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
 $('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length-1){loadMission(S.mission+1);if(!S.briefing)S.running=true;}else{S.active=false;showMenu();}};
 
+function arrestOutcome(){if(S.noRes)return S.dnr.produced?'No resuscitation — a valid DNR was produced right away':'No resuscitation — definite signs of death';
+  if(S.terminated&&S.dnr.stop)return 'Efforts stopped on a valid DNR at '+clockStr(S.torT);
+  if(S.terminated)return `No ROSC — medical control ordered efforts stopped at ${clockStr(S.torT)}, ${Math.round((S.torEl||0)/60)} minutes in`;
+  if(S.rosc&&!S.arrest)return 'ROSC on scene at '+mmss(S.roscAt)+' — transported with a pulse';
+  if(S.roscAt!==null)return 'ROSC on scene, re-arrested in transport — CPR continued to the hospital';return '—';}
+function arrestDebrief(){const out=`<div class="mrow"><span>Outcome</span><b style="text-align:right;max-width:62%">${esc(arrestOutcome())}</b></div>`;
+  const plain=`<p style="font-size:15px;color:var(--soft);margin-top:10px"><b style="color:var(--ink)">Your score measures your care, never the outcome.</b> `+(S.noRes?'There was nothing to resuscitate. The call was about recognizing it, protecting the scene and caring for his wife.':S.terminated?'He died. A run that ends this way can still score 100 when the care was right: the numbers above are what you controlled.':'He lived to the hospital. The same care can end the other way on another day; the score would be the same.')+'</p>';
+  if(S.noRes)return `<div style="margin-top:6px">${out}</div>`+plain;
+  const ccf=S.arrestT?Math.round(S.compT/S.arrestT*100):0,avg=S.rateN?Math.round(S.rateSum/S.rateN):0,onScene=S.resus0===null?0:(S.terminated?S.torEl:(S.roscAt!==null?S.roscAt-S.resus0:S.t-S.resus0));
+  return `<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':V.shock===false?'no shockable rhythm':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Resuscitation on scene',mmss(Math.max(0,onScene))+`  (${COUNTY.name}: about ${COUNTY.torMin} min, then the medic consults)`]].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+out+`</div>`+plain;}
 /* ================= render ================= */
 let wave=[],phase=0;
 function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}if(CALL==='cb'){renderCB();return;}if(CALL==='dm'){renderDM();return;}
@@ -710,36 +860,36 @@ function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD(
   ODG.forEach(i=>$(i).classList.add('hidden'));$('fattrack').classList.remove('hidden');$('mon-mode').style.color='';
   ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
   $('clock').textContent=clockStr();$('score').textContent=S.score;
-  $('eta-l').textContent=S.mission===3?'East Side Hospital':S.als.arrived?'Medic 1':'Medic 1';
-  $('eta-v').textContent=S.mission===3?(S.tx.arrived?'Arrived':mmss((S.tx.total-S.tx.t))+' out'):S.als.arrived?'On scene':mmss(S.als.eta)+' out';
+  const ph=aPh(),el=S.resus0===null?0:S.t-S.resus0;$('eta-l').textContent=ph==='tx'?'East Side Hospital':S.als.arrived&&S.resus0!==null&&!S.terminated&&!S.rosc?'On scene':'Medic 1';
+  $('eta-v').textContent=ph==='tx'?(S.tx.arrived?'Arrived':mmss((S.tx.total-S.tx.t))+' out'):S.als.arrived?(S.resus0!==null&&!S.terminated&&!S.rosc?mmss(el)+` of ~${COUNTY.torMin}:00`:'On scene'):mmss(S.als.eta)+' out';
   $('mon-name').textContent=S.als.zoll?'Monitor · pads':'AED';
-  $('mon-mode').textContent=S.rosc?'Pulse present':S.arrest&&S.checked?'Arrest':'—';
+  $('mon-mode').textContent=S.terminated?'Efforts stopped':S.noRes?'No resuscitation':S.rosc?'Pulse present':S.arrest&&S.checked?'Arrest':'—';
   const msg=!A.pads?(S.checked?'Pads not attached':'—'):S.als.zoll?(S.rosc?'Sinus rhythm':S.als.rc?'Rhythm check':'CPR in progress'):A.state==='analyzing'?'Analyzing… do not touch':A.state==='charging'?'Shock advised · charging':A.state==='ready'?(A.clear?'Press shock':'Stand clear!'):A.state==='shocked'?'Shock delivered · begin CPR':(S.t-A.lastAnalyze>=120&&A.analyzedOnce&&S.arrest)?'Rhythm check due':'Continue CPR';
   $('aedmsg').textContent=msg;
   const manual=S.cpr.on&&S.arrest;
   $('v-rate').textContent=manual?Math.round(S.cpr.rate):'—';$('v-depth').textContent=manual&&(S.als.zoll||compressorNow()==='LUCAS')?(S.cpr.depth>=.9?'2.2"':S.cpr.depth>=.7?'1.9"':'1.5"'):manual?'?':'—';
   $('v-etco2').textContent=S.air.adv&&S.als.zoll?Math.round(S.etco2):'—';
   const ccf=S.arrestT>5?Math.round(S.compT/S.arrestT*100):null;$('v-ccf').textContent=ccf===null?'—':ccf+'%';
-  const who=compressorNow();$('who').textContent=!S.checked?'No compressions':S.rosc?'ROSC — compressions held':S.cpr.on?`Compressor: ${who==='You'?'you':who==='Partner'?'partner':who==='Wife'?'his wife':'LUCAS'}`:'Hands off';
+  const who=compressorNow();$('who').textContent=S.terminated?'Efforts stopped — '+clockStr(S.torT):S.noRes?'No resuscitation':!S.checked?'No compressions':S.rosc?'ROSC — compressions held':S.cpr.on?`Compressor: ${who==='You'?'you':who==='Partner'?'partner':who==='Wife'?'his wife':'LUCAS'}`:'Hands off';
   const f=who==='LUCAS'?0:(S.fat[who]||0);$('fat').style.width=(S.cpr.on?Math.min(100,f*100):0)+'%';$('fat').style.background=f>.75?'#e5383b':f>.55?'#ffc23d':'#39e36f';
   $('pause').textContent=S.pause.on&&S.arrest&&S.checked&&S.compT>0?(S.pause.aed?`rhythm check ${Math.round(S.pause.t)}s`:`paused ${Math.round(S.pause.t)}s`):'';$('pause').style.color=S.pause.aed?'#ffc23d':S.pause.t>10?'#ff8f8a':'#9fb0c3';
   $('cycle').textContent=S.air.adv?`Continuous compressions · ${S.vent.lastRt>0?'last breath '+Math.round(S.rt-S.vent.lastRt)+'s ago':'start bagging — one breath every 6 seconds'}`:S.vent.waiting?'Pause for two breaths!':S.cpr.on&&compressorNow()!=='LUCAS'?`Compressions ${Math.floor(S.cpr.count)} of 30`:'';
   $('a-swap').classList.toggle('hidden',!(S.air.o2&&S.o2psi<600&&!S.als.arrived));$('a-swap').classList.toggle('hot',S.o2psi<400);
   $('o2psi').textContent=Math.round(S.o2psi).toLocaleString()+' psi';$('o2bar').style.width=(S.o2psi/2000*100)+'%';
   /* buttons */
-  $('a-cpr').textContent=S.als.lucas===2&&S.arrest?'LUCAS running':S.cpr.on?'Hold CPR':'Start CPR';$('a-cpr').classList.toggle('on',S.cpr.on);
+  $('a-cpr').textContent=S.terminated?'Efforts stopped':S.noRes?'No CPR':S.als.lucas===2&&S.arrest?'LUCAS running':S.cpr.on?'Hold CPR':'Start CPR';$('a-dnr').classList.toggle('on',S.dnr.asked);$('a-cpr').classList.toggle('on',S.cpr.on);
   $('a-met').classList.toggle('on',S.cpr.met);$('a-switch').classList.toggle('hot',S.sinceSwitch>110&&S.cpr.on&&who!=='LUCAS'&&who!=='Wife');
   $('a-check').classList.toggle('on',S.checked);$('a-opa').classList.toggle('on',S.air.opa);$('a-bvm').classList.toggle('on',S.air.bvm);$('a-o2').classList.toggle('on',S.air.o2);
   $('a-breaths').classList.toggle('hot',S.vent.waiting);$('a-breath').classList.toggle('hot',S.air.adv&&S.arrest!==false&&S.rt-(S.vent.lastRt>0?S.vent.lastRt:-99)>=6);$('a-breaths').classList.toggle('hidden',S.air.adv);$('a-breath').classList.toggle('hidden',!S.air.adv);
   $('a-pads').classList.toggle('on',A.pads);$('a-analyze').textContent='Analyze (hands off)';$('a-analyze').classList.toggle('hot',A.pads&&!S.als.zoll&&S.arrest&&(A.state==='off'||A.state==='idle'||A.state==='shocked')&&(!A.analyzedOnce||S.t-A.lastAnalyze>=120));
   $('a-clear').classList.toggle('hot',A.state==='ready'&&!A.clear);$('a-shock').classList.toggle('hot',A.state==='ready'&&A.clear);
-  $('g-aed').classList.toggle('hidden',S.als.zoll);$('g-als').classList.toggle('hidden',!S.als.arrived||S.mission>1);
+  $('g-aed').classList.toggle('hidden',S.als.zoll);$('g-als').classList.toggle('hidden',!S.als.arrived||S.noRes||S.terminated||ph==='pack'||ph==='tx');
   $('a-zoll').classList.toggle('on',S.als.zoll);$('a-hands').classList.toggle('hot',!!S.als.rc&&S.als.rc.phase==='call');
   $('a-lucas1').classList.toggle('hot',!!S.als.rc&&S.als.rc.phase==='check'&&S.als.lucas===0);$('a-lucas1').classList.toggle('on',S.als.lucas>=1);$('a-lucas2').classList.toggle('on',S.als.lucas>=2);
   if(S.als.rc&&S.als.rc.phase==='resume')$('a-cpr').classList.add('hot');else $('a-cpr').classList.remove('hot');
-  $('g-move').classList.toggle('hidden',S.mission!==2);$('g-ride').classList.toggle('hidden',S.mission!==3);
+  $('g-move').classList.toggle('hidden',ph!=='pack');$('g-ride').classList.toggle('hidden',ph!=='tx');
   $('a-cot').classList.toggle('on',S.cot);$('a-straps').classList.toggle('on',S.straps);$('a-load').classList.toggle('on',S.loaded);
-  $('g-assess').classList.toggle('hidden',S.mission>1&&!S.air.vomit);$('g-cpr').classList.toggle('hidden',S.mission>=2&&S.als.lucas>=2);
+  $('g-assess').classList.toggle('hidden',(ph==='pack'||ph==='tx'||ph==='work'||ph==='ext'||ph==='tor')&&!S.air.vomit);$('g-cpr').classList.toggle('hidden',S.noRes||S.terminated||((ph==='pack'||ph==='tx')&&S.als.lucas>=2));
 }
 
 /* ================= guide ================= */
@@ -755,13 +905,15 @@ const GUIDE={
  handoff:{name:'Handoff report',what:'A short, structured summary of the patient for the next provider.',when:'When ALS arrives, and at the hospital.',wrong:'Long stories, missing times, or stopping compressions to talk.',tip:'Age, what happened and when, what you found, what you did (shocks, airway, drugs), and current status. Give it while compressions continue.',mca:'Many systems teach MIST or SBAR; use your agency\'s format.',rel:['pause']},
  zoll:{name:'Cardiac monitor and CPR feedback',what:'The ALS monitor takes over from the AED. Many monitors can show real-time CPR rate and depth feedback.',when:'Pads move from the AED to the monitor as soon as practical, with a minimal pause.',wrong:'A long pause while pads are swapped and the monitor is set up.',tip:'Use the feedback. If the screen says you are shallow, you are shallow — no matter how it feels.',rel:['cpr','etco2']},
  etco2:{name:'End-tidal CO₂ during CPR',what:'Carbon dioxide measured at the airway. During CPR it reflects how much blood your compressions are moving.',when:'Once the medic places an airway with capnography.',wrong:'Ignoring a low number. Values under about 10 mmHg suggest compressions need to improve.',tip:'An abrupt rise — often to 35–40 or higher — can be the first sign of ROSC, before anyone feels a pulse.',rel:['vent','rosc','cpr']},
- lucas:{name:'Mechanical CPR device (LUCAS)',what:'A device that delivers consistent compressions, freeing hands and allowing CPR during moves and transport.',when:'Long arrests, moving the patient, and transport — when the medic decides.',wrong:'Long pauses to deploy it. Placement should take only seconds of hands-off time.',tip:'Back plate in during a planned pause such as a rhythm check, then manual compressions until the upper part locks on and starts.',rel:['pause','cot']},
+ lucas:{name:'Mechanical CPR device (LUCAS)',what:'A device that delivers consistent compressions, freeing hands through a long arrest worked on scene, and staying on the chest, paused, while a patient with ROSC is moved in case he re-arrests.',when:'Long arrests on scene, and moving a patient after ROSC — when the medic decides.',wrong:'Long pauses to deploy it. Placement should take only seconds of hands-off time.',tip:'Back plate in during a planned pause such as a rhythm check, then manual compressions until the upper part locks on and starts.',rel:['pause','cot']},
  crew:{name:'Who rides in',what:'How many firefighters go to the hospital to assist the medic.',when:'Decided by the officer and the medic based on how sick the patient is.',wrong:'Too few hands for a working arrest, or forgetting that every rider leaves your engine short.',tip:'Plan your engine\'s next move: who picks up the riders, and whether you are available for another call.',rel:['lucas']},
  cot:{name:'Cot and power-load safety',what:'Moving a patient to and into the ambulance with a powered cot and loading system.',when:'Every transport.',wrong:'Manual lifts that the equipment could do, poor communication on lifts, and unsecured patients or devices.',tip:'Communicate every lift ("on three"), use the powered systems, and check straps and devices before you move.',rel:['crew']},
- rosc:{name:'Return of spontaneous circulation (ROSC)',what:'The heart has resumed an organized rhythm with a pulse.',when:'Recognized by the medic on a rhythm check — often signaled first by a jump in EtCO₂.',wrong:'Hyperventilating, relaxing, or forgetting that re-arrest is common.',tip:'Steady ventilation (one every 6 seconds), SpO₂ about 92–98%, and hands ready to restart compressions.',rel:['vent','etco2']},
+ rosc:{name:'Return of spontaneous circulation (ROSC)',what:'The heart has resumed an organized rhythm with a pulse.',when:'Recognized by the medic on a rhythm check — often signaled first by a jump in EtCO₂.',wrong:'Hyperventilating, relaxing, or forgetting that re-arrest is common.',tip:'Steady ventilation (one every 6 seconds), SpO₂ about 92–98%, and hands ready to restart compressions. In Bay County, ROSC happens on scene; the 12-lead and the cath lab alert come before you move him.',rel:['vent','etco2','tor']},
+ tor:{name:'Termination of resuscitation (Bay County)',what:`${COUNTY.name} works a cardiac arrest on scene for about ${COUNTY.torMin} minutes from the start of resuscitation. A patient in arrest is not transported; transport happens only after ROSC.`,when:`No ROSC at about ${COUNTY.torMin} minutes: the medic contacts medical control (the medical director) about stopping, while CPR continues at full quality. The medic may keep working longer for special cases — a cold patient, a child, a pregnant woman, or a heart that may still respond.`,wrong:'Easing off while the medic is on the phone, pulling the airway or IO after the order, cleaning up the scene, and leaving the family alone.',tip:'Until the order: full-quality CPR, short pauses, regular switches. After it: stop compressions, note the time, leave every device in place for the coroner, do not clean up, and stay with the family. Plain words ("he died"), and help them call someone. The medic calls the coroner.',mca:'Bay County practice as described by a local firefighter (October 2026). Still subject to the pending Bay County Medical Control Authority protocol review.',rel:['death','pause','rosc']},
+ death:{name:'Signs of death and DNRs',what:'Definite signs of death: rigor mortis (stiffness), dependent lividity (color settled to the low side of the body), decomposition, or a body cold to the touch in a warm environment. Supporting context — mail piled up, flies at the windows of a locked house, an odor — is never enough on its own.',when:'Every unwitnessed arrest: look before you start. And on every arrest, ask the family whether there is a DNR.',wrong:'Withholding CPR on clues alone, calling a cold patient dead in a cold environment, or taking a family\'s word for a DNR nobody can produce.',tip:'Definite signs, or a valid DNR produced right away: do not start; notify (the medic confirms and calls the coroner), protect the scene, support the family. Anything less: start CPR. Cold from the weather is not death — not dead until warm and dead. A DNR that turns up mid-resuscitation goes to the medic, who verifies it and decides. When in doubt, start.',mca:'What makes a Michigan DNR valid (the state form, signatures, witnesses) is to confirm with the MCA. Hypothermia guidance is to confirm with the medical director.',rel:['tor','cpr','agonal']},
  bridge:{name:'Transport delays: the river crossings',what:'Monitor Township is on the west side of the Saginaw River; East Side Hospital is across it. The four Bay City drawbridges open for river traffic.',when:'Any transport across the river, especially in boating season.',wrong:'Being surprised by an opening. A bridge going up for a freighter can add minutes.',tip:'Crews can request through dispatch that a bridge be held down for a priority patient. Commercial ships already committed may not be able to wait. Plan your oxygen and your arms for the longer ride.',rel:['o2math']}
 };
-function incidentKey(w){const R=[[/glucose check|sugar dropped/i,'glucometer'],[/golden minute/i,'golden'],[/newborn left uncovered|lose heat in minutes/i,'nwarm'],[/too fast for a newborn/i,'nppv'],[/head delivered fast/i,'deliver'],[/postpartum hemorrhage/i,'pph'],[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
+function incidentKey(w){const R=[[/signs of death|DNR/i,'death'],[/glucose check|sugar dropped/i,'glucometer'],[/golden minute/i,'golden'],[/newborn left uncovered|lose heat in minutes/i,'nwarm'],[/too fast for a newborn/i,'nppv'],[/head delivered fast/i,'deliver'],[/postpartum hemorrhage/i,'pph'],[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
   const d=w.match(/^Decision — (.*)$/);if(d){const k=Object.keys(DEC).find(x=>DEC[x].tag===d[1]);return k?DEC[k].g:null;}for(const [r,k] of R)if(r.test(w))return k;return null;}
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
@@ -1904,9 +2056,8 @@ const OPT_TEXT={
  agonal:["Start compressions now — gasping like that is not breathing","Roll him into the recovery position and watch his breathing closely","Put him on a non-rebreather at 15 and recheck in one minute"],
  pads:["Below the right collarbone, and on the left side below the armpit","One centered on the front of his chest, one between his shoulder blades","Both side by side in the middle of his chest, over the sternum"],
  handoff:["\"62-year-old male, witnessed collapse, wife CPR about 4 minutes. Pulseless, agonal breaths. {shocks} shocks, OPA and BVM on 15 liters, 30:2. No ROSC.\"","\"His wife says he was watching TV and slumped over, so she called 911. When we got here she was doing CPR, so we took over and put the AED on him…\"","\"Witnessed cardiac arrest, about ten minutes down. We've shocked him and we're bagging. Still in VF on the AED, no pulse yet.\""],
- ride:["Two of us — one managing his airway, one assisting the medic with everything else","One — the LUCAS is doing compressions, so the medic just needs an airway","None — the LUCAS and the medic can handle it, and our engine stays in service"],
+ ride:["Two of us — one managing his airway, one assisting the medic with everything else","One — the LUCAS is on his chest if he re-arrests, so an airway is enough","None — he has a pulse, the medic can handle it, and our engine stays in service"],
  rosc:["Keep bagging one every 6 seconds, ready to restart compressions","Bag faster to bring his oxygen saturation up as quickly as possible","Stop bagging — he has a pulse, so let him breathe on his own"],
- noRosc:["Keep the LUCAS and the bagging going through the move to the bed","Pause the LUCAS for the move into the ER so the transfer is safer","Bag faster through the doors to make up for the time without a pulse"],
  erHand:["Age, collapse time, shocks, airway, drugs, ROSC time, current status","Say nothing — the medic gives the report, so stay out of the way","Tell it in order from the moment the tones dropped so nothing is missed"],
  mvaScene:["Ten-second size-up — traffic, fuel, wires, airbags — then in once it's stabilized","Reach in through the broken window and start your assessment while the crew sets up","Stay outside the car until the engine crew finishes cutting and hands her to you"],
  tqPlace:["Upper arm, 2–3 inches above the wound, tight until the bleeding stops","Directly over the elbow joint, so it can't slide down her arm","Snug enough to hurt, but loose enough to keep a pulse at her wrist"],
@@ -1970,7 +2121,7 @@ const MONCFG={
 };
 function monCfg(){return MONCFG[CALL]||null;}
 function monState(){
-  if(CALL==='arrest'){if(!S.aed.pads)return {kind:'none'};if(S.rosc)return {kind:'ecg',r:'sinus',hr:96,stemi:true,lead:S.mon.twelve?'II':'pads'};return {kind:'ecg',r:S.cpr.on?'cpr':'vf',hr:S.cpr.on?S.cpr.rate:0,lead:S.als.zoll?'pads':'AED'};}
+  if(CALL==='arrest'){if(!S.aed.pads||S.terminated||S.noRes)return {kind:'none'};if(S.rosc)return {kind:'ecg',r:'sinus',hr:96,stemi:true,lead:S.mon.twelve?'II':'pads'};return {kind:'ecg',r:S.cpr.on?'cpr':'vf',hr:S.cpr.on?S.cpr.rate:0,lead:S.als.zoll?'pads':'AED'};}
   if(CALL==='cb'){const x=S.c;return x&&x.born&&x.hrKnown?{kind:'ecg',r:'sinus',hr:Math.max(40,x.hr),lead:'HR (counted)'}:{kind:'none'};}
   const c=monCfg();if(c&&S.mon.four&&c.rhythm)return Object.assign({kind:'ecg',lead:'II'},c.rhythm());
   const ox={od:()=>S.o&&S.o.ox&&S.o.pulse&&{hr:S.o.hr},ep:()=>S.e&&S.e.ox&&{hr:epV().hr},st:()=>S.s&&S.s.ox&&{hr:88,irr:true},fl:()=>S.f&&S.f.vitCount&&{hr:98},dm:()=>S.d&&S.d.vit&&{hr:dmV().hr}}[CALL];
@@ -2050,10 +2201,10 @@ function twelveShow(){const c=monCfg();S.mon.wasRun=S.running;S.running=false;co
   grid.forEach((row,r)=>row.forEach((ld,cI)=>draw(ld,cI*85,r*62,85,62)));draw('II',0,186,W,62);x.fillText('II (rhythm)',3,196);}
 $('tw-close').onclick=()=>{$('twelveov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing)S.running=true;};
 /* --- per-tick upkeep, UI sync --- */
-function monTick(dtReal){if(S.mon&&S.mon.acqT>0&&!DEC_OPEN){S.mon.acqT-=dtReal*3;if(S.mon.acqT<=0){S.mon.acqT=0;S.mon.twelve=true;if(!S.mon.four)S.mon.four=true;radio('Medic 1','12-lead acquired.','good');twelveShow();}}}
+function monTick(dtReal){if(S.mon&&S.mon.acqT>0&&!DEC_OPEN){S.mon.acqT-=dtReal*3;if(S.mon.acqT<=0){S.mon.acqT=0;S.mon.twelve=true;if(!S.mon.four)S.mon.four=true;radio('Medic 1','12-lead acquired.','good');if(CALL==='arrest')radio('Medic 1','Inferior STEMI. Dispatch, Medic 1 — cath lab alert to East Side Hospital: post-arrest, ROSC on scene, inferior STEMI.','good');twelveShow();}}}
 function monSync(){const c=monCfg();const vis=(id,on)=>$(id).classList.toggle('hidden',!on);
   const need=!!(c&&S.active&&c.need()),show4=need&&!c.only12&&!S.mon.four,show12=need&&c.twelve&&(S.mon.four||c.only12)&&!S.mon.twelve&&!(S.mon.acqT>0);
-  vis('g-monitor',(show4||show12||S.mon.acqT>0)&&S.mission<=3);vis('mon-4',show4);vis('mon-12',show12);
+  vis('g-monitor',(show4||show12||S.mon.acqT>0)&&(S.mission<=3||CALL==='arrest'));vis('mon-4',show4);vis('mon-12',show12);
   $('mon-txt').textContent=S.mon.acqT>0?'Acquiring the 12-lead — keep the patient still…':show4?'The medic is putting the patient on the cardiac monitor. Help place the leads.':show12?'The medic wants a 12-lead. Help place the chest leads.':'';
   const st=monState();$('trace').classList.toggle('hidden',st.kind==='none');if(st.kind==='ecg'&&st.lead==='II'&&CALL!=='arrest')$('mon-name').textContent='Cardiac monitor';else if(st.kind==='pleth')$('mon-name').textContent='Pulse oximeter';$('ecg-lead').textContent=st.lead||'';$('ecg-hr').textContent=st.kind==='ecg'&&['vf','cpr'].includes(st.r)?'':st.hr?`${st.kind==='pleth'?'PR':'HR'} ${Math.round(st.hr)}`:'';}
 $('mon-4').onclick=()=>{if(!S.active)return;leadStart('4');};$('mon-12').onclick=()=>{if(!S.active)return;leadStart('12');};
@@ -2073,7 +2224,7 @@ insertStep(M_EP,2,'Medic 1 takes over',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.
 insertStep(M_ST,1,'Onto the cot',{t:'Help Medic 1: 4-lead and 12-lead',f:()=>S.mon.twelve});
 insertStep(M_FL,1,null,{t:'Help Medic 1: 4-lead and 12-lead',f:()=>S.mon.twelve});
 insertStep(M_DM,1,'He\'s alert and oriented',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
-insertStep(M_ARREST,3,'Arrive at East Side Hospital',{t:'Pulse back? Help with the 12-lead',f:()=>!S.rosc||S.mon.twelve});
+/* the arrest call's 12-lead now happens on scene after ROSC (A_ROSC) */
 Object.assign(GUIDE,{
  ecg4:{name:'Placing a 4-lead',what:'Four electrodes for cardiac monitoring: white (RA), black (LA), red (LL), green (RL).',when:'Whenever ALS puts a patient on the monitor — MFRs often place them.',wrong:'Swapping colors, placing over bone or on hairy, sweaty skin, or loose electrodes that cause artifact.',tip:'"White on right, smoke over fire, snow over grass": white on the right upper chest, black on the left upper chest above red on the left lower abdomen, green on the right lower abdomen.',mca:'Lead placement follows the monitor manufacturer and your agency\'s training.',rel:['ecg12','artifact']},
  ecg12:{name:'Placing a 12-lead',what:'Six chest electrodes (V1–V6) plus the limb leads give twelve views of the heart.',when:'Chest pain, after cardiac arrest with ROSC, syncope, stroke, and other complaints per protocol — ideally within about 10 minutes for chest pain.',wrong:'V1 and V2 too high (the 2nd space instead of the 4th), V4 off the midclavicular line, or V3 placed before V4.',tip:'Find the angle of Louis (the bump below the notch) — that\'s the 2nd rib; the space below it is the 2nd intercostal space. Count down to the 4th: V1 right of the sternum, V2 left. V4: 5th space, midclavicular. V3 halfway between. V5 and V6 level with V4 at the anterior and midaxillary lines.',rel:['ecg4','stemi','artifact']},
@@ -2090,7 +2241,8 @@ const DRILLS=[
  {id:'med',name:'Med math',sub:'8 questions · mg, mL, mg/kg',g:'conc'},
  {id:'o2',name:'Oxygen math',sub:'8 cylinders',g:'o2math'},
  {id:'apgar',name:'APGAR',sub:'8 newborns',g:'apgar'},
- {id:'lkw',name:'Last known well',sub:'6 stroke scenarios',g:'lkw'}];
+ {id:'lkw',name:'Last known well',sub:'6 stroke scenarios',g:'lkw'},
+ {id:'startcpr',name:'Start CPR or not?',sub:'8 situations · signs of death, DNRs, the cold',g:'death'}];
 let DR=null;
 const fmt=n=>(Math.round(n*100)/100).toString();
 const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
@@ -2114,6 +2266,17 @@ function genO2(){const cyl=pick([['D',.16],['E',.28],['M',1.56]]),psi=pick([800,
 function genApgar(){const w=()=>pick([0,1,1,2,2,2]);const A=w(),P=w(),G=w(),Ac=w(),R=w(),t=A+P+G+Ac+R;
   const tx={A:['blue or pale all over','pink body, blue hands and feet','pink all over'],P:['no heart rate','heart rate about 80','heart rate about 140'],G:['no response when you flick her foot','grimaces when you flick her foot','cries and pulls away when you flick her foot'],Ac:['limp','some flexion of the arms and legs','active, moving all four limbs'],R:['not breathing','weak, irregular breaths','strong cry']};
   const d=[t+2,t-2,t+1,t-1].filter(x=>x>=0&&x<=10&&x!==t);return {q:`Color: ${tx.A[A]}. ${tx.P[P][0].toUpperCase()+tx.P[P].slice(1)}. ${tx.G[G][0].toUpperCase()+tx.G[G].slice(1)}. Tone: ${tx.Ac[Ac]}. Breathing: ${tx.R[R]}. APGAR?`,a:String(t),d:shuf(d).slice(0,3).map(String),why:`Appearance ${A} + Pulse ${P} + Grimace ${G} + Activity ${Ac} + Respiration ${R} = ${t}.`};}
+const SQ_A='Start CPR',SQ_B='Do not start: notify the medic and protect the scene',SQ_C='Hold off until the medic arrives and decides';
+const sq=(q,a,why)=>({q,a,d:[SQ_A,SQ_B,SQ_C].filter(x=>x!==a),why});
+const STARTQ=[
+ sq('Unwitnessed. Found in bed in a warm bedroom: his jaw and arms are stiff, he is cold to the touch, and the color has settled along his back.',SQ_B,'Stiffness, settled color and cold in a warm room are definite signs of death. Do not start; the medic confirms and calls the coroner.'),
+ sq('Unwitnessed. Found face down in the snow at 9°F: cold, pale, muscles stiff, no pulse.',SQ_A,'The cold is from the weather, not from death, and the stiffness may be the cold. Not dead until warm and dead — start. (Hypothermia guidance: to confirm with the medical director.)'),
+ sq('Unwitnessed. Found on the kitchen floor: warm, limp, no settled color. His coffee is cold and the TV is still on.',SQ_A,'No definite signs. Clues about how long someone has been down never justify withholding CPR.'),
+ sq('His wife hands you, right away, a Michigan do-not-resuscitate order on the state form with his name, signed, dated and witnessed.',SQ_B,'A valid DNR produced right away: do not start. The medic confirms it. (What makes it valid: to confirm with MCA.)'),
+ sq('Her son says she has a DNR "somewhere in the house" but he cannot find it. She is warm and collapsed minutes ago.',SQ_A,'A DNR only counts if it is produced right away and is valid. Without it in hand, start CPR; if it turns up, the medic verifies it.'),
+ sq('A neighbor says the mail has piled up for days. Inside, the woman on the floor has no pulse, but she is warm and her arms move freely.',SQ_A,'Mail piling up is context, never a sign of death on its own. She is warm with no definite signs — start.'),
+ sq('Witnessed collapse two minutes ago. He is gasping every few seconds and has no pulse.',SQ_A,'Gasping is agonal breathing, not breathing. No definite signs, no DNR — start right away.'),
+ sq('Unwitnessed. A locked house, a strong odor, and clear signs of decomposition.',SQ_B,'Decomposition is a definite sign of death. Do not start; protect the scene and notify through the medic. Keep the family out of the room.')];
 const LKWQ=[
  {q:'Her husband found her slumped and slurring at 3:10 p.m. He last saw her acting normal when they ate lunch together at 12:30.',a:'12:30 p.m.',d:['3:10 p.m.','When 911 was called','Unknown'],why:'Last known well is the last time anyone knew she was normal — lunch at 12:30 — not when she was found.'},
  {q:'He woke up at 6:45 a.m. unable to move his left arm. His wife says he went to bed normal at 11:00 p.m.',a:'11:00 p.m. last night',d:['6:45 a.m.','Midnight','Unknown — he was asleep'],why:'Wake-up stroke: last known well is bedtime, when he was last known normal.'},
@@ -2133,7 +2296,7 @@ function drawStrip(cv,r){if(!cv||!cv.getContext)return;const W=320,H=96,d=window
     const y=H*.6-v*H*.42;px?x.lineTo(px,y):x.moveTo(px,y);}x.stroke();}
 /* --- runner --- */
 function drillStart(id){pca('begin','pc','drill-'+id,()=>DR&&DR.qs?`question-${DR.i+1}`:'');const d=DRILLS.find(x=>x.id===id);DR={id,d,i:0,right:0,qs:[],t0:performance.now(),errs:0,taps:[]};$('dr-title').textContent=d.name;
-  if(id==='med')DR.qs=Array.from({length:8},genMed);if(id==='o2')DR.qs=Array.from({length:8},genO2);if(id==='apgar')DR.qs=Array.from({length:8},genApgar);if(id==='lkw')DR.qs=shuf(LKWQ);
+  if(id==='med')DR.qs=Array.from({length:8},genMed);if(id==='o2')DR.qs=Array.from({length:8},genO2);if(id==='apgar')DR.qs=Array.from({length:8},genApgar);if(id==='lkw')DR.qs=shuf(LKWQ);if(id==='startcpr')DR.qs=shuf(STARTQ).map(x=>Object.assign({},x,{d:x.d.slice()}));
   if(id==='rhythm')DR.qs=Array.from({length:8},()=>{const r=pick(RHY);return {rhy:r,q:'What rhythm is this?',a:r.n,d:shuf(RHY.filter(x=>x.k!==r.k).map(x=>x.n)).slice(0,3),why:r.why};});
   if(id==='cpr')return cprDrill();if(id==='leads')return leadDrill();drillQ();}
 function drillQ(){const q=DR.qs[DR.i];$('dr-meta').textContent=`${DR.i+1} of ${DR.qs.length} · ${DR.right} right`;
@@ -2190,7 +2353,7 @@ const INJECTS=[
  {id:'vomit',label:'Patient vomits',ok:()=>(CALL==='arrest'&&S.arrest&&S.checked&&!S.air.adv&&!S.air.vomit)||(CALL==='od'&&S.o.checked&&S.mission<=1)||(CALL==='st'&&S.s.abc&&!S.s.vomit&&S.mission<=1),
   run:()=>{if(CALL==='arrest'){S.air.vomit=true;$('a-suction').classList.remove('hidden');radio('Partner','He vomited — the airway\'s full!','bad');}else if(CALL==='od'){S.o.gurgle=true;S.o.vomit=true;S.o.recov=false;radio('Partner','He\'s vomiting — airway\'s full!','bad');}else{S.s.vomit=true;S.s.spo2=89;radio('Husband','She\'s throwing up!','bad');}}},
  {id:'lucas',label:'LUCAS battery dies',ok:()=>CALL==='arrest'&&S.arrest&&S.als.lucas===2,run:()=>{S.als.lucas=0;S.cpr.on=false;S.cpr.who='You';S.fat.You=.2;startPause();radio('Medic 1','The LUCAS just died — battery! Manual compressions, now!','bad');}},
- {id:'rearrest',label:'Re-arrest after ROSC',ok:()=>CALL==='arrest'&&S.rosc,run:()=>{S.rosc=false;S.arrest=true;S.Q=0;S.cpr.on=false;if(S.als.lucas===3)S.als.lucas=2;S.cpr.who=S.als.lucas===2?'You':'You';startPause();radio('Medic 1','I\'ve lost the pulse — he\'s re-arrested! Compressions!','bad');S.als.rcNext=S.t+120;}},
+ {id:'rearrest',label:'Re-arrest after ROSC (in transport)',ok:()=>CALL==='arrest'&&S.rosc&&S.arrest===false&&aPh()==='tx',run:()=>{S.rosc=false;S.arrest=true;S.Q=0;S.cpr.on=false;if(S.als.lucas===3)S.als.lucas=2;S.cpr.who=S.als.lucas===2?'You':'You';startPause();radio('Medic 1','I\'ve lost the pulse — he\'s re-arrested! Compressions!','bad');S.als.rcNext=S.t+120;}},
  {id:'o2',label:'O₂ cylinder runs out',ok:()=>CALL==='arrest'&&S.air.o2&&!S.als.arrived&&S.o2psi>220,run:()=>{S.o2psi=190;S.o2ok=false;radio('Partner','The D cylinder just hit empty!','bad');}},
  {id:'worse',label:'Patient deteriorates',ok:()=>({arrest:()=>false,mva:()=>S.m.inside,od:()=>S.o.checked&&S.o.pulse,ep:()=>S.e.assessed,st:()=>S.s.abc,fl:()=>S.f.primary,cb:()=>S.c.born,dm:()=>S.d.abc}[CALL]||(()=>false))(),
   run:()=>{({mva:()=>{S.m.lost+=600;radio('You','She\'s getting paler and more confused — pulse is climbing.','bad');},
@@ -2200,8 +2363,8 @@ const INJECTS=[
     fl:()=>{S.f.gcs=Math.max(12,S.f.gcs-1);radio('Patient','…What happened? Where am I?','bad');},
     cb:()=>{if(S.mission>=3){S.c.loss+=400;S.c.massage=false;radio('Partner','Mom\'s bleeding picked up — the uterus feels soft again!','bad');}else if(!S.c.vigorous){S.c.hr=Math.max(45,S.c.hr-20);radio('You','Her heart rate is dropping!','bad');}else{radio('Partner','Baby\'s getting a little dusky — is she staying warm?','bad');S.c.sts=false;}},
     dm:()=>{S.d.gl=Math.max(22,S.d.gl-12);radio('Partner','He\'s less responsive — sugar must be dropping again.','bad');}})[CALL]();}},
- {id:'bridge',label:'Drawbridge goes up',ok:()=>S.mission===3&&((CALL==='arrest'&&!S.tx.arrived)||(CALL==='st'&&!V.lvo&&!S.s.tx.arrived)||(CALL==='od'&&!S.o.tx.arrived)||(CALL==='ep'&&!S.e.tx.arrived)),run:()=>{const t=CALL==='arrest'?S.tx:CALL==='st'?S.s.tx:CALL==='od'?S.o.tx:S.e.tx;t.total+=180;radio('EMT','The bridge is going up in front of us — freighter. We\'re stuck about three minutes.','bad');}},
- {id:'family',label:'Family member gets in the way',ok:()=>S.active&&S.mission<=1,run:()=>{const line={arrest:['Son','Why aren\'t you shocking him?! Do something!'],mva:['Bystander','I\'m a nurse — let me in there!'],od:['Roommate','Is he going to jail? Don\'t tell the cops!'],ep:['Wife','He hates hospitals — just give him Benadryl!'],st:['Husband','Can\'t you just give her an aspirin?'],fl:['Daughter (phone)','Just put her in bed, she\'ll be fine!'],cb:['Husband','Should I drive her? I can drive her!'],dm:['Officer','He\'s faking it. I\'m taking him in.']}[CALL]||['Bystander','What\'s happening?!'];radio(line[0],line[1],'bad');}}
+ {id:'bridge',label:'Drawbridge goes up',ok:()=>(CALL==='arrest'&&aPh()==='tx'&&!S.tx.arrived)||S.mission===3&&((CALL==='st'&&!V.lvo&&!S.s.tx.arrived)||(CALL==='od'&&!S.o.tx.arrived)||(CALL==='ep'&&!S.e.tx.arrived)),run:()=>{const t=CALL==='arrest'?S.tx:CALL==='st'?S.s.tx:CALL==='od'?S.o.tx:S.e.tx;t.total+=180;radio('EMT','The bridge is going up in front of us — freighter. We\'re stuck about three minutes.','bad');}},
+ {id:'family',label:'Family member gets in the way',ok:()=>S.active&&(CALL==='arrest'?S.arrest&&['contact','als','work','ext','tor','look'].includes(aPh()):S.mission<=1),run:()=>{const line={arrest:['Son','Why aren\'t you shocking him?! Do something!'],mva:['Bystander','I\'m a nurse — let me in there!'],od:['Roommate','Is he going to jail? Don\'t tell the cops!'],ep:['Wife','He hates hospitals — just give him Benadryl!'],st:['Husband','Can\'t you just give her an aspirin?'],fl:['Daughter (phone)','Just put her in bed, she\'ll be fine!'],cb:['Husband','Should I drive her? I can drive her!'],dm:['Officer','He\'s faking it. I\'m taking him in.']}[CALL]||['Bystander','What\'s happening?!'];radio(line[0],line[1],'bad');}}
 ];
 function instOpen(){if(!S.active)return;S.instWasRunning=S.running;S.running=false;instRender();$('instov').classList.remove('hidden');}
 function instClose(){$('instov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing&&$('discov').classList.contains('hidden')&&S.instWasRunning!==false)S.running=true;}

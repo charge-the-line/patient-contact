@@ -23,6 +23,43 @@ with sync_playwright() as p:
         rows.append((w, 'drills', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL))))
         pg.goto(URL+'?drill=apgar'); pg.wait_for_timeout(300); rows.append((w, 'daily link', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)) + (0 if pg.is_visible('#drillov') else 99)))
         pg.evaluate("localStorage.setItem('preconnect-drill',JSON.stringify({on:true,inst:'Max',roster:['Jo','Sam'],who:'',start:new Date().toISOString()}))"); pg.goto(URL); pg.wait_for_timeout(300); rows.append((w, 'drill picker', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.click('.pc-drill-name'); pg.wait_for_timeout(200); rows.append((w, 'drill bar', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.close()
+    # Bay County arrest flows, played with slow real taps on buttons found by their visible text
+    def tap(pg, text, sel='button'):
+        pg.locator(sel, has_text=text).first.click(delay=260); pg.wait_for_timeout(350)
+    def answer(pg, key=None):   # tap the right option of the open decision by its visible text, then Continue
+        ans = pg.evaluate("DEC_OPEN.opts.find(o=>o.r==='good').t"); pg.locator('#dec-opts button', has_text=ans).first.click(delay=260); pg.wait_for_timeout(300)
+        pg.click('#dec-go', delay=200); pg.wait_for_timeout(400)
+    for w, force, label in ((390, "{look:'obvious'}", 'obvious death'), (320, "{dnr:'valid'}", 'valid DNR')):
+        pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={arrest:%s}" % force); pg.click('#b-call1'); pg.wait_for_timeout(200); pg.click('#brief-go'); pg.wait_for_timeout(300)
+        tap(pg, 'Check: responsive'); pg.wait_for_timeout(3200); tap(pg, 'Ask: is there a DNR?'); pg.wait_for_timeout(800)
+        rows.append((w, label + ': start or not', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#decov') else 99))); answer(pg)
+        for _ in range(30):
+            if pg.is_visible('#done') and pg.is_visible('#b-next') and pg.evaluate("S.mission<M.length-1"): pg.click('#b-next', delay=200); pg.wait_for_timeout(400)
+            if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(300)
+            if pg.is_visible('#decov'): answer(pg)
+            if pg.is_visible('#done') and pg.evaluate("S.mission===M.length-1"): break
+            pg.wait_for_timeout(1500)
+        rows.append((w, label + ' (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and 'nothing to resuscitate' in pg.inner_html('#done-b') else 99))); pg.close()
+    # the medical-control ending at a phone's width: jump to the consult (the long CPR before it is covered by the suite at human pace), then play it with real taps
+    pg = b.new_page(viewport={'width': 320, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={arrest:{open:'cpr',outcome:'tor',shock:true,dnr:null}}"); pg.click('#b-call1'); pg.wait_for_timeout(200)
+    pg.evaluate("(()=>{Object.assign(S,{checked:true,arrest:true,resus0:0,compT:900,arrestT:1000,running:false});S.cpr.who='You';S.cpr.on=true;S.pause.on=false;S.aed.pads=true;S.als.arrived=true;S.als.arrT=S.t;S.als.zoll=true;S.als.lucas=2;S.air.adv=true;S.tor.calling=true;S.tor.callT=S.t;S.tor.comp0=S.compT;S.dnr.asked=true;M=[A_TOR()];loadMission(0);})()")
+    pg.wait_for_timeout(300)
+    if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(500)
+    rows.append((320, 'consult decision', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#decov') else 99))); answer(pg)
+    for _ in range(60):
+        if pg.is_visible('#decov'): answer(pg)
+        if pg.is_visible('#done'): break
+        pg.wait_for_timeout(1500)
+    rows.append((320, 'termination (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and 'never the outcome' in pg.inner_html('#done-b') and 'Time of death' in pg.evaluate("S.log.map(e=>e.msg).join(' ')") else 99))); pg.close()
+    # the Start CPR or not? drill, answered by visible text
+    pg = b.new_page(viewport={'width': 390, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click('#b-drills'); pg.wait_for_timeout(200); tap(pg, 'Start CPR or not?')
+    rows.append((390, 'start-or-not drill', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+    for _ in range(8):
+        a = pg.evaluate("DR.qs[DR.i].a"); pg.locator('#dr-body button', has_text=a).first.click(delay=260); pg.wait_for_timeout(250); pg.locator('#dr-foot button').first.click(delay=200); pg.wait_for_timeout(250)
+    rows.append((390, 'start-or-not drill (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if '100' in pg.inner_text('#dr-body') else 99))); pg.close()
     pg = b.new_page(viewport={'width': 844, 'height': 390}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.goto(URL); pg.wait_for_timeout(300)
     if pg.is_visible('#b-start'): pg.click('#b-start'); pg.wait_for_timeout(200)
@@ -35,6 +72,6 @@ with sync_playwright() as p:
     pg.close()
     b.close()
 bad = [r for r in rows if r[2] > 1]
-for r in rows: print(f"{'PASS' if r[2] <= 1 else 'FAIL'}  {r[0]}px  {r[1]:<8} overflow {r[2]%1000}px · buttons under 44px: {r[2]//1000}")
+for r in rows: print(f"{'PASS' if r[2] <= 1 else 'FAIL'}  {r[0]}px  {r[1]:<26} overflow {r[2]%1000}px · buttons under 44px: {r[2]//1000}")
 print('JavaScript errors:', errs or 'none')
 sys.exit(1 if bad or errs else 0)

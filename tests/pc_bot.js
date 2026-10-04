@@ -8,8 +8,10 @@ function play(tier,choice='good',opts={}){const {api,els}=boot();const {$}=api;a
     if(!S.running&&!hid('done')){missions.push({m:curM,t:Math.round(S.t-mT)});if(S.mission>=api.M().length-1)break;c('b-next');curM=api.S().mission;mT=api.S().t;continue;}
     if(S.running){
       if(!S.checked)c('a-check');
+      const V=api.V(),tag=(api.M()[S.mission]||{}).tag,canStart=!S.noRes&&!S.terminated&&(V.open!=='look'||S.startChoice==='start');
+      if(S.checked&&!S.dnr.asked&&!S.act)c('a-dnr');
       const A=S.aed;
-      if(S.checked&&!S.act&&!S.cpr.on&&S.arrest&&!['analyzing','charging','ready'].includes(A.state)&&!S.vent.waiting&&!(S.als.rc&&S.als.rc.phase==='check')&&!opts.lazy)c('a-cpr');
+      if(canStart&&S.checked&&!S.act&&!S.cpr.on&&S.arrest&&!['analyzing','charging','ready'].includes(A.state)&&!S.vent.waiting&&!(S.als.rc&&S.als.rc.phase==='check')&&!opts.lazy)c('a-cpr');
       if(S.cpr.on&&!S.cpr.met&&!opts.noMet)c('a-met');
       if(opts.metOff&&S.cpr.met&&api.stepsDone()[3])c('a-met');
       if(S.cpr.on&&!A.pads&&!A.padsAsked)c('a-pads');
@@ -20,15 +22,15 @@ function play(tier,choice='good',opts={}){const {api,els}=boot();const {$}=api;a
       if(S.vent.waiting)c('a-breaths');
       if(S.air.vomit)c('a-suction');if(S.o2psi<500)c('a-swap');
       if(S.cpr.on&&S.sinceSwitch>(opts.noSwitch?230:100))c('a-switch');
-      if(S.als.arrived&&!S.als.zoll&&S.mission===1)c('a-zoll');
+      if(S.als.arrived&&!S.als.zoll&&tag==='als')c('a-zoll');
       const rc=S.als.rc;if(rc&&rc.phase==='call')c('a-hands');if(rc&&rc.phase==='check'&&S.als.lucas===0)c('a-lucas1');if(rc&&rc.phase==='resume')c('a-cpr');
       if(S.als.lucas===1&&!rc&&!S.act)c('a-lucas2');
       if(S.air.adv&&(S.rt-(S.vent.lastRt>0?S.vent.lastRt:-99))>=6)c('a-breath');
-      if(S.mission===2){c('a-cot');c('a-straps');c('a-load');}
-      if(S.mission===3)c('a-reassess');
+      if(tag==='pack'){c('a-cot');c('a-straps');c('a-load');}
+      if(tag==='tx')c('a-reassess');
       api.tick(.25);}
     t+=.25;}
-  S=api.S();global.__last={api,S:api.S()};return {mq:S.manT?+(S.Qm/S.manT).toFixed(2):0,tier,choice,score:S.score,rosc:S.rosc,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,firstShock:S.aed.firstShockT&&Math.round(S.aed.firstShockT),shocks:S.aed.shocks,longest:Math.round(S.pause.longest),over10:S.pause.over10,Q:Math.round(S.Q),missions,finished:missions.length===4,incidents:S.incidents,steps:api.stepsDone(),mission:S.mission,o2:Math.round(S.o2psi)};}
+  S=api.S();global.__last={api,S:api.S()};return {mq:S.manT?+(S.Qm/S.manT).toFixed(2):0,tier,choice,score:S.score,rosc:S.rosc,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,firstShock:S.aed.firstShockT&&Math.round(S.aed.firstShockT),shocks:S.aed.shocks,longest:Math.round(S.pause.longest),over10:S.pause.over10,Q:Math.round(S.Q),missions,finished:missions.length===api.M().length,outcome:api.arrestOutcome(),incidents:S.incidents,steps:api.stepsDone(),mission:S.mission,o2:Math.round(S.o2psi)};}
 module.exports={play};
 if(require.main===module){for(const tier of [0,1,2])for(const ch of ['good','partial','bad']){const r=play(tier,ch);console.log(r.finished?'PASS':'FAIL',['Guided','Recall','Chaos'][tier].padEnd(7),ch.padEnd(8),'score',String(r.score).padStart(3),'ROSC',r.rosc,'CCF',r.ccf+'%','1st shock',r.firstShock+'s','shocks',r.shocks,'longest',r.longest+'s','Q',r.Q,'O2',r.o2,'| missions',r.missions.map(m=>m.t+'s').join('/'),r.finished?'':' STUCK m'+r.mission+' steps '+r.steps.map(x=>x?1:0).join(''));if(tier===0&&ch==='good')console.log('   incidents:',r.incidents);}
   console.log('--- poor CPR (no metronome, never switch):');const r=play(0,'good',{noMet:true,noSwitch:true});console.log('  score',r.score,'ROSC',r.rosc,'CCF',r.ccf,'Q',r.Q,'finished',r.finished,'incidents',r.incidents.length);}
