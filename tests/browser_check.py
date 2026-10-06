@@ -24,8 +24,11 @@ with sync_playwright() as p:
         pg.goto(URL+'?drill=apgar'); pg.wait_for_timeout(300); rows.append((w, 'daily link', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)) + (0 if pg.is_visible('#drillov') else 99)))
         pg.evaluate("localStorage.setItem('preconnect-drill',JSON.stringify({on:true,inst:'Max',roster:['Jo','Sam'],who:'',start:new Date().toISOString()}))"); pg.goto(URL); pg.wait_for_timeout(300); rows.append((w, 'drill picker', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.click('.pc-drill-name'); pg.wait_for_timeout(200); rows.append((w, 'drill bar', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.close()
     # Bay County arrest flows, played with slow real taps on buttons found by their visible text
-    def tap(pg, text, sel='button'):
+    def tap(pg, text, sel='button:visible'):   # only buttons a finger could reach: several calls share labels
         pg.locator(sel, has_text=text).first.click(delay=260); pg.wait_for_timeout(350)
+    def try_ff(pg):   # the button can hide between looking and tapping (something just happened): that's a missed tap, not a failure
+        try: pg.locator('#b-ff').click(delay=260, timeout=1500); pg.wait_for_timeout(350)
+        except Exception: pass
     def answer(pg, key=None):   # tap the right option of the open decision by its visible text, then Continue
         ans = pg.evaluate("DEC_OPEN.opts.find(o=>o.r==='good').t"); pg.locator('#dec-opts button', has_text=ans).first.click(delay=260); pg.wait_for_timeout(300)
         pg.click('#dec-go', delay=200); pg.wait_for_timeout(400)
@@ -70,14 +73,65 @@ with sync_playwright() as p:
             nxt = pg.evaluate(SHOCK_NEXT)
             if nxt: tap(pg, nxt); continue
             if pg.evaluate("ffWhy()==='due'"): tap(pg, 'Reassess vitals')
-            if pg.is_visible('#b-ff'): tap(pg, 'Fast-forward')
+            if pg.is_visible('#b-ff'): try_ff(pg)
             pg.wait_for_timeout(300)
         log = pg.evaluate("S.log.map(e=>e.msg).join(' ')"); inc = pg.evaluate('S.incidents')
         rows.append((w, 'shock worse, handled (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and 'bleeding into the thigh' in log and 'Binder going on' in log and 'Fluids are running' in log and 'Got worse in your care' in pg.inner_html('#done-b') and not any(('nothing changed' in x) or ('without a binder' in x) or ('getting worse' in x) for x in inc) else 99))); pg.close()
+    # pass 2: each call's deterioration in the back (or on scene), answered with slow real taps on buttons found by their visible text
+    def run_steps(pg, steps):
+        for st in steps:
+            if pg.is_visible('#decov'): answer(pg)
+            if isinstance(st, int): pg.wait_for_timeout(st); continue
+            if st.startswith('until:'):
+                for _ in range(80):
+                    if pg.is_visible('#decov'): answer(pg)
+                    if pg.evaluate(st[6:]): break
+                    pg.wait_for_timeout(400)
+                continue
+            if st.startswith('breathe:'):
+                for _ in range(int(st[8:])):
+                    if pg.is_visible('#decov'): answer(pg)
+                    pg.locator('button:visible', has_text='Breath (1 every 6 s)').first.click(delay=200); pg.wait_for_timeout(5800)
+                continue
+            tap(pg, st)
+        for _ in range(4):
+            if pg.is_visible('#decov'): answer(pg)
+            pg.wait_for_timeout(300)
+    P2 = [
+     (390, 'overdose re-sedates in the back', 'od', "{L:1}", "Object.assign(S.o,{checked:true,open:true,gurgle:false,vomit:false,bvm:true,o2:true,ox:true,doses:1,doseT:[S.t-400],wake:true,alsArr:true,alsT:S.t-300,recov:true,loaded:true});S.mon.four=true;loadMission(3)",
+      ['Reassess his breathing', 'Head-tilt, chin-lift', 'breathe:3', 'Tell the medic what changed', 'breathe:5', "until:S.o.rr>=10"], ['re-sedating', 'titrated to his breathing']),
+     (320, 'allergic reaction: you draw the second dose', 'ep', "{rebound:false}", "Object.assign(S.e,{assessed:true,sting:true,pos:true,o2:true,ox:true,recogT:S.t-450,doses:[{t:S.t-400,mg:.3,site:'thigh'}],injected:true,injT:S.t-400,site:'thigh',ampOK:true,ampChecked:true,syr:true,vol:.3,drawn:true,xcheck:true,swapped:true,timeNoted:true,eta:900});loadMission(2)",
+      ['Reassess', 'Draw up a second dose', 'Check the ampule', 2600, '1 mL syringe', '+0.1', '+0.1', '+0.1', 'Done', 'Cross-check', 'Swap to 1-inch', 'Inject', 3000, 'Note the time'], ['voice is back', 'Second dose: new ampule']),
+     (390, 'allergic reaction: the medic gives it in the back', 'ep', "{rebound:false}", "Object.assign(S.e,{assessed:true,sting:true,pos:true,o2:true,ox:true,recogT:S.t-450,doses:[{t:S.t-400,mg:.3,site:'thigh'}],injected:true,injT:S.t-400,site:'thigh',ampOK:true,ampChecked:true,syr:true,vol:.3,drawn:true,xcheck:true,swapped:true,timeNoted:true,alsArr:true,alsT:S.t-200});S.mon.four=true;loadMission(3)",
+      ['Reassess', 'Tell the medic what changed', "until:S.e.doses.length>=2"], ['voice is back', 'Second epi, 0.3 mg IM']),
+     (320, 'stroke worse in the back', 'st', "{lvo:false,side:'R'}", "Object.assign(S.s,{abc:true,bf:{B:true,E:true,F:true,A:true,S:true},bfT:S.t-300,timeAsked:true,lkw:'good',lkwSec:CALL0-3600,glu:true,meds:true,fam:true,vitCount:1,ox:true,alsArr:true,alsT:S.t-200,cot:true,loaded:true,txStart:S.t-30});S.mon.four=true;S.mon.twelve=true;loadMission(3)",
+      ['Recheck BE-FAST', 'Tell the medic what changed', 'Suction her mouth', 'Turn her toward her weak side', "until:S.s.tx.diverted&&!S.s.secr"], ['pooling in her mouth', 'Medical control says Regional']),
+     (390, 'fall patient declines in the back', 'fl', "{}", "Object.assign(S.f,{primary:true,why:true,head:true,meds:true,vitCount:1,glu:true,neuro:1,warm:true,pad:true,smr:'good',moved:true,loaded:true,alsArr:true,alsT:S.t-200,txStart:S.t-30});S.mon.four=true;S.mon.twelve=true;loadMission(3)",
+      ['Neuro recheck', 'Tell the medic what changed', "until:S.f.tx.diverted"], ['pupil slightly bigger', 'Regional for neurosurgery']),
+     (320, 'childbirth: mom bleeds, then the baby gets dusky, in the ambulance', 'cb', "{vig:true}", "Object.assign(S.c,{hist:true,look:true,kit:true,warm:true,pos:true,crown:true,head:true,headOut:true,nuchal:'good',born:true,vigorous:true,birthRt:S.rt-600,birthT:S.t-600,tob:true,dried:true,wrapped:true,posA:true,gurgly:false,breath:'crying',tone:'active',color:'pink, hands blue',hr:150,sts:true,cut:true,placenta:true,massage:true,massT:S.t-200,nurse:true,mvit:1,alsArr:true,alsT:S.t-300});loadMission(4)",
+      ['Reassess both', 'Fundal massage', 'Tell the medic what changed', "until:!detOpen('mom')", 'INJECT', 'Reassess both', 'Dry towel and hat', 'Heat up in the back', "until:!S.c.dusky"], ['boggy again', 'IV fluids going', 'lips and hands dusky', 'pinking back up'])]
+    for w, label, call, force, setup, steps, want in P2:
+        pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        idx = {'od': 3, 'ep': 4, 'st': 5, 'fl': 6, 'cb': 7}[call]
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={%s:%s}" % (call, force)); pg.click(f'#b-call{idx}'); pg.wait_for_timeout(200)
+        pg.evaluate("(()=>{%s})()" % setup); pg.wait_for_timeout(300)
+        if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(400)
+        for _ in range(4):
+            if pg.is_visible('#decov'): answer(pg)
+        pg.evaluate("INJECTS.find(x=>x.id==='worse').run()"); pg.wait_for_timeout(700)
+        rows.append((w, label + ': on screen', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.evaluate("(S.dets||[]).some(x=>!x.closed)") and not pg.is_visible('#b-ff') else 99)))
+        if 'INJECT' in steps:
+            i = steps.index('INJECT'); run_steps(pg, steps[:i]); pg.evaluate("INJECTS.find(x=>x.id==='worse').run()"); pg.wait_for_timeout(600); run_steps(pg, steps[i+1:])
+        else: run_steps(pg, steps)
+        log = pg.evaluate("S.log.map(e=>e.msg).join(' ')"); inc = pg.evaluate('S.incidents')
+        bad = [x for x in inc if ('nothing changed' in x) or ("Didn't tell" in x) or ('no second dose' in x) or ('cross-check' in x) or ('too soon' in x)]
+        ok = all(t in log for t in want) and not bad and pg.evaluate("(S.dets||[]).every(x=>x.closed)")
+        if not ok: print('   detail:', label, [t for t in want if t not in log], bad, pg.evaluate("JSON.stringify((S.dets||[]).map(x=>[x.id,x.found,x.told,x.closed]))"))
+        rows.append((w, label + ' (handled)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if ok else 99))); pg.close()
     # Fast-forward in the trauma transport, with slow real taps on buttons found by their visible text: it skips to the next thing that matters
     for w in (320, 390):
         pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
-        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click('#b-call2'); pg.wait_for_timeout(200)
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={mva:{loss:300,pelvis:false}}"); pg.click('#b-call2'); pg.wait_for_timeout(200)
         pg.evaluate("(()=>{Object.assign(S.m,{sized:true,inside:true,cspine:true,survey:true,ctrl:2,tqAsked:true,marked:true,o2:true,warm:true,protected:true,moved:true,loaded:true,alsArr:true,vitCount:1,vitExtr:1});Object.assign(S.m.extr,{done:true,stage:4});S.mon.four=true;loadMission(3);})()")
         pg.wait_for_timeout(300)
         if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(400)
@@ -93,7 +147,7 @@ with sync_playwright() as p:
             nxt = pg.evaluate(SHOCK_NEXT)
             if nxt: tap(pg, nxt); continue
             if pg.evaluate("ffWhy()==='due'"): tap(pg, 'Reassess vitals')
-            if pg.is_visible('#b-ff'): tap(pg, 'Fast-forward')
+            if pg.is_visible('#b-ff'): try_ff(pg)
             pg.wait_for_timeout(300)
         rows.append((w, 'transport with fast-forward (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and not any('without reassessing' in x for x in pg.evaluate('S.incidents')) else 99))); pg.close()
     # the Start CPR or not? drill, answered by visible text

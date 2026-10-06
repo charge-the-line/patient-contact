@@ -4,7 +4,7 @@ function play(tier,choice='good',o={}){const {api,els}=boot();const {$}=api;api.
   const hid=id=>els[id]&&els[id]._cls.has('hidden');let rt=0,nextTap=0,lastB=-99,missions=[],react={},dec=[];
   const tap=id=>{if(rt<nextTap)return false;const e=$(id);if(!e.onclick||hid(id)||e._cls.has('on'))return false;e.onclick();nextTap=rt+1.1;return true;};
   const after=(k,c,d)=>{if(!c){delete react[k];return false;}if(react[k]===undefined)react[k]=rt;return rt-react[k]>=d;};
-  while(rt<1600){const S=api.S(),x=S.c;
+  while(rt<1600){const S=api.S(),x=S.c;if(o.stopAt&&S.active&&o.stopAt(S,api))return {stopped:true,api,els,S};
     if(!hid('briefov')){if(after('b',true,2))$('brief-go').onclick();rt+=.25;continue;}
     if(api.DECO()){if(after('d',true,3)){const D=api.DECO();let i=D.opts.findIndex(v=>v.r===choice);if(i<0)i=0;dec.push(api.DEC[D.key].tag+':'+D.opts[i].r);$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});$('dec-go').onclick();}rt+=.25;continue;}
     if(!S.running&&!hid('done')){if(after('n',true,2)){missions.push(Math.round(rt));if(S.mission>=api.M().length-1)break;$('b-next').onclick();}rt+=.25;continue;}

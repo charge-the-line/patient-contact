@@ -24,6 +24,7 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
         else if(o.nudged===o.doses&&o.rr<10&&o.doses<4)tap('o-nal');
         if(o.bvm&&o.rr<10&&rt-lastBreath>=(opts.breathEvery||(opts.sloppy?4.5+Math.random()*8:6))){const e=$('o-breath');e.onclick();lastBreath=rt;}
         if(!o.pulse&&!o.cpr)tap('o-cpr');
+        {const dd=(S.dets||[]).filter(x=>x.id==='renarc').pop();if(dd&&!dd.closed&&!opts.noDet&&after('detod',true,2)){if(!dd.found)tap('o-reass');else if(!o.open)tap('o-open');else if(o.gurgle)tap('o-suct');else if(o.alsArr&&!dd.told)tap('o-tell');else if(!o.alsArr&&o.doseT.length&&S.t-o.doseT[o.doseT.length-1]>150&&o.rr<10)tap('o-nal');}else if(!dd||dd.closed)delete react.detod;}
         if(S.mission===1){if(!o.recov)tap('o-recov');else if(o.vitCount<1&&!o.act)tap('o-vitals');}
         if(S.mission===2)tap('o-load');if(S.mission===3&&rt%40<1)tap('o-reass');}
       if(call==='arrest'){const A=S.aed,V=api.V(),tag=(api.M()[S.mission]||{}).tag,canStart=!S.noRes&&!S.terminated&&(V.open!=='look'||S.startChoice==='start');if(S.air.vomit)tap('a-suction');
@@ -55,11 +56,14 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
         else for(const id of ['e-pos','e-sting','e-o2','e-ox'])if(tap(id))break;
         if(S.mission>=1){if(!e.ampOK){if(e.ampChecked&&e.ampBad)tap('e-another');else tap('e-check');}else if(!e.syr)tap('e-syr');
           else if(!e.drawn){if(e.vol<.3-.001)tap('e-p10');else tap('e-drawn');}else if(!e.xcheck&&!e.injected)tap('e-xcheck');else if(!e.swapped&&!e.injected)tap('e-swap');else if(!e.injected)tap('e-inject');else if(!e.timeNoted)tap('e-time');}
-        if(e.injected&&S.mission>=2)tap('e-reass');}
-      if(call==='fl'){const x=S.f;if(!x.act){for(const id of ['f-primary','f-why','f-head','f-meds','f-vitals','f-glu','f-neuro','f-warm','f-pad'])if(tap(id))break;}if(S.mission===2)tap('f-load');if(S.mission===3&&rt%40<1)tap('f-reass');}
+        if(e.injected&&S.mission>=2&&!(S.dets||[]).some(x=>x.id==='worse'&&!x.closed))tap('e-reass');
+        {const dd=(S.dets||[]).filter(x=>x.id==='worse').pop(),last=e.doses.length?e.doses[e.doses.length-1].t:-1e9;if(dd&&!dd.closed&&!opts.noDet&&after('detep',true,2)){if(!dd.found)tap('e-reass');else if(e.alsArr&&!dd.told)tap('e-tell');else if(!e.o2)tap('e-o2');else if(S.t>=last+300&&!(e.d2&&!e.injected)&&!e.doses.some(q=>q.t>=dd.t0)&&(!e.alsArr||e.medSaysDraw))tap('e-second');}else if(!dd||dd.closed)delete react.detep;}}
+      if(call==='fl'){const x=S.f;if(!x.act){for(const id of ['f-primary','f-why','f-head','f-meds','f-vitals','f-glu','f-neuro','f-warm','f-pad'])if(tap(id))break;}if(S.mission===2)tap('f-load');
+        {const dd=(S.dets||[]).filter(q=>q.id==='decline').pop();if(x.vomit&&!opts.noDet)tap('f-suct');if(dd&&!dd.closed&&!opts.noDet){if(after('detfl',true,2)){if(!dd.found)tap('f-reass');else if(!dd.told)tap('f-tell');}}else{delete react.detfl;if(S.mission===3&&rt%40<1)tap('f-reass');}}}
       if(call==='dm'){const x=S.d;if(!x.act){if(!x.keys)tap('d-keys');else if(!x.abc)tap('d-abc');else if(!x.id)tap('d-id');else if(!x.glu)tap('d-glu');else if(x.swT===null)tap('d-sw');else if(!x.vit)tap('d-vit');else if(x.doseT.length&&!x.recheck&&S.t-x.doseT[0]>=200&&S.t-(x.gluT||0)>100)tap('d-glu');else if(x.d10&&x.glu<2)tap('d-glu');}}
       if(call==='st'){const x=S.s;if(!x.abc)tap('s-abc');else if(!x.act){const k=['B','E','F','A','S'].find(k=>!x.bf[k]);if(k)tap('s-'+k);else for(const id of ['s-time','s-glu','s-meds','s-vitals'])if(tap(id))break;}
-        if(x.vomit)tap('s-suct');if(x.alsArr){tap('s-fam');tap('s-cot');}if(S.mission===2)tap('s-load');if(S.mission===3)tap('s-reass');}
+        if(x.vomit)tap('s-suct');if(x.alsArr){tap('s-fam');tap('s-cot');}if(S.mission===2)tap('s-load');
+        {const dd=(S.dets||[]).filter(q=>q.id==='worse').pop();if(dd&&!dd.closed&&!opts.noDet){if(after('detst',true,2)){if(!dd.found)tap('s-reass');else if(!dd.told)tap('s-tell');else if(x.secr&&!x.suct2)tap('s-suct');else if(!x.side)tap('s-side');else if(x.spo2<94&&!x.o2on)tap('s-o2');else if(!x.glu2&&!x.act)tap('s-glu2');}}else{delete react.detst;if(S.mission===3)tap('s-reass');}}}
       if(api.S().running)api.tick(.25);}
     rt+=.25;}
   const S=api.S();return {call,tier,finished:missions.length===api.M().length,missions,score:S.score,stuckAt,incidents:S.incidents,outcome:call==='arrest'?api.arrestOutcome():null,S};}

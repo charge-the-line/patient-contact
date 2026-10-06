@@ -38,10 +38,10 @@ module.exports=function(report){
     // it stopped for the reassessment, before the five-minute penalty, and reassessing makes it available again
     const S2=api.S();const hiddenWhenDue=(api.ffWhy()==='due');api.$('m-reass').onclick();
     report('ff','in the trauma transport it stops when a reassessment is due, before the penalty; reassessing offers it again',a.why==='due'&&hiddenWhenDue&&api.ffWhy()===''&&!S2.incidents.some(x=>/without reassessing/.test(x)),`stopped: ${a.why}, then ${api.ffWhy()||'available'}`);}
-  // 3. skipping never dodges a problem: the overdose patient who nods off again in the ambulance stops the skip at the decision
+  // 3. skipping never dodges a problem: the overdose patient who nods off again in the ambulance stops the skip, and then it isn't offered
   {const o={stopAt:(S,api)=>S.mission===3&&!api.ffWhy()};const r=quiet(()=>human.play('od',0,o));const api=r.api,S=api.S();let why='',g=0;
-    while(g++<20&&!api.DECO()){why=api.ffGo()||'unavailable';if(api.ffWhy()==='due')api.$('o-reass').onclick();if(why==='unavailable')api.tick(.25);}
-    report('ff','skipping never dodges a problem: the overdose renarcotizing in the ambulance still happens and stops the skip',!!api.DECO()&&api.DECO().key==='odRenarc'&&S.o.renarcDone,`stopped: ${why}, decision ${api.DECO()&&api.DECO().key}`);}
+    while(g++<20&&!S.o.renarcDone){why=api.ffGo()||'unavailable';if(api.ffWhy()==='due'&&!(S.dets||[]).length)api.$('o-reass').onclick();if(why==='unavailable')api.tick(.25);}
+    report('ff','skipping never dodges a problem: the overdose re-sedating in the ambulance still happens, stops the skip, and holds it',S.o.renarcDone&&['radio','patient','skill'].includes(why)&&api.ffWhy()!=='',`stopped: ${why}, then ${api.ffWhy()}`);}
   // the diabetic whose sugar keeps falling: the seizure still happens under fast-forward, and stops it
   {const o={stopAt:(S,api)=>S.mission===1&&!api.ffWhy()&&!S.d.d10};F({dm:{low:false}});const r=quiet(()=>human.play('dm',2,o));F(null);
     if(r.stopped){const api=r.api,S=api.S();const gl0=S.d.gl;const why=api.ffGo();report('ff','his blood sugar keeps moving during a skip (the physics run), and the skip stops when he changes',S.d.gl!==gl0&&REASONS.includes(why),`glucose ${Math.round(gl0)} → ${Math.round(S.d.gl)}, stopped: ${why}`);}
