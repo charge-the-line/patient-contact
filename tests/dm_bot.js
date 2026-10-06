@@ -10,7 +10,8 @@ function play(tier,choice='good',o={}){const {api,els}=boot();const {$}=api;api.
     if(S.running&&!(o.slow&&rt<o.slow)){if(!x.act){
         if(!x.keys)tap('d-keys');else if(!x.abc)tap('d-abc');else if(!x.id)tap('d-id');else if(!x.glu)tap('d-glu');else if(x.swT===null)tap('d-sw');else if(!x.vit)tap('d-vit');
         else if(x.doseT.length&&!x.recheck&&S.t-x.doseT[0]>=200&&S.t-(x.gluT||0)>100)tap('d-glu');
-        else if(x.d10&&x.glu<2)tap('d-glu');}}
+        else if(x.d10&&x.glu<2)tap('d-glu');
+        const dd=(S.dets||[]).find(q=>q.id==='falling'&&!q.closed);if(dd&&!o.noDet&&!x.act){if(!dd.found)tap('d-glu');else if(x.alsArr&&!dd.told)tap('d-tell');else if(x.alsArr&&!x.ivSet)tap('d-ivset');else if(!x.alsArr&&x.sw&&api.dmV().gcs>=13)tap('d-tube');else if(!x.pos)tap('d-pos');}}}
     if(S.running)api.tick(.25);
     rt+=.25;}
   const S=api.S(),x=S.d;return {ok:missions.length===3,tier,choice,score:S.score,sw:x.sw,tubes:x.tubes,low:Math.round(x.lowGl),seized:x.seized,asp:x.aspiration,d10:x.d10,missions:missions.map(m=>(m/60).toFixed(1)),mission:S.mission,steps:api.stepsDone().map(v=>v?1:0).join(''),incidents:S.incidents,dec};}

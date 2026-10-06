@@ -4,7 +4,7 @@ function play(tier,choice='good',opts={}){const {api,els}=boot();const {$}=api;a
   let t=0,lastBreath=-99;const log=[];let missions=[];let curM=0,mT=0;
   while(t<1200){S=api.S();
     if(!hid('briefov'))c('brief-go');
-    if(api.DECO()){const d=api.DEC[api.DECO().key];let i=d.opts.findIndex(o=>o.r===choice);if(i<0)i=0;$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});c('dec-go');}
+    if(api.DECO()){const d=api.DECO();let i=d.opts.findIndex(o=>o.r===choice);if(i<0)i=0;$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});c('dec-go');}
     if(!S.running&&!hid('done')){missions.push({m:curM,t:Math.round(S.t-mT)});if(S.mission>=api.M().length-1)break;c('b-next');curM=api.S().mission;mT=api.S().t;continue;}
     if(S.running){
       if(!S.checked)c('a-check');

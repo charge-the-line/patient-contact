@@ -5,7 +5,7 @@ const {boot}=require('./pc_mock.js');
 const human=require('./human_bot.js'),cbBot=require('./cb_bot.js');
 const quiet=fn=>{const l=console.log;console.log=()=>{};try{return fn();}finally{console.log=l;}};
 const F=f=>{global.window.FORCE_V=f;};
-const PASS=2;   // passes built so far: 1 = car versus tree; 2 = overdose, allergic reaction, stroke, fall, childbirth
+const PASS=3;   // passes built: 1 = car versus tree; 2 = overdose, allergic reaction, stroke, fall, childbirth; 3 = the diabetic, the dose error, vomiting, the arrest's injects, and every card
 // [call, id, sources, pass]. 'existing' entries already had a response before the audit and are registered in pass 3.
 const PLAN=[
  ['mva','shock',['natural','inject:worse'],1],['mva','fuel',['chaos'],1],['mva','delay',['inject:delay','chaos'],1],['mva','family',['inject:family'],1],
@@ -41,14 +41,14 @@ function epResp(S){const e=S.e,d=S.dets.find(q=>q.id==='worse'),last=e.doses.len
 // play from the snapshot for H game seconds: decisions answered well, parts advanced; respond taps what a person would
 function play2(api,c,respond){const S=api.S(),t0=S.t;let g=0,n=0,lastB=-99;S.o&&(S.o.lowSpo2Det=S.o.spo2);S.epSev=0;
   while(S.t<t0+c.H&&g++<20000){if(api.DECO()){answer(api);continue;}if(!S.running){if(S.briefing){api.$('brief-go').onclick();continue;}if(S.mission>=api.M().length-1)break;api.$('b-next').onclick();continue;}
-    if(respond){n++;if(n%5===0){const id=c.resp(S,api);if(id&&shown(api,id))api.$(id).onclick();}if(c.breathe&&c.breathe(S)&&S.rt-lastB>=6){api.$('o-breath').onclick();lastB=S.rt;}}
-    api.tick(.25);if(S.o)S.o.lowSpo2Det=Math.min(S.o.lowSpo2Det,S.o.spo2);if(S.e)S.epSev=api.epV().sev;}
+    if(respond){n++;if(n%5===0){const id=c.resp(S,api);if(id&&shown(api,id))api.$(id).onclick();}if(c.breathe&&c.breathe(S)&&S.rt-lastB>=6){api.$('o-breath').onclick();lastB=S.rt;}if(c.breatheA&&S.air.adv&&S.rt-lastB>=6&&shown(api,'a-breath')){api.$('a-breath').onclick();lastB=S.rt;}}
+    api.tick(.25);if(S.o)S.o.lowSpo2Det=Math.min(S.o.lowSpo2Det,S.o.spo2);if(S.e){S.epSev=api.epV().sev;S.epHr=api.epV().hr;}}
   return {m:c.metric(S),score:S.score,S,log:(S.log||[]).map(e=>e.msg).join(' ')};}
 module.exports=function(report){
   const {api:a0}=boot();const DET=a0.DET();
   // 1. the response table: every audited item for the built passes is in it; the rest are named, not forgotten
   {const missing=PLAN.filter(p=>p[3]<=PASS&&!DET.some(d=>d.call===p[0]&&d.id===p[1]));
-    report('deter',`response table: every item for passes 1 to ${PASS} has a response`,missing.length===0,missing.map(p=>p.join(':')).join(', ')||`${DET.length} entries; ${PLAN.filter(p=>p[3]>PASS).length} audited items left for passes 2 and 3`);
+    report('deter',`response table: every item for passes 1 to ${PASS} has a response`,missing.length===0,missing.map(p=>p.join(':')).join(', ')||`${DET.length} entries; ${PLAN.filter(p=>p[3]>PASS).length} audited items left for later passes`);
     const bad=DET.filter(d=>!(d.dec||(d.acts&&d.acts.length>=2&&d.acts.some(z=>z[1]==='patient')&&d.find&&d.noAct&&d.noActWhy&&(!d.tell||d.tellWhy))));
     report('deter','every entry answers with a decision card, or with two or more actions including one that changes the patient, a finding and a penalty for ignoring it',bad.length===0,bad.map(d=>d.call+':'+d.id).join(', ')||`${DET.length} entries`);
     const decs=DET.filter(d=>d.dec).filter(d=>!a0.DEC[d.dec]);report('deter','every decision card in the table exists',decs.length===0,decs.map(d=>d.dec).join(', '));}
@@ -113,7 +113,28 @@ module.exports=function(report){
     metric:S=>(S.c.dusky?0:10)+S.c.hr/100,mlab:'pink again',need:9},
    {k:'cb.baby',lab:'baby dusky in the ambulance (inject: warm her in the restraint)',call:'cb',tier:0,stop:S=>S.mission===4&&S.running&&!S.briefing&&S.c.tx.t>20,fire:api=>{api.S().c.momHit=true;api.INJECTS.find(x=>x.id==='worse').run();},H:240,
     resp:S=>{const x=S.c,d=S.dets.find(q=>q.id==='baby');if(!d.found)return 'c-reass';if(!x.rewrap)return 'b-wrap';if(!x.heat)return 'c-heat';return null;},
-    metric:S=>(S.c.dusky?0:10)+S.c.hr/100,mlab:'pink again',need:9}];
+    metric:S=>(S.c.dusky?0:10)+S.c.hr/100,mlab:'pink again',need:9},
+   // pass 3
+   {k:'dm.falling',lab:'diabetic who can\'t swallow, sugar falling before the medic',call:'dm',tier:0,force:{low:true,pill:true},stop:S=>(S.dets||[]).some(x=>x.id==='falling'),H:700,
+    resp:S=>{const x=S.d,d=S.dets.find(q=>q.id==='falling');if(x.act)return null;if(!d.found)return 'd-glu';if(!x.pos)return 'd-pos';if(x.alsArr&&!d.told)return 'd-tell';if(x.alsArr&&!x.ivSet)return 'd-ivset';return null;},
+    metric:S=>-(S.d.d10T||1e4),mlab:'dextrose in (earlier is better)',need:20},
+   {k:'dm.falling',lab:'diabetic who can swallow, less responsive again (inject)',call:'dm',tier:0,force:{low:false,pill:true},stop:S=>S.d.og==='good'&&S.d.sw&&S.mission===1&&S.d.gl>50&&S.running,fire:api=>api.INJECTS.find(x=>x.id==='worse').run(),H:240,
+    resp:(S,api)=>{const x=S.d,d=S.dets.find(q=>q.id==='falling');if(x.act)return null;if(!d.found)return 'd-glu';if(x.swT<d.t0)return 'd-sw';if(x.sw&&api.dmV().gcs>=13&&!x.doseT.some(t=>t>=d.t0))return 'd-tube';if(!x.sw&&!x.pos)return 'd-pos';if(x.alsArr&&!d.told)return 'd-tell';return null;},
+    metric:S=>S.d.gl,mlab:'glucose',need:10},
+   {k:'ep.overdose',lab:'allergic reaction: too much epinephrine drawn and given',call:'ep',tier:0,force:{rebound:false},stop:S=>S.mission===1&&S.e.syr&&!S.e.drawn&&S.e.vol===0,
+    fire:api=>{const S=api.S();for(let i=0;i<7;i++)api.$('e-p10').onclick();api.$('e-drawn').onclick();api.$('e-swap').onclick();api.$('e-inject').onclick();let g=0;while(!(S.dets||[]).some(x=>x.id==='overdose')&&g++<400){if(api.DECO())answer(api);else api.tick(.25);}},H:420,
+    resp:S=>{const e=S.e,d=S.dets.find(q=>q.id==='overdose');if(e.act)return null;if(!d.found)return 'e-vitals';if(!e.calm)return 'e-calm';if(e.alsArr&&!d.told)return 'e-tell';return null;},
+    metric:S=>-S.epHr,mlab:'heart rate (lower is better)',need:30},
+   {k:'od.vomit',lab:'overdose vomits on the bag (inject)',call:'od',tier:0,force:{L:1},stop:S=>S.o.checked&&S.mission===0&&S.o.bvm&&S.o.open&&!S.o.gurgle&&S.o.doses>=1,fire:api=>api.INJECTS.find(x=>x.id==='vomit').run(),H:120,
+    resp:S=>S.o.gurgle?'o-suct':null,breathe:S=>S.o.rr<10&&S.o.bvm,metric:S=>(S.o.gurgle?0:10)+S.o.lowSpo2Det/100,mlab:'airway clear',need:9},
+   {k:'arrest.vomit',lab:'arrest: he vomits during CPR (inject)',call:'arrest',tier:0,force:{open:'cpr',outcome:'rosc',shock:true},stop:S=>S.arrest&&S.cpr.on&&S.air.bvm&&!S.air.adv&&S.compT>60&&!S.air.vomit,fire:api=>api.INJECTS.find(x=>x.id==='vomit').run(),H:60,
+    resp:S=>S.air.vomit?'a-suction':(!S.cpr.on&&!S.act&&!S.vent.waiting?'a-cpr':null),metric:S=>(S.air.vomit?0:10),mlab:'airway clear',need:10},
+   {k:'arrest.lucas',lab:'arrest: the LUCAS battery dies (inject)',call:'arrest',tier:0,force:{open:'cpr',outcome:'rosc',shock:true},stop:S=>S.arrest&&S.als.lucas===2&&!S.als.rc,fire:api=>api.INJECTS.find(x=>x.id==='lucas').run(),H:60,
+    resp:S=>!S.cpr.on&&!S.act?'a-cpr':null,metric:S=>S.compT,mlab:'compression time',need:20},
+   {k:'arrest.rearrest',lab:'arrest: he re-arrests in the ambulance (inject)',call:'arrest',tier:0,force:{open:'cpr',outcome:'rosc',shock:true},stop:(S,api)=>api.aPh()==='tx'&&S.rosc&&!S.briefing&&S.running,fire:api=>api.INJECTS.find(x=>x.id==='rearrest').run(),H:150,
+    resp:S=>S.arrest&&!S.cpr.on&&!S.act?'a-cpr':null,breatheA:true,metric:S=>S.Q,mlab:'CPR quality (the LUCAS restarts; your breaths count)',need:5},
+   {k:'arrest.o2',lab:'arrest: the oxygen cylinder runs out (inject)',call:'arrest',tier:0,force:{open:'cpr',outcome:'rosc',shock:true},stop:S=>S.arrest&&S.cpr.on&&S.air.o2&&!S.als.arrived&&S.o2psi>220&&S.compT>60,fire:api=>api.INJECTS.find(x=>x.id==='o2').run(),H:60,
+    resp:S=>!S.o2ok?'a-swap':null,metric:S=>S.o2ok?10:0,mlab:'oxygen back on',need:10}];
   const covered=new Set();
   for(const c of SC){F(c.force?{[c.call]:c.force}:null);const r=quiet(()=>c.call==='cb'?cbBot.play(c.tier,'good',{noDet:true,stopAt:c.stop}):human.play(c.call,c.tier,{noDet:true,stopAt:c.stop}));F(null);
     const name=`${c.lab} · ${['Guided','Recall','Chaos'][c.tier]}`;
@@ -126,7 +147,7 @@ module.exports=function(report){
     report('deter',`${name}: it happens, and reassessing finds the cause`,open&&det.find.test(B.log),open?'':'did not fire');
     report('deter',`${name}: at least two actions can be tapped right then, and no fast-forward until it's handled`,tappable.length>=2&&held,`${tappable.length} tappable: ${tappable.join(', ')}`);
     report('deter',`${name}: responding changes the patient and doing nothing costs points`,B.m>=A.m+c.need&&B.score>A.score&&(!c.also||c.also(B.S)),`${c.mlab} ${fmt(A.m)} → ${fmt(B.m)}, score ${A.score} → ${B.score}${c.also?', '+(c.also(B.S)?'and the rest':'NOT the rest'):''}`);}
-  {const want=DET.filter(d=>!d.dec&&d.call!=='mva').map(d=>d.call+'.'+d.id).filter(k=>!covered.has(k));report('deter','every pass-2 response is proved by a do-nothing and a respond run',want.length===0,want.join(', ')||`${covered.size} entries`);}
+  {const want=DET.filter(d=>!d.dec&&d.call!=='mva').map(d=>d.call+'.'+d.id).filter(k=>!covered.has(k));report('deter','every response with actions is proved by a do-nothing and a respond run',want.length===0,want.join(', ')||`${covered.size} entries`);}
   // 4. the logistics events answer with a card: right call free, wrong call costs
   const cardCase=(name,key,setup,fire)=>{for(const pick of ['good','bad']){F({mva:{loss:300,pelvis:false}});const r=quiet(()=>human.play('mva',setup.tier,{noDet:true,stopAt:setup.at}));F(null);if(!r.stopped){report('deter',`car versus tree, ${name}: reaches the moment`,false);return;}
       const api=r.api,S=api.S();fire(api);let g=0;while(!(api.DECO()&&api.DECO().key===key)&&g++<2000){if(api.DECO()){answer(api);continue;}if(!S.running){if(S.briefing)api.$('brief-go').onclick();else api.$('b-next').onclick();continue;}api.tick(.25);}
@@ -134,6 +155,21 @@ module.exports=function(report){
   cardCase('Medic 1 delayed (inject)','mvaDelay',{tier:0,at:S=>S.mission===0&&S.m.inside&&!S.m.alsArr},api=>api.INJECTS.find(x=>x.id==='delay').run());
   cardCase('a bystander nurse (inject)','mvaNurse',{tier:0,at:S=>S.mission===1&&S.running},api=>api.INJECTS.find(x=>x.id==='family').run());
   cardCase('fuel leak on Chaos','mvaFuel',{tier:2,at:S=>S.m.extr.stage===2},()=>{});
+  // pass 3: every delay, drawbridge and family card in every call: it opens, the right call is free, the wrong call costs 10
+  {const C=[['od','delay',{L:1},S=>S.o.checked&&S.mission===0&&!S.o.alsArr&&S.running],['od','family',{L:1},S=>S.o.checked&&S.mission===0&&S.running],['od','bridge',{L:1},S=>S.mission===3&&S.running&&!S.briefing&&S.o.tx.t>20],
+      ['ep','delay',{},S=>S.e.assessed&&S.mission===0&&!S.e.alsArr&&S.running],['ep','family',{},S=>S.e.assessed&&S.mission===0&&S.running],['ep','bridge',{},S=>S.mission===3&&S.running&&!S.briefing&&S.e.tx.t>20],
+      ['st','delay',{lvo:false},S=>S.s.abc&&S.mission===0&&!S.s.alsArr&&S.running],['st','family',{lvo:false},S=>S.s.abc&&S.mission===0&&S.running],['st','bridge',{lvo:false},S=>S.mission===3&&S.running&&!S.briefing&&S.s.tx.t>20&&!S.s.tx.arrived],
+      ['fl','delay',{},S=>S.f.primary&&S.mission===0&&!S.f.alsArr&&S.running],['fl','family',{},S=>S.f.primary&&S.mission===0&&S.running],
+      ['dm','delay',{},S=>S.d.abc&&S.mission===0&&!S.d.alsArr&&S.running],['dm','family',{},S=>S.d.abc&&S.mission===0&&S.running],
+      ['arrest','delay',{open:'cpr',outcome:'rosc',shock:true},S=>S.arrest&&S.cpr.on&&!S.als.arrived&&S.compT>30],['arrest','family',{open:'cpr',outcome:'rosc',shock:true},S=>S.arrest&&S.cpr.on&&S.compT>30],['arrest','bridge',{open:'cpr',outcome:'rosc',shock:true},(S,api)=>api.aPh()==='tx'&&S.running&&!S.briefing&&S.tx.t>20],
+      ['cb','delay',{},S=>S.c.hist&&S.mission===0&&!S.c.alsArr&&S.running],['cb','family',{},S=>S.c.hist&&S.mission===0&&S.running]];
+    for(const [call,id,force,at] of C){const det=a0.DET().find(d=>d.call===call&&d.id===id);const inj=id;
+      for(const pick of ['good','bad']){F({[call]:force});const r=quiet(()=>call==='cb'?cbBot.play(0,'good',{noDet:true,stopAt:at}):human.play(call,0,{noDet:true,stopAt:at}));F(null);
+        const lab=`${call} · ${det?det.name:id} (inject): a card asks for a response (${pick==='good'?'right call costs nothing':'wrong call costs 10'})`;
+        if(!r.stopped||!det){report('deter',lab,false,!det?'not in the table':'never reached the moment');continue;}
+        const api=r.api,S=api.S();const x=api.INJECTS.find(q=>q.id===inj);let ok=false;try{ok=x.ok();}catch(e){}if(!ok){report('deter',lab,false,'inject not offered there');continue;}
+        x.run();let g=0;while(!(api.DECO()&&api.DECO().key===det.dec)&&g++<200){if(api.DECO()){answer(api);continue;}if(!S.running&&!S.briefing&&!api.DECO()){api.$('b-next').onclick();continue;}if(S.briefing){api.$('brief-go').onclick();continue;}api.tick(.25);}
+        const s0=S.score;const got=answer(api,pick);report('deter',lab,got===det.dec&&(pick==='good'?S.score===s0:S.score===s0-10),`card ${got}, score ${s0} → ${S.score}`);}}}
   // a card raised while another one is open waits its turn instead of being lost
   {F({mva:{loss:300,pelvis:false}});const r=quiet(()=>human.play('mva',0,{noDet:true,stopAt:S=>S.mission===1&&S.running}));F(null);const api=r.api;
     api.INJECTS.find(x=>x.id==='family').run();api.INJECTS.find(x=>x.id==='delay').ok()&&api.INJECTS.find(x=>x.id==='delay').run();const keys=[];let g=0;

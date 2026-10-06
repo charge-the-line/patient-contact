@@ -88,6 +88,13 @@ with sync_playwright() as p:
                     if pg.evaluate(st[6:]): break
                     pg.wait_for_timeout(400)
                 continue
+            if st.startswith('ffuntil:'):
+                for _ in range(60):
+                    if pg.is_visible('#decov'): answer(pg)
+                    if pg.evaluate(st[8:]): break
+                    if pg.is_visible('#b-ff'): try_ff(pg)
+                    pg.wait_for_timeout(400)
+                continue
             if st.startswith('breathe:'):
                 for _ in range(int(st[8:])):
                     if pg.is_visible('#decov'): answer(pg)
@@ -128,6 +135,31 @@ with sync_playwright() as p:
         ok = all(t in log for t in want) and not bad and pg.evaluate("(S.dets||[]).every(x=>x.closed)")
         if not ok: print('   detail:', label, [t for t in want if t not in log], bad, pg.evaluate("JSON.stringify((S.dets||[]).map(x=>[x.id,x.found,x.told,x.closed]))"))
         rows.append((w, label + ' (handled)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if ok else 99))); pg.close()
+    # pass 3: the diabetic's falling sugar, the epinephrine dose error, and two of the cards, with slow real taps
+    P3 = [
+     (390, 'diabetic: sugar falling, can\'t swallow', 'dm', "{low:true,pill:true}", "Object.assign(S.d,{keys:true,abc:true,id:true,glu:1,gluT:S.t,gluVal:31,firstVal:31,firstGluT:S.t,swT:S.t,sw:false,vit:true,pos:true,og:'good'});loadMission(1)", "",
+      ['Check blood glucose', 'ffuntil:S.d.alsArr', 'Tell the medic what changed', 'Set up the IV for the medic', "until:S.d.d10"], ['still falling', 'dextrose going'], ['nothing changed', "Didn't tell"]),
+     (320, 'allergic reaction: too much epinephrine', 'ep', "{rebound:false}", "Object.assign(S.e,{assessed:true,sting:true,pos:true,o2:true,ox:true,recogT:S.t-60,ampOK:true,ampChecked:true});loadMission(1)", "",
+      ['1 mL syringe', '+0.1', '+0.1', '+0.1', '+0.1', '+0.1', '+0.1', '+0.1', 'Done', 'Swap to 1-inch', 'Inject', "until:(S.dets||[]).some(x=>x.id==='overdose')", 'Vitals', 7500, 'Keep him still'], ['too much epinephrine', 'Slow breaths with me'], ['nothing changed']),
+     (390, 'card: the officer says he\'s faking it', 'dm', "{low:false,pill:false}", "Object.assign(S.d,{keys:true,abc:true});", "INJECTS.find(x=>x.id==='family').run()",
+      ["until:!!DEC_OPEN"], ['faking it'], ['Decision']),
+     (320, 'card: stuck at the drawbridge with the overdose', 'od', "{L:1}", "Object.assign(S.o,{checked:true,open:true,gurgle:false,vomit:false,bvm:true,o2:true,ox:true,doses:1,doseT:[S.t-400],wake:true,alsArr:true,alsT:S.t-300,recov:true,loaded:true});S.mon.four=true;loadMission(3)", "INJECTS.find(x=>x.id==='bridge').run()",
+      ["until:!!DEC_OPEN"], ['bridge is going up'], ['Decision'])]
+    for w, label, call, force, setup, trig, steps, want, badw in P3:
+        pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        idx = {'od': 3, 'ep': 4, 'st': 5, 'fl': 6, 'cb': 7, 'dm': 8}[call]
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={%s:%s}" % (call, force)); pg.click(f'#b-call{idx}'); pg.wait_for_timeout(200)
+        pg.evaluate("(()=>{%s})()" % setup); pg.wait_for_timeout(300)
+        if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(400)
+        for _ in range(4):
+            if pg.is_visible('#decov') and not trig: answer(pg)
+        if trig: pg.evaluate(trig); pg.wait_for_timeout(500)
+        run_steps(pg, steps)
+        log = pg.evaluate("S.log.map(e=>e.msg).join(' ')"); inc = pg.evaluate('S.incidents')
+        bad = [x for x in inc if any(b_ in x for b_ in badw)]
+        ok = all(t in log for t in want) and not bad and pg.evaluate("(S.dets||[]).every(x=>x.closed)")
+        if not ok: print('   detail:', label, [t for t in want if t not in log], bad, pg.evaluate("JSON.stringify((S.dets||[]).map(x=>[x.id,x.found,x.told,x.closed]))"))
+        rows.append((w, label, pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if ok else 99))); pg.close()
     # Fast-forward in the trauma transport, with slow real taps on buttons found by their visible text: it skips to the next thing that matters
     for w in (320, 390):
         pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
