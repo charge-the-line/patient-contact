@@ -30,7 +30,7 @@ module.exports=function(report){
     for(const m of [1,2]){api.setM(api.M());S.mission=m;if(!api.ffWhy())cbBad++;}
     report('ff','not offered while CPR runs in any arrest patient, nor in the delivery or the golden minute',bad===0&&cbBad===0,`arrest ${bad}, childbirth ${cbBad}`);}
   // 2. the physics keep running: a skip lands exactly where the same number of ordinary ticks would
-  {F({mva:{}});const o={stopAt:(S,api)=>S.mission===3&&S.m.tx.tqChecks>=1&&!api.ffWhy()};const r=quiet(()=>human.play('mva',0,o));F(null);const api=r.api,S=api.S();
+  {F({mva:{loss:300,pelvis:false}});const o={stopAt:(S,api)=>S.mission===3&&S.m.tx.tqChecks>=1&&!api.ffWhy()};const r=quiet(()=>human.play('mva',0,o));F(null);const api=r.api,S=api.S();
     const snap=JSON.stringify(S),done=api.stepsDone().slice(),t0=S.t,lost0=S.m.lost;const why=api.ffGo();const a={t:S.t,lost:S.m.lost,why};
     const back=JSON.parse(snap);for(const k of Object.keys(S))delete S[k];Object.assign(S,back);done.forEach((v,j)=>api.stepsDone()[j]=v);
     let n=0;while(S.t<a.t-1e-9&&n<5000){api.tick(.25);n++;}

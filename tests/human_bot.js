@@ -15,7 +15,7 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
     if(opts.instChaos&&S.running&&Math.random()<.004){const ok=api.INJECTS.filter(x=>{try{return x.ok()&&['delay','family','worse','vomit','bridge'].includes(x.id);}catch(e){return false;}});if(ok.length){api.instAct({a:'inj',i:ok[Math.floor(Math.random()*ok.length)].id});opts._inj=(opts._inj||0)+1;}}
     if(opts.ff&&S.running){const w=api.ffWhy();
       if(!w&&rt>=nextTap){(opts.ffLog=opts.ffLog||[]).push(api.ffGo());nextTap=rt+1.2;rt+=.25;continue;}
-      if(w==='due'&&(call==='dm'||(call==='arrest'?(api.M()[S.mission]||{}).tag==='tx':S.mission===api.FFC[call].tx)))tap({mva:'m-reass',od:'o-reass',ep:'e-reass',st:'s-reass',fl:'f-reass',arrest:'a-reassess',dm:'d-glu'}[call]);}
+      if(w==='due'&&!(S.dets||[]).some(x=>!x.closed)&&(call==='dm'||(call==='arrest'?(api.M()[S.mission]||{}).tag==='tx':S.mission===api.FFC[call].tx)))tap({mva:'m-reass',od:'o-reass',ep:'e-reass',st:'s-reass',fl:'f-reass',arrest:'a-reassess',dm:'d-glu'}[call]);}
     if(S.running){
       if(call==='od'){const o=S.o;
         if(!o.checked)tap('o-check');
@@ -46,7 +46,11 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
         if(tag==='pack'){tap('a-cot');tap('a-straps');tap('a-load');}if(tag==='tx')tap('a-reassess');}
       if(call==='mva'){const m=S.m;tap('m-size');if(m.extr.stage>=1)tap('m-enter');
         if(m.inside){for(const id of ['m-cspine','m-protect','m-survey','m-press','m-tq','m-mark','m-o2','m-warm'])if(tap(id))break;if(!m.act&&((S.mission===0&&m.vitCount<1)||(S.mission===1&&m.vitExtr<1)))tap('m-vitals');}
-        if(m.extr.done)tap('m-move');tap('m-load');if(S.mission===3){if(m.tx.tqChecks<1)tap('m-tqcheck');else if(rt%40<1)tap('m-reass');}}
+        if(m.extr.done)tap('m-move');tap('m-load');
+        const dd=(S.dets||[]).filter(x=>x.id==='shock').pop();
+        if(dd&&!opts.noDet&&S.mission>=2&&after('det',true,2)){if(!dd.found)tap('m-reass');else if(!m.recheck&&!m.act)tap('m-recheck');else if(!dd.told)tap('m-tell');else if(!m.stab)tap('m-thigh');else if(api.V().pelvis&&!m.binder)tap('m-binder');else if(!m.rigWarm)tap('m-heat');else if(!m.ivSet)tap('m-ivset');}
+        else if(!dd)delete react.det;
+        if(S.mission===3){if(m.tx.tqChecks<1)tap('m-tqcheck');else if(rt%40<1)tap('m-reass');}}
       if(call==='ep'){const e=S.e;if(!e.assessed)tap('e-assess');
         else for(const id of ['e-pos','e-sting','e-o2','e-ox'])if(tap(id))break;
         if(S.mission>=1){if(!e.ampOK){if(e.ampChecked&&e.ampBad)tap('e-another');else tap('e-check');}else if(!e.syr)tap('e-syr');

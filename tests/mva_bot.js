@@ -14,6 +14,7 @@ function play(tier,choice='good',o={}){const {api,els}=boot();const {$}=api;api.
         c('m-o2');if(!o.noWarm)c('m-warm');
         if(!m.act&&((S.mission===0&&m.vitCount<1)||(S.mission===1&&m.vitExtr<1)))c('m-vitals');}
       if(m.extr.done)c('m-move');c('m-load');
+      {const dd=(S.dets||[]).filter(x=>x.id==='shock').pop();if(dd&&!o.noDet){if(!dd.found)c('m-reass');if(!m.recheck&&!m.act)c('m-recheck');c('m-tell');c('m-thigh');if(api.V().pelvis)c('m-binder');c('m-heat');c('m-ivset');}}
       if(S.mission===3){c('m-reass');if(m.tx.tqChecks<1)c('m-tqcheck');}
       api.tick(.25);}
     t+=.25;}

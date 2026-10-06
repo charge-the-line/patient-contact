@@ -53,6 +53,27 @@ with sync_playwright() as p:
         if pg.is_visible('#done'): break
         pg.wait_for_timeout(1500)
     rows.append((320, 'termination (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and 'never the outcome' in pg.inner_html('#done-b') and 'Time of death' in pg.evaluate("S.log.map(e=>e.msg).join(' ')") else 99))); pg.close()
+    # the next piece of shock care a person would tap, by its visible text, while her shock is getting worse
+    SHOCK_NEXT = "(()=>{const d=detOpen('shock');if(!d||S.m.act)return '';const m=S.m;if(!d.found)return 'Reassess vitals';if(!m.recheck)return 'Rapid recheck';if(!d.told)return 'Tell the medic';if(!m.stab)return 'Pad the thigh';if(V.pelvis&&!m.binder)return 'pelvic binder';if(!m.rigWarm)return 'Heat up';if(!m.ivSet)return 'Set up the IV';return '';})()"
+    # car versus tree: her shock gets worse in the back (unstable pelvis), handled with slow real taps on the shock care, to the debrief
+    for w in (320, 390):
+        pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={mva:{loss:600,pelvis:true}}"); pg.click('#b-call2'); pg.wait_for_timeout(200)
+        pg.evaluate("(()=>{Object.assign(S.m,{sized:true,inside:true,cspine:true,survey:true,ctrl:2,tqAsked:true,marked:true,o2:true,warm:true,protected:true,moved:true,loaded:true,alsArr:true,vitCount:1,vitExtr:1});Object.assign(S.m.extr,{done:true,stage:4});S.mon.four=true;loadMission(3);})()")
+        pg.wait_for_timeout(300)
+        if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(400)
+        tap(pg, 'Check tourniquet'); pg.evaluate("INJECTS.find(x=>x.id==='worse').run()"); pg.wait_for_timeout(600)
+        rows.append((w, 'shock worse: shock care on screen', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#g-mshock') and 'alarm' in pg.inner_text('#radio') and not pg.is_visible('#b-ff') else 99)))
+        for _ in range(80):
+            if pg.is_visible('#decov'): answer(pg)
+            if pg.is_visible('#done'): break
+            nxt = pg.evaluate(SHOCK_NEXT)
+            if nxt: tap(pg, nxt); continue
+            if pg.evaluate("ffWhy()==='due'"): tap(pg, 'Reassess vitals')
+            if pg.is_visible('#b-ff'): tap(pg, 'Fast-forward')
+            pg.wait_for_timeout(300)
+        log = pg.evaluate("S.log.map(e=>e.msg).join(' ')"); inc = pg.evaluate('S.incidents')
+        rows.append((w, 'shock worse, handled (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and 'bleeding into the thigh' in log and 'Binder going on' in log and 'Fluids are running' in log and 'Got worse in your care' in pg.inner_html('#done-b') and not any(('nothing changed' in x) or ('without a binder' in x) or ('getting worse' in x) for x in inc) else 99))); pg.close()
     # Fast-forward in the trauma transport, with slow real taps on buttons found by their visible text: it skips to the next thing that matters
     for w in (320, 390):
         pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
@@ -66,9 +87,11 @@ with sync_playwright() as p:
         t0 = pg.evaluate('S.t'); tap(pg, 'Fast-forward')
         moved = pg.evaluate('S.t') - t0
         rows.append((w, 'fast-forward stops when due', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if moved > 100 and 'Fast-forward:' in pg.inner_text('#radio') and 'reassess' in pg.inner_text('#radio') and not pg.is_visible('#b-ff') else 99)))
-        for _ in range(40):
+        for _ in range(60):
             if pg.is_visible('#decov'): answer(pg)
             if pg.is_visible('#done'): break
+            nxt = pg.evaluate(SHOCK_NEXT)
+            if nxt: tap(pg, nxt); continue
             if pg.evaluate("ffWhy()==='due'"): tap(pg, 'Reassess vitals')
             if pg.is_visible('#b-ff'): tap(pg, 'Fast-forward')
             pg.wait_for_timeout(300)
