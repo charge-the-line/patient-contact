@@ -8,6 +8,7 @@ function play(tier,choice='good',o={}){const {api,els}=boot();const {$}=api;api.
     if(!hid('briefov')){if(after('b',true,2))$('brief-go').onclick();rt+=.25;continue;}
     if(api.DECO()){if(after('d',true,3)){const D=api.DECO();let i=D.opts.findIndex(v=>v.r===choice);if(i<0)i=0;dec.push(api.DEC[D.key].tag+':'+D.opts[i].r);$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});$('dec-go').onclick();}rt+=.25;continue;}
     if(!S.running&&!hid('done')){if(after('n',true,2)){missions.push(Math.round(rt));if(S.mission>=api.M().length-1)break;$('b-next').onclick();}rt+=.25;continue;}
+    if(o.ff&&S.running){const w=api.ffWhy();if(!w&&rt>=nextTap){(o.ffLog=o.ffLog||[]).push(api.ffGo());nextTap=rt+1.1;rt+=.25;continue;}if(w==='due'&&S.mission===4)tap('c-reass');}
     if(S.running){
       if(S.mission===0)for(const id of ['c-hist','c-look','c-kit','c-warm','c-pos'])if(tap(id))break;
       if(S.mission===1){if($('c-push')._cls.has('hot'))tap('c-push');if(x.crown&&!x.head&&!o.noHead)tap('c-head');if($('c-shoulders')._cls.has('hot'))tap('c-shoulders');if(x.born)tap('c-tob');}
@@ -17,7 +18,7 @@ function play(tier,choice='good',o={}){const {api,els}=boot();const {$}=api;api.
       if(S.mission===4&&rt%40<1)tap('c-reass');
       api.tick(.25);}
     rt+=.25;}
-  const S=api.S(),x=S.c;return {ok:missions.length===5,tier,choice,score:S.score,first:x.firstEffRt!==null?Math.round(x.firstEffRt-x.birthRt):null,vig:x.vigRt?Math.round(x.vigRt-x.birthRt):null,loss:Math.round(x.loss),missions:missions.map(m=>(m/60).toFixed(1)),mission:S.mission,steps:api.stepsDone().map(v=>v?1:0).join(''),incidents:S.incidents,dec};}
+  const S=api.S(),x=S.c;return {ok:missions.length===5,tier,choice,score:S.score,first:x.firstEffRt!==null?Math.round(x.firstEffRt-x.birthRt):null,vig:x.vigRt?Math.round(x.vigRt-x.birthRt):null,loss:Math.round(x.loss),missions:missions.map(m=>(m/60).toFixed(1)),mission:S.mission,steps:api.stepsDone().map(v=>v?1:0).join(''),incidents:S.incidents,dec,ff:S.ff,ffLog:o.ffLog};}
 module.exports={play};
 if(require.main===module){for(const tier of [0,1,2])for(const ch of ['good','partial','bad']){const r=play(tier,ch);console.log(r.ok?'PASS':'FAIL',['Guided','Recall','Chaos'][tier].padEnd(7),ch.padEnd(8),'score',String(r.score).padStart(3),'1st breath',r.first+'s','crying at',r.vig+'s','mom loss',r.loss,'| real min',r.missions.join('/'),r.ok?'':'STUCK m'+r.mission+' '+r.steps);}
  const g=play(0,'good');console.log('good incidents:',g.incidents);

@@ -67,6 +67,7 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .guidebtn{padding:6px 10px;font-size:15px;background:#14324d;border-color:#2b6a99;color:#cfe6ff}
 .eta{display:flex;justify-content:space-between;align-items:center;background:var(--deck);border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:15px}
 .eta b{font-family:"Saira Condensed";font-size:24px;font-weight:600}
+.etaw{display:flex;flex-direction:column;min-width:0;line-height:1.15}.ffbtn{flex:none;margin-left:10px;padding:0 14px;font-size:16px}.ffoff{visibility:hidden}
 /* the monitor: the one bold element */
 .mon{background:var(--mon);border-radius:16px;border:3px solid #2a3340;padding:10px 12px 12px;margin-bottom:10px;box-shadow:inset 0 0 0 1px #000}
 .mon .hdr{display:flex;justify-content:space-between;font-size:14px;color:#7d8a99;margin-bottom:4px}
@@ -137,7 +138,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="meta"><button id="b-guide" class="guidebtn">Protocol guide</button><div style="margin-top:4px">Score <b id="score">100</b></div><div id="clock">14:41</div></div>
 </div>
 
-<div class="eta" id="etabar"><span id="eta-l">Medic 1</span><b id="eta-v">9:00 out</b></div>
+<div class="eta" id="etabar"><div class="etaw"><span id="eta-l">Medic 1</span><b id="eta-v">9:00 out</b></div><button id="b-ff" class="go ffbtn ffoff">Fast-forward ▸▸</button></div>
 
 <div class="mon" id="monitor">
   <div class="hdr"><span id="mon-name">AED</span><span id="mon-mode"></span></div>
@@ -265,7 +266,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.23.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.24.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -386,7 +387,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.23.0';
+const APP_VERSION='0.24.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -397,7 +398,7 @@ if(typeof document!=='undefined'&&document.addEventListener)document.addEventLis
 
 const $=id=>document.getElementById(id);
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-let TIER=0,S={},stepsDone=[],CALL='arrest';
+let TIER=0,S={},stepsDone=[],CALL='arrest',RADIO_N=0,FF_ON=false;
 function fresh(){S={mon:{four:false,twelve:false,placing:null,err4:0,err12:0,acqT:0},log:[],t:0,mStart:0,mission:0,running:false,active:false,briefing:false,score:100,incidents:[],decisions:[],lastChoice:null,
   checked:false,arrest:true,rosc:false,roscAt:null,Q:0,resus0:null,terminated:false,noRes:false,startChoice:null,torT:null,torEl:null,tor:{calling:false,callT:null,extended:false},dnr:{asked:false,produced:false,verifyT:null,stop:false},nores:{confirmed:false},
   cpr:{on:false,who:'Wife',met:false,count:0,rate:0,depth:0},fat:{You:0,Partner:0,Wife:.55},switches:0,sinceSwitch:0,
@@ -409,7 +410,7 @@ function fresh(){S={mon:{four:false,twelve:false,placing:null,err4:0,err12:0,acq
   ride:0,cot:false,straps:false,loaded:false,act:null,actT:0,
   tx:{t:0,total:600,bridge:0,arrived:false,reassess:0,lastReass:-999},
   etco2:0,chaos:{vomitDone:false,etaHit:false},rateSum:0,rateN:0,Qm:0,manT:0};}
-function radio(who,msg,cls=''){msg=vt(msg);const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">${esc(who)}:</span> <span class="${cls}">${esc(msg)}</span>`;r.prepend(d);while(r.children.length>18)r.lastChild.remove();if(typeof radioHook==='function')radioHook(who,msg);}
+function radio(who,msg,cls=''){RADIO_N++;msg=vt(msg);const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">${esc(who)}:</span> <span class="${cls}">${esc(msg)}</span>`;r.prepend(d);while(r.children.length>18)r.lastChild.remove();if(typeof radioHook==='function')radioHook(who,msg);}
 function ding(p,why){S.score=Math.max(0,S.score-p);S.incidents.push(why);radio('Feedback',`${why} (−${p})`,'bad');pcFx('bad');if(TIER===0){const k=incidentKey(why);if(k)radio('Guide',`Why it matters: Protocol guide → ${GUIDE[k].name}`);}}
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
 let CALL0=14*3600+41*60;
@@ -711,7 +712,7 @@ const A_AED=()=>[{t:'Metronome on — 100 to 120 a minute',f:()=>S.cpr.met},
    {t:'Back on the chest within 5 seconds of the shock',f:()=>S.aed.resumeAfterShock!==null},
    {t:'Partner: OPA and BVM ready',f:()=>S.air.opa&&S.air.bvm},{t:'Oxygen on the bag at 15 LPM',f:()=>S.air.o2},
    {t:'Decision: how long will the oxygen last?',dec:'o2',f:()=>S.air.o2},
-   {t:'30:2 — give two breaths at each 30 (three cycles)',wait:true,f:()=>S.vent.cycles>=3},
+   {t:'30:2 — give two breaths at each 30 (three cycles)',wait:true,rt:true,f:()=>S.vent.cycles>=3},
    {t:'Switch compressors at about two minutes',wait:true,f:()=>S.switches>=1},
    {t:'Rhythm check at two minutes: analyze, clear, shock',wait:true,f:()=>S.aed.shocks>=2},
    {t:'Keep quality CPR until Medic 1 is on scene',wait:true,f:()=>S.als.arrived}];
@@ -737,7 +738,7 @@ const A_ALS=()=>({tag:'als',title:'Medic 1 on scene',sub:'Now you work for the m
   skills:['handoff','zoll','vent','etco2','lucas','pause'],
   steps:[{t:'Decision: your handoff',dec:'handoff',f:()=>true},
    {t:'Move pads to the monitor — keep the pause short',f:()=>S.als.zoll},
-   {t:'Airway is in: one breath about every 6 seconds (5 breaths)',wait:true,f:()=>S.air.adv&&(S.vent.delivered||0)>=5},
+   {t:'Airway is in: one breath about every 6 seconds (5 breaths)',wait:true,rt:true,f:()=>S.air.adv&&(S.vent.delivered||0)>=5},
    {t:'Rhythm check: hands off on the call, back on when told',wait:true,f:()=>S.als.rcDone>=1||S.als.lucas>=1},
    {t:'LUCAS: back plate in during a rhythm-check pause',f:()=>S.als.lucas>=1},
    {t:'LUCAS: upper part on and running',f:()=>S.als.lucas>=2},
@@ -781,8 +782,8 @@ const A_ROSC=()=>[{tag:'pack',title:'ROSC on scene',sub:'A pulse, here. Now the 
  {tag:'tx',title:'Transport — East Side Hospital',sub:'Across the river with a pulse. About ten minutes if the bridge is down.',
   brief:'You are in the back with the medic. The cath lab knows you are coming. The EMT is driving to East Side Hospital, across the Saginaw River. Keep ventilating, reassess with the medic, and be ready if he re-arrests.',
   skills:['vent','etco2','rosc','bridge','lucas'],onStart:()=>{S.vent.txBase=S.vent.delivered||0;},
-  steps:[{t:'Ventilate about one breath every 6 seconds (10 more)',wait:true,f:()=>(S.vent.delivered||0)>=(S.vent.txBase||0)+10},
-   {t:'Reassess with the medic (twice)',wait:true,f:()=>S.tx.reassess>=2},
+  steps:[{t:'Ventilate about one breath every 6 seconds (10 more)',wait:true,rt:true,f:()=>(S.vent.delivered||0)>=(S.vent.txBase||0)+10},
+   {t:'Reassess with the medic (twice)',wait:true,act:true,f:()=>S.tx.reassess>=2},
    {t:'Arrive at East Side Hospital',wait:true,f:()=>S.tx.arrived},
    {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}];
 function arrestMissions(){return V.open==='look'?[A_LOOK()]:[A_CPR(),A_ALS(),A_WORK()];}
@@ -811,8 +812,59 @@ function checkMission(dt){const m=M[S.mission];let all=true,done=0;
     if(s.dec){if(!DEC_OPEN&&(prev||s.any)&&s.f())openDecision(s.dec,j);all=false;return;}
     if(prev&&s.f()){stepsDone[j]=true;done++;const el=$('st-'+j);if(el)el.classList.add('done');}else all=false;});
   if($('rcn'))$('rcn').textContent=`${done} of ${m.steps.length} done`;
-  if(done!==S.lastDone){S.lastDone=done;S.stallT=0;}else if(TIER>0&&!DEC_OPEN){S.stallT=(S.stallT||0)+(S.dtr||.25);if(S.stallT>45){S.stallT=-60;const nx=m.steps.find((s,j)=>!stepsDone[j]);if(nx&&(nx.wait||nx.dec)){S.stallT=0;}else if(nx){S.score=Math.max(0,S.score-2);S.incidents.push('Hint used');radio('Guide',`Stuck? Next: ${nx.t} (−2)`);}}}
+  if(done!==S.lastDone){S.lastDone=done;S.stallT=0;}else if(TIER>0&&!DEC_OPEN){S.stallT=(S.stallT||0)+(S.dtr||.25);if(S.stallT>45){S.stallT=-60;const nx=m.steps.find((s,j)=>!stepsDone[j]);if(nx&&(nx.wait||nx.dec||(nx.gate&&!nx.gate()))){S.stallT=0;}else if(nx){S.score=Math.max(0,S.score-2);S.incidents.push('Hint used');radio('Guide',`Stuck? Next: ${nx.t} (−2)`);}}}
   if(all&&S.running){S.running=false;finish();}}
+/* ================= Fast-forward =================
+   Offered when everything left in this part of the call is waiting (the medic, the ride, a slow recovery).
+   It runs the same physics, tick by tick, and stops the moment anything happens: a radio call or a penalty,
+   a decision, a step done, the patient changing, a skill the person must do in real time, or a reassessment
+   coming due. Skipping never dodges a problem: whatever would have happened still happens. */
+const CS=()=>({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d})[CALL];
+function monGate(){const c=monCfg();return !!(c&&S.active&&c.need());}
+const FFC={
+ mva:{tx:3,re:240,sig:()=>{const m=S.m,v=mvaV();return [shockClass(v.loss),v.gcs,m.extr.stage,m.extr.hold>0,m.ctrl,m.alsArr].join();},
+  due:()=>{const m=S.m;return (S.mission===0&&m.extr.stage>=1&&!m.inside)||(S.mission===1&&m.vitExtr<1&&!m.act)||(S.mission===1&&m.extr.done&&!m.moved);}},
+ od:{tx:3,re:200,sig:()=>{const o=S.o;return [o.pulse,o.rr>=10,o.withdrawal,o.gurgle,o.spo2>=90,o.gcs>=13,o.alsArr].join();},
+  block:()=>{const o=S.o;return o.checked&&(!o.pulse||o.rr<10||o.gurgle);}},
+ ep:{tx:3,re:200,sig:()=>{const e=S.e,v=epV();return [v.sev<.2?0:v.sev<.45?1:v.sev<.7?2:3,e.overdose&&S.t-e.odT<600,e.alsArr].join();},
+  due:()=>{const e=S.e;return S.mission===2&&e.injected&&e.reassAfter<2&&S.t-Math.max(e.lastReass,e.injT)>=120;}},
+ st:{tx:3,re:200,sig:()=>{const x=S.s;return [x.sev>.5,x.vomit,x.alsArr,x.tx.bridge].join();}},
+ fl:{tx:3,re:200,sig:()=>{const x=S.f;return [x.gcs,x.alsArr].join();}},
+ cb:{tx:4,re:200,sig:()=>{const x=S.c;return [Math.floor(x.loss/250),x.vigorous,x.alsArr].join();},block:()=>S.mission===1||S.mission===2},
+ dm:{sig:()=>{const x=S.d;return [dmV().gcs,x.seized,x.d10,x.alsArr].join();},
+  due:()=>{const x=S.d;return S.mission===1&&!x.act&&((x.doseT.length>0&&!x.recheck&&S.t-x.doseT[0]>=200)||((x.d10||(x.og!=='good'&&x.alsArr))&&x.glu<2));}},
+ arrest:{re:150,sig:()=>[S.rosc,S.arrest,S.terminated,S.noRes,S.aed.state,S.als.arrived,S.tor.calling,S.tor.extended].join(),
+  block:()=>S.arrest&&S.checked&&!S.terminated&&!S.noRes}};
+function ffTx(){if(CALL==='arrest')return aPh()==='tx'?S.tx:null;const c=FFC[CALL],x=CS();return c&&x&&c.tx===S.mission?x.tx:null;}
+function ffSig(){const c=FFC[CALL];return c?c.sig():'';}
+function ffDue(){const c=FFC[CALL]||{};if(c.due&&c.due())return true;const tx=ffTx();if(!tx)return false;
+  /* at the doors with a reassessment still owed: waiting can't finish it, so it's due now */
+  if(tx.arrived)return ffPend().some(s=>s.act);return S.t-Math.max(tx.lastReass,S.t-tx.t)>=c.re;}
+function ffPend(){const m=M[S.mission];return m?m.steps.filter((s,j)=>!stepsDone[j]):[];}
+/* a step waits if it is a wait step, if it can't start yet (the medic isn't here), or if it is already done and only waits its turn in the list */
+const ffWaits=s=>s.wait||(s.gate&&!s.gate())||(!s.dec&&s.f());
+/* '' when fast-forward is available; otherwise why not: busy, steps (something to do), skill (real-time care), due (reassess) */
+function ffWhy(){if(!S.active||!S.running||S.briefing||DEC_OPEN||!FFC[CALL])return 'busy';
+  const p=ffPend();if(!p.length||!p.every(s=>ffWaits(s)||s.dec)||!p.some(ffWaits))return 'steps';
+  const c=FFC[CALL];if(p.some(s=>s.rt)||(c.block&&c.block()))return 'skill';
+  if(ffDue())return 'due';return '';}
+function ffSync(){const b=$('b-ff');if(b)b.classList.toggle('ffoff',!!ffWhy());}
+function ffGo(){if(ffWhy())return '';const r0=RADIO_N,t0=S.t,mi=S.mission,d0=stepsDone.filter(Boolean).length,g0=ffSig();let n=0,why='cap';FF_ON=true;
+  try{while(n++<4800&&S.t-t0<900){tick(.25);
+    if(!S.active||!S.running||DEC_OPEN||S.mission!==mi){why='event';break;}
+    if(RADIO_N!==r0){why='radio';break;}
+    if(stepsDone.filter(Boolean).length!==d0){why='step';break;}
+    if(ffSig()!==g0){why='patient';break;}
+    const w=ffWhy();if(w){why=w;break;}}}
+  finally{FF_ON=false;}
+  const dt=S.t-t0;S.ff=S.ff||{n:0,t:0};S.ff.n++;S.ff.t+=dt;S.ffLast={why,t:dt};
+  ffNote(`${mmss(dt)} later.${why==='patient'?' Your patient has changed — take a look.':why==='due'?' Time to reassess.':why==='skill'?' Your patient needs you now.':''}`,RADIO_N-r0);
+  if(S.active)render();ffSync();return why;}
+/* the note sits under whatever happened, so the event stays on top */
+function ffNote(txt,k){const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">Fast-forward:</span> <span>${esc(txt)}</span>`;
+  if(S&&S.log)S.log.push({c:clockStr(),who:'Fast-forward',msg:txt});
+  if(r.insertBefore&&r.children&&r.children[k])r.insertBefore(d,r.children[k]);else r.prepend(d);}
+$('b-ff').onclick=()=>{ffGo();};
 let DEC_OPEN=null;
 function openDecision(key,j){const d=DEC[key];const opts=typeof d.optsFn==='function'?d.optsFn():d.opts;DEC_OPEN={key,j,opts};S.running=false;
   let q=vt(typeof d.q==='function'?d.q():d.q);opts.forEach(o=>{o.t=vt(o.t);o.why=vt(o.why);});$('dec-q').textContent=q;const ord=opts.map((_,i)=>i).sort(()=>Math.random()-.5);$('dec-opts').innerHTML=ord.map(i=>[opts[i],i]).map(([o,i])=>`<button class="opt" data-i="${i}">${esc(o.t.replace('{shocks}',S.aed.shocks===1?'One':S.aed.shocks===2?'Two':String(S.aed.shocks)).replace(/about 0:00 … /,'about '+mmss(S.t+60)+' ago — '))}</button>`).join('');
@@ -855,7 +907,7 @@ function arrestDebrief(){const out=`<div class="mrow"><span>Outcome</span><b sty
   return `<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':V.shock===false?'no shockable rhythm':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Resuscitation on scene',mmss(Math.max(0,onScene))+`  (${COUNTY.name}: about ${COUNTY.torMin} min, then the medic consults)`]].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+out+`</div>`+plain;}
 /* ================= render ================= */
 let wave=[],phase=0;
-function render(){if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}if(CALL==='cb'){renderCB();return;}if(CALL==='dm'){renderDM();return;}
+function render(){if(FF_ON)return;if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}if(CALL==='cb'){renderCB();return;}if(CALL==='dm'){renderDM();return;}
   EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
   ODG.forEach(i=>$(i).classList.add('hidden'));$('fattrack').classList.remove('hidden');$('mon-mode').style.color='';
   ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
@@ -982,7 +1034,7 @@ function tickMVA(dtReal){const m=S.m;const F=S.mission===3?7:3;const dt=dtReal*F
     if(S.t-Math.max(m.tx.lastReass,m.txStart)>420&&!m.tx.gapDing){m.tx.gapDing=true;ding(3,'Went more than 5 minutes without reassessing an unstable patient');}
     if(!m.tx.arrived&&m.tx.t>=m.tx.total){m.tx.arrived=true;radio('EMT','Regional Medical Center — trauma bay.','good');}}
   checkMission(dt);renderMVA();}
-function renderMVA(){const m=S.m;if(!m)return;
+function renderMVA(){if(FF_ON)return;const m=S.m;if(!m)return;
   $('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals'].forEach(i=>$(i).classList.add('hidden'));
   ODG.forEach(i=>$(i).classList.add('hidden'));EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
@@ -1023,7 +1075,7 @@ const M_MVA=[
   brief:'The engine crew is working the car around you: glass, then the door, then the dash. You are inside with her. Protect her from the cutting, keep reassessing, and tell the officer when her condition changes the plan.',
   skills:['protect','shock','rapid','handoff','vitals'],
   steps:[{t:'Protect her before the glass goes',f:()=>S.m.protected||S.m.extr.stage>=2},
-   {t:'Reassess vitals while they cut',wait:true,f:()=>S.m.vitExtr>=1},
+   {t:'Reassess vitals while they cut',wait:true,act:true,f:()=>S.m.vitExtr>=1},
    {t:'Decision: controlled or rapid extrication',dec:'mvaRapid',any:true,f:()=>S.m.extr.stage>=3},
    {t:'Decision: handoff to Medic 1',dec:'mvaHandoff',any:true,f:()=>S.m.alsArr},
    {t:'She\'s free: out to the cot on your count',wait:true,f:()=>S.m.moved}]},
@@ -1034,7 +1086,7 @@ const M_MVA=[
  {title:'Transport — Regional Medical Center',sub:'South on I-75 to the trauma center. No drawbridges, but a longer ride.',
   brief:'You are in the back with the medic for about 22 minutes. She is in shock and still bleeding internally from her thigh. Keep her warm, keep reassessing, and watch the tourniquet.',
   skills:['vitals','shock','tq','hypo','handoff'],
-  steps:[{t:'Reassess vitals about every 5 minutes (3 times)',wait:true,f:()=>S.m.tx.reass>=3},
+  steps:[{t:'Reassess vitals about every 5 minutes (3 times)',wait:true,act:true,f:()=>S.m.tx.reass>=3},
    {t:'Check the tourniquet and below it',f:()=>S.m.tx.tqChecks>=1},
    {t:'Arrive at the trauma center',wait:true,f:()=>S.m.tx.arrived},
    {t:'Decision: trauma handoff',dec:'mvaER',f:()=>S.m.tx.arrived}]}
@@ -1159,7 +1211,7 @@ function tickOD(dtReal){const o=S.o;const F=S.mission===3?4:3;const dt=dtReal*F;
     if(!o.tx.arrived&&o.tx.t>=o.tx.total){o.tx.arrived=true;radio('EMT','East Side Hospital — we\'re at the doors.','good');}}
   checkMission(dt);renderOD();}
 function triggerWithdrawal(why){const o=S.o;o.withdrawal=true;o.vomit=true;o.gurgle=true;o.recov=false;ding(10,why);radio('You','He\'s up — vomiting, swinging his arms, ripping the mask off! Roll him, suction!','bad');}
-function renderOD(){const o=S.o;if(!o)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
+function renderOD(){if(FF_ON)return;const o=S.o;if(!o)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));
   EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-od-a',S.mission<=1);vis('g-od-b',S.mission<=1||S.mission===3);vis('g-od-n',S.mission<=1);vis('g-od-t',S.mission>=2);
@@ -1185,12 +1237,12 @@ const M_OD=[
    {t:'Suction the gurgling',f:()=>!S.o.gurgle},
    {t:'OPA in (no gag reflex)',f:()=>S.o.opa||S.o.gcs>=9},
    {t:'BVM with oxygen at 15 LPM',f:()=>S.o.bvm&&S.o.o2},
-   {t:'Breathe for him about every 6 seconds — until he breathes on his own',wait:true,f:()=>(S.o.delivered||0)>=6||((S.o.delivered||0)>=1&&S.o.rr>=10&&S.o.pulse)},
+   {t:'Breathe for him about every 6 seconds — until he breathes on his own',wait:true,rt:true,f:()=>(S.o.delivered||0)>=6||((S.o.delivered||0)>=1&&S.o.rr>=10&&S.o.pulse)},
    {t:'Naloxone 4 mg intranasal',f:()=>S.o.doses>=1},
    {t:'Pulse oximeter on',f:()=>S.o.ox},
    {t:'Pulse check — under 10 seconds',f:()=>S.o.pulseChecks>=1},
    {t:'Decision: another dose?',dec:'odSecond',any:true,f:()=>S.o.doses>=1&&S.t-S.o.doseT[0]>=150},
-   {t:'Keep breathing for him until he breathes 10+ a minute on his own',wait:true,f:()=>S.o.rr>=10&&S.o.pulse}]},
+   {t:'Keep breathing for him until he breathes 10+ a minute on his own',wait:true,rt:true,f:()=>S.o.rr>=10&&S.o.pulse}]},
  {title:'Breathing — but not awake',sub:'He\'s breathing on his own. The job isn\'t done.',
   brief:'His breathing has come back to about 11 a minute and his oxygen is good, but he only groans when you rub his sternum. Medic 1 is close.',
   skills:['naloxone','withdrawal','xylazine','recovery','handoff'],
@@ -1205,7 +1257,7 @@ const M_OD=[
  {title:'Transport — East Side Hospital',sub:'A short ride across the river. Watch him the whole way.',
   brief:'You are in the back with the medic for about ten minutes. He is awake and quiet, oxygen on. Keep reassessing his breathing.',
   skills:['renarc','rescue','handoff'],
-  steps:[{t:'Reassess his breathing (twice)',wait:true,f:()=>S.o.tx.reass>=2},
+  steps:[{t:'Reassess his breathing (twice)',wait:true,act:true,f:()=>S.o.tx.reass>=2},
    {t:'Arrive at East Side Hospital',wait:true,f:()=>S.o.tx.arrived},
    {t:'Decision: ER handoff',dec:'odER',f:()=>S.o.tx.arrived}]}
 ];
@@ -1325,7 +1377,7 @@ function tickEP(dtReal){const e=S.e;const F=S.mission===3?4:3;const dt=dtReal*F;
 function epSyr(){const v=S.e.vol;let g=`<rect x="20" y="16" width="230" height="26" rx="4" fill="#0f1a2e" stroke="#a9b7cc"/><rect x="20" y="16" width="${230*v}" height="26" rx="4" fill="#c7313a" opacity=".8"/>`;
   for(let i=0;i<=10;i++){const x=20+23*i;g+=`<line x1="${x}" y1="16" x2="${x}" y2="${i%5===0?30:24}" stroke="#a9b7cc" stroke-width="${i%5===0?1.6:.8}"/>`;if(i%5===0)g+=`<text x="${x}" y="54" font-size="10" fill="#a9b7cc" text-anchor="middle" font-family="sans-serif">${(i/10).toFixed(1)}</text>`;}
   g+=`<rect x="250" y="24" width="30" height="10" fill="#a9b7cc"/><rect x="${20+230*v-3}" y="10" width="6" height="38" fill="#e8eef6"/><line x1="0" y1="29" x2="20" y2="29" stroke="#e8eef6" stroke-width="2"/>`;$('syr').innerHTML=g;}
-function renderEP(){const e=S.e;if(!e)return;const v=epV();$('clock').textContent=clockStr();$('score').textContent=S.score;
+function renderEP(){if(FF_ON)return;const e=S.e;if(!e)return;const v=epV();$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG).forEach(i=>$(i).classList.add('hidden'));
   STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-ep','ep-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!e.ox);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-ep-a',S.mission===0||S.mission===2);vis('g-ep-m',S.mission>=1);
@@ -1362,14 +1414,14 @@ const M_EP=[
  {title:'Is it working?',sub:'Reassess. Epinephrine takes a few minutes.',
   brief:'The dose is in. Most patients start improving within a few minutes. Reassess, keep him flat, and be ready if it isn\'t enough.',
   skills:['epi','biphasic','upright','handoff'],
-  steps:[{t:'Reassess a few minutes after the shot (twice)',wait:true,f:()=>S.e.reassAfter>=2},
+  steps:[{t:'Reassess a few minutes after the shot (twice)',wait:true,act:true,f:()=>S.e.reassAfter>=2},
    {t:'Decision: "I feel better — I can walk"',dec:'epWalk',f:()=>S.e.reassAfter>=1},
    {t:'Decision: handoff to Medic 1',dec:'epHandoff',any:true,f:()=>S.e.alsArr},
    {t:'Medic 1 takes over',wait:true,f:()=>S.e.alsArr&&S.t-S.e.alsT>20}]},
  {title:'Transport — East Side Hospital',sub:'A short ride. The reaction isn\'t finished.',
   brief:'You\'re in the back with the medic. He\'s feeling better. Keep reassessing — anaphylaxis can come back.',
   skills:['biphasic','epi'],
-  steps:[{t:'Reassess in the back (twice)',wait:true,f:()=>S.e.tx.reass>=2},
+  steps:[{t:'Reassess in the back (twice)',wait:true,act:true,f:()=>S.e.tx.reass>=2},
    {t:'Arrive at East Side Hospital',wait:true,f:()=>S.e.tx.arrived},
    {t:'Decision: ER handoff',dec:'epER',f:()=>S.e.tx.arrived}]}
 ];
@@ -1469,7 +1521,7 @@ function tickST(dtReal){const x=S.s;const F=S.mission===3?4:3;const dt=dtReal*F;
     if(x.worsePending&&!DEC_OPEN){x.worsePending=false;openDecision('stWorse',-1);}
     if(!x.tx.arrived&&x.tx.t>=x.tx.total){x.tx.arrived=true;radio('EMT',V.lvo?'Regional Medical Center — the stroke team and neurointerventional team are waiting.':'East Side Hospital — the stroke team is waiting at the door.','good');}}
   checkMission(dt);renderST();}
-function renderST(){const x=S.s;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
+function renderST(){if(FF_ON)return;const x=S.s;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG).forEach(i=>$(i).classList.add('hidden'));
   FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-st','st-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.ox);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-st-a',S.mission<=1);vis('g-st-b',S.mission<=1);vis('g-st-c',S.mission>=1);
@@ -1506,7 +1558,7 @@ const M_ST=[
  {title:()=>V.lvo?'Transport — Regional Medical Center':'Transport — East Side Hospital',sub:()=>V.lvo?'South on I-75 to the thrombectomy center.':'Across the river. Every minute counts.',
   brief:()=>V.lvo?'You\'re in the back with the medic, heading to Regional for possible clot removal. Recheck her BE-FAST on the way — and tell the medic the moment anything changes.':'You\'re in the back with the medic. Recheck her BE-FAST on the way — and tell the medic the moment anything changes. The EMT is driving toward the drawbridges.',
   skills:['befast','bridge','handoff'],
-  steps:[{t:'Recheck her BE-FAST on the way (twice)',wait:true,f:()=>S.s.tx.reass>=2},
+  steps:[{t:'Recheck her BE-FAST on the way (twice)',wait:true,act:true,f:()=>S.s.tx.reass>=2},
    {t:'Arrive at the stroke center',wait:true,f:()=>S.s.tx.arrived},
    {t:'Decision: handoff to the stroke team',dec:'stER',f:()=>S.s.tx.arrived}]}
 ];
@@ -1601,7 +1653,7 @@ function tickFL(dtReal){const x=S.f;const F=S.mission===3?4:3;const dt=dtReal*F;
     if(x.tx.decline&&x.tx.t>360&&x.gcs===14)x.gcs=13;
     if(!x.tx.arrived&&x.tx.t>=x.tx.total){x.tx.arrived=true;radio('EMT',x.tx.diverted?'Regional Medical Center — trauma bay. Neurosurgery is waiting.':'East Side Hospital — at the doors.','good');}}
   checkMission(dt);renderFL();}
-function renderFL(){const x=S.f;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
+function renderFL(){if(FF_ON)return;const x=S.f;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG).forEach(i=>$(i).classList.add('hidden'));
   CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-fl','fl-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.vitCount);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-fl-a',S.mission<=1);vis('g-fl-c',true);
@@ -1642,7 +1694,7 @@ const M_FL=[
  {title:'Transport — East Side Hospital',sub:'Keep checking her mind, not just her hip.',
   brief:'You\'re in the back with the medic. She\'s chatting about her grandkids. Recheck her neuro status every few minutes — blood thinners plus a head strike means a bleed can show up hours later.',
   skills:['anticoag','neurocheck'],
-  steps:[{t:'Neuro recheck on the way (twice)',wait:true,f:()=>S.f.tx.reass>=2},
+  steps:[{t:'Neuro recheck on the way (twice)',wait:true,act:true,f:()=>S.f.tx.reass>=2},
    {t:'Arrive at the hospital',wait:true,f:()=>S.f.tx.arrived},
    {t:'Decision: ER handoff',dec:'flER',f:()=>S.f.tx.arrived}]}
 ];
@@ -1765,7 +1817,7 @@ function tickCB(dtReal){const x=S.c;const F=S.mission===0?3:S.mission===1?2:S.mi
   if(!x.alsArr){x.eta-=dt;if(TIER===2&&!x.chaos.eta&&S.t>200){x.chaos.eta=true;x.eta+=120;radio('Dispatch','Medic 1 slid off the road — they\'re fine, back on their way. Plus two minutes.','bad');}if(x.eta<=0){x.alsArr=true;x.alsT=S.t;x.lossAtALS=x.loss;radio('Medic 1','Medic 1 — wow. Okay. Talk to me.','good');}}
   if(S.mission===4&&!S.briefing){x.tx.t+=dt;if(!x.tx.arrived&&x.tx.t>=x.tx.total){x.tx.arrived=true;radio('EMT','East Side Hospital — labor and delivery is meeting us.','good');}}
   checkMission(dt);renderCB();}
-function renderCB(){const x=S.c;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
+function renderCB(){if(FF_ON)return;const x=S.c;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG,FLG).forEach(i=>$(i).classList.add('hidden'));
   DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-cb','cb-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(x.born&&x.hrKnown));$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-cb-m',S.mission!==2);vis('g-cb-b',S.mission===2||(S.mission===3&&!x.sts));
@@ -1794,10 +1846,10 @@ const M_CB=[
  {title:'Delivery',sub:'Push with the contractions. Control the head.',
   brief:'She\'s crowning. Coach her to push only during contractions, support the head as it delivers, check for the cord, then guide the shoulders.',
   skills:['deliver','nuchal'],
-  steps:[{t:'Coach her to push with the contractions',wait:true,f:()=>S.c.push>=2},
+  steps:[{t:'Coach her to push with the contractions',wait:true,rt:true,f:()=>S.c.push>=2},
    {t:'Support the head as it delivers',f:()=>S.c.headOut},
    {t:'Decision: the cord',dec:'cbNuchal',f:()=>S.c.headOut},
-   {t:'Guide the shoulders — down, then up',wait:true,f:()=>S.c.born},
+   {t:'Guide the shoulders — down, then up',wait:true,rt:true,f:()=>S.c.born},
    {t:'Note the time of birth',f:()=>S.c.tob}]},
  {title:'The golden minute',sub:'She\'s limp and not crying. This part runs in real time.',
   brief:'The baby is out but limp, blue, and not crying. You have about a minute to warm, dry, stimulate, position, and clear her airway — and if she still isn\'t breathing well, to start breathing for her. This mission runs at real speed: one breath every 1 to 1½ seconds.',
@@ -1807,9 +1859,9 @@ const M_CB=[
    {t:'Position the airway',f:()=>S.c.posA},{t:'Suction: mouth, then nose',f:()=>!S.c.gurgly},
    {t:'Check her heart rate',f:()=>S.c.hrChecks>=1},
    {t:'Decision: she\'s gasping, heart rate 80',dec:'cbPPV',f:()=>S.c.hrChecks>=1},
-   {t:'Infant BVM — breathe for her at 40–60 a minute',wait:true,f:()=>(S.c.delivered||0)>=10||S.c.vigorous},
+   {t:'Infant BVM — breathe for her at 40–60 a minute',wait:true,rt:true,f:()=>(S.c.delivered||0)>=10||S.c.vigorous},
    {t:'Decision: 1-minute APGAR',dec:'cbApgar1',any:true,f:()=>S.c.born&&S.rt-S.c.birthRt>=60},
-   {t:'Keep going until she breathes on her own',wait:true,f:()=>S.c.vigorous},
+   {t:'Keep going until she breathes on her own',wait:true,rt:true,f:()=>S.c.vigorous},
    {t:'Skin-to-skin with mom',f:()=>S.c.sts},
    {t:'Decision: 5-minute APGAR',dec:'cbApgar5',f:()=>S.c.vigorous&&S.t-S.c.birthT>=300}]},
  {title:'Mom',sub:'The placenta, and the bleeding.',
@@ -1824,7 +1876,7 @@ const M_CB=[
   brief:'Mom and baby are going to East Side, where labor and delivery is expecting them. You\'re in the back with the medic.',
   skills:['nseat','pph','nwarm'],
   steps:[{t:'Decision: how does the baby ride?',dec:'cbSeat',f:()=>true},
-   {t:'Reassess both — mom\'s fundus and bleeding, baby\'s breathing and color (twice)',wait:true,f:()=>S.c.tx.reass>=2},
+   {t:'Reassess both — mom\'s fundus and bleeding, baby\'s breathing and color (twice)',wait:true,act:true,f:()=>S.c.tx.reass>=2},
    {t:'Arrive at East Side Hospital',wait:true,f:()=>S.c.tx.arrived},
    {t:'Decision: handoff to labor and delivery',dec:'cbER',f:()=>S.c.tx.arrived}]}
 ];
@@ -1954,7 +2006,7 @@ function tickDM(dtReal){const x=S.d;const dt=dtReal*3;S.t+=dt;
   if(!x.alsArr){x.eta-=dt;if(TIER===2&&!x.chaos.eta&&S.t>150){x.chaos.eta=true;x.eta+=120;radio('Dispatch','Medic 1 delayed — plus two minutes.','bad');}if(x.eta<=0){x.alsArr=true;x.alsT=S.t;radio('Medic 1','Medic 1 — what have we got?','good');}}
   if(x.alsArr&&!x.d10&&x.gl<70&&S.t-x.alsT>60){x.d10=true;x.gl=Math.max(x.gl,95);radio('Medic 1','IV is in — dextrose going. Watch him, he\'ll come around fast.','good');}
   checkMission(dt);renderDM();}
-function renderDM(){const x=S.d;if(!x)return;const v=dmV();$('clock').textContent=clockStr();$('score').textContent=S.score;
+function renderDM(){if(FF_ON)return;const x=S.d;if(!x)return;const v=dmV();$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG,FLG,CBG).forEach(i=>$(i).classList.add('hidden'));
   ['vitals-dm','dm-line','g-dm'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.vit);$('fattrack').classList.add('hidden');
   $('eta-l').textContent='Medic 1';$('eta-v').textContent=x.alsArr?'On scene':mmss(x.eta)+' out';
@@ -1977,7 +2029,7 @@ const M_DM=[
  {title:'Is it working?',sub:'Recheck. Glucose takes a few minutes.',
   brief:'Oral glucose works within minutes, but not instantly. Recheck his sugar and his mental status, and hand off to Medic 1 when they arrive.',
   skills:['glucometer','oralgluc','handoff'],
-  steps:[{t:'Recheck his glucose a few minutes after treatment',wait:true,f:()=>S.d.recheck||(S.d.og!=='good'&&S.d.alsArr&&S.d.glu>=2)||S.d.d10&&S.d.glu>=2},
+  steps:[{t:'Recheck his glucose a few minutes after treatment',wait:true,act:true,f:()=>S.d.recheck||(S.d.og!=='good'&&S.d.alsArr&&S.d.glu>=2)||S.d.d10&&S.d.glu>=2},
    {t:'Decision: still low?',dec:'dmSecond',f:()=>S.d.recheck||S.d.d10&&S.d.glu>=2},
    {t:'Decision: handoff to Medic 1',dec:'dmHandoff',any:true,f:()=>S.d.alsArr},
    {t:'He\'s alert and oriented',wait:true,f:()=>dmV().gcs>=15}]},
@@ -2218,12 +2270,12 @@ $('b-rand').onclick=()=>{RANDOM=!RANDOM;const p=load();p.standard=!RANDOM;save(p
 window.addEventListener('resize',()=>{MV.kind='';});
 
 function insertStep(Ms,mi,beforeText,step){const st=Ms[mi].steps;let j=beforeText?st.findIndex(x=>x.t.startsWith(beforeText)):-1;if(j<0)j=st.length;st.splice(j,0,step);}
-insertStep(M_MVA,2,'Power load',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
-insertStep(M_OD,1,'Medic 1 takes over',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
-insertStep(M_EP,2,'Medic 1 takes over',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
-insertStep(M_ST,1,'Onto the cot',{t:'Help Medic 1: 4-lead and 12-lead',f:()=>S.mon.twelve});
-insertStep(M_FL,1,null,{t:'Help Medic 1: 4-lead and 12-lead',f:()=>S.mon.twelve});
-insertStep(M_DM,1,'He\'s alert and oriented',{t:'Help Medic 1: 4-lead on',f:()=>S.mon.four});
+insertStep(M_MVA,2,'Power load',{t:'Help Medic 1: 4-lead on',gate:monGate,f:()=>S.mon.four});
+insertStep(M_OD,1,'Medic 1 takes over',{t:'Help Medic 1: 4-lead on',gate:monGate,f:()=>S.mon.four});
+insertStep(M_EP,2,'Medic 1 takes over',{t:'Help Medic 1: 4-lead on',gate:monGate,f:()=>S.mon.four});
+insertStep(M_ST,1,'Onto the cot',{t:'Help Medic 1: 4-lead and 12-lead',gate:monGate,f:()=>S.mon.twelve});
+insertStep(M_FL,1,null,{t:'Help Medic 1: 4-lead and 12-lead',gate:monGate,f:()=>S.mon.twelve});
+insertStep(M_DM,1,'He\'s alert and oriented',{t:'Help Medic 1: 4-lead on',gate:monGate,f:()=>S.mon.four});
 /* the arrest call's 12-lead now happens on scene after ROSC (A_ROSC) */
 Object.assign(GUIDE,{
  ecg4:{name:'Placing a 4-lead',what:'Four electrodes for cardiac monitoring: white (RA), black (LA), red (LL), green (RL).',when:'Whenever ALS puts a patient on the monitor — MFRs often place them.',wrong:'Swapping colors, placing over bone or on hairy, sweaty skin, or loose electrodes that cause artifact.',tip:'"White on right, smoke over fire, snow over grass": white on the right upper chest, black on the left upper chest above red on the left lower abdomen, green on the right lower abdomen.',mca:'Lead placement follows the monitor manufacturer and your agency\'s training.',rel:['ecg12','artifact']},
@@ -2466,7 +2518,7 @@ fresh();render();
 if(load().seen){$('intro').classList.add('hidden');showMenu();}
 /* the home page's daily drill deep-links here: patient-contact/?drill=med */
 {const q=new URLSearchParams((typeof location!=='undefined'&&location.search)||'').get('drill');if(q&&DRILLS.find(x=>x.id===q)){$('intro').classList.add('hidden');$('menu').classList.add('hidden');drillMenu();drillStart(q);}}
-let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();},250);
+let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();ffSync();},250);
 requestAnimationFrame(drawWave);
 </script>
 </body>

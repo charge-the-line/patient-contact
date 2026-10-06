@@ -13,6 +13,9 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
     if(rt-lastProgress>150&&!stuckAt){const j=api.stepsDone().findIndex(x=>!x);stuckAt={mission:S.mission,step:api.M()[S.mission].steps[j]&&api.M()[S.mission].steps[j].t};}
     if(opts.probe&&S.incidents.length>(opts._n||0)){opts._n=S.incidents.length;const last=S.incidents[S.incidents.length-1];if(last==='Hint used'){const j=api.stepsDone().findIndex(x=>!x);console.log('   HINT in',call,'M'+(S.mission+1),'→',api.M()[S.mission].steps[j].t);}}
     if(opts.instChaos&&S.running&&Math.random()<.004){const ok=api.INJECTS.filter(x=>{try{return x.ok()&&['delay','family','worse','vomit','bridge'].includes(x.id);}catch(e){return false;}});if(ok.length){api.instAct({a:'inj',i:ok[Math.floor(Math.random()*ok.length)].id});opts._inj=(opts._inj||0)+1;}}
+    if(opts.ff&&S.running){const w=api.ffWhy();
+      if(!w&&rt>=nextTap){(opts.ffLog=opts.ffLog||[]).push(api.ffGo());nextTap=rt+1.2;rt+=.25;continue;}
+      if(w==='due'&&(call==='dm'||(call==='arrest'?(api.M()[S.mission]||{}).tag==='tx':S.mission===api.FFC[call].tx)))tap({mva:'m-reass',od:'o-reass',ep:'e-reass',st:'s-reass',fl:'f-reass',arrest:'a-reassess',dm:'d-glu'}[call]);}
     if(S.running){
       if(call==='od'){const o=S.o;
         if(!o.checked)tap('o-check');
@@ -53,7 +56,7 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
       if(call==='dm'){const x=S.d;if(!x.act){if(!x.keys)tap('d-keys');else if(!x.abc)tap('d-abc');else if(!x.id)tap('d-id');else if(!x.glu)tap('d-glu');else if(x.swT===null)tap('d-sw');else if(!x.vit)tap('d-vit');else if(x.doseT.length&&!x.recheck&&S.t-x.doseT[0]>=200&&S.t-(x.gluT||0)>100)tap('d-glu');else if(x.d10&&x.glu<2)tap('d-glu');}}
       if(call==='st'){const x=S.s;if(!x.abc)tap('s-abc');else if(!x.act){const k=['B','E','F','A','S'].find(k=>!x.bf[k]);if(k)tap('s-'+k);else for(const id of ['s-time','s-glu','s-meds','s-vitals'])if(tap(id))break;}
         if(x.vomit)tap('s-suct');if(x.alsArr){tap('s-fam');tap('s-cot');}if(S.mission===2)tap('s-load');if(S.mission===3)tap('s-reass');}
-      api.tick(.25);}
+      if(api.S().running)api.tick(.25);}
     rt+=.25;}
   const S=api.S();return {call,tier,finished:missions.length===api.M().length,missions,score:S.score,stuckAt,incidents:S.incidents,outcome:call==='arrest'?api.arrestOutcome():null,S};}
 module.exports={play};

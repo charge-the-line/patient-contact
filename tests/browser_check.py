@@ -16,7 +16,7 @@ with sync_playwright() as p:
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click(f'#b-call{n}'); pg.wait_for_timeout(200)
             pg.click('#brief-go'); pg.wait_for_timeout(1500)
-            rows.append((w, f'call {n}', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.close()
+            rows.append((w, f'call {n}', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)) + (0 if not pg.is_visible('#b-ff') else 99))); pg.close()   # nothing to wait for at the start: no Fast-forward
         pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True)
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.wait_for_timeout(200); rows.append((w, 'home', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.click('#b-lesson'); pg.wait_for_timeout(200); rows.append((w, 'lesson', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.click('[data-l="quit"]'); pg.wait_for_timeout(150); pg.click('#h-set'); pg.wait_for_timeout(150); rows.append((w, 'settings', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL)))); pg.click('#set-close'); pg.click('#b-drills'); pg.click('[data-d="rhythm"]'); pg.wait_for_timeout(300)
@@ -53,6 +53,26 @@ with sync_playwright() as p:
         if pg.is_visible('#done'): break
         pg.wait_for_timeout(1500)
     rows.append((320, 'termination (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and 'never the outcome' in pg.inner_html('#done-b') and 'Time of death' in pg.evaluate("S.log.map(e=>e.msg).join(' ')") else 99))); pg.close()
+    # Fast-forward in the trauma transport, with slow real taps on buttons found by their visible text: it skips to the next thing that matters
+    for w in (320, 390):
+        pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click('#b-call2'); pg.wait_for_timeout(200)
+        pg.evaluate("(()=>{Object.assign(S.m,{sized:true,inside:true,cspine:true,survey:true,ctrl:2,tqAsked:true,marked:true,o2:true,warm:true,protected:true,moved:true,loaded:true,alsArr:true,vitCount:1,vitExtr:1});Object.assign(S.m.extr,{done:true,stage:4});S.mon.four=true;loadMission(3);})()")
+        pg.wait_for_timeout(300)
+        if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(400)
+        hidden_first = not pg.is_visible('#b-ff')
+        tap(pg, 'Check tourniquet'); pg.wait_for_timeout(400)
+        rows.append((w, 'fast-forward offered', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if hidden_first and pg.is_visible('#b-ff') else 99)))
+        t0 = pg.evaluate('S.t'); tap(pg, 'Fast-forward')
+        moved = pg.evaluate('S.t') - t0
+        rows.append((w, 'fast-forward stops when due', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if moved > 100 and 'Fast-forward:' in pg.inner_text('#radio') and 'reassess' in pg.inner_text('#radio') and not pg.is_visible('#b-ff') else 99)))
+        for _ in range(40):
+            if pg.is_visible('#decov'): answer(pg)
+            if pg.is_visible('#done'): break
+            if pg.evaluate("ffWhy()==='due'"): tap(pg, 'Reassess vitals')
+            if pg.is_visible('#b-ff'): tap(pg, 'Fast-forward')
+            pg.wait_for_timeout(300)
+        rows.append((w, 'transport with fast-forward (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and not any('without reassessing' in x for x in pg.evaluate('S.incidents')) else 99))); pg.close()
     # the Start CPR or not? drill, answered by visible text
     pg = b.new_page(viewport={'width': 390, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click('#b-drills'); pg.wait_for_timeout(200); tap(pg, 'Start CPR or not?')
