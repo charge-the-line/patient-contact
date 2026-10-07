@@ -196,6 +196,13 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="v g"><div class="l">Pulse</div><div class="n" id="dv-hr">—</div></div>
     <div class="v c"><div class="l">SpO₂</div><div class="n" id="dv-spo2">—</div></div>
   </div>
+  <div class="vitals hidden" id="vitals-pd">
+    <div class="v y"><div class="l">Resp</div><div class="n" id="pv-rr">—</div></div>
+    <div class="v c"><div class="l">SpO₂</div><div class="n" id="pv-spo2">—</div></div>
+    <div class="v g"><div class="l">Pulse</div><div class="n" id="pv-hr">—</div></div>
+    <div class="v w"><div class="l">Words</div><div class="n" id="pv-words" style="font-size:20px">—</div></div>
+  </div>
+  <div class="cprbar hidden" id="pd-line"><span id="pv-sound">Not assessed</span><span id="pv-age"></span></div>
   <div class="cprbar hidden" id="dm-line"><span id="dv-skin">—</span><span id="dv-age"></span></div>
   <div class="cprbar hidden" id="od-line"><span id="ov-air">—</span><span id="ov-age"></span></div>
   <div class="cprbar hidden" id="mva-line"><span id="mv-skin">No vitals yet</span><span id="mv-age"></span></div>
@@ -249,6 +256,10 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="grp hidden" id="g-cb-m"><h3>Mom</h3><div class="row three"><button id="c-hist">Due date, babies, contractions</button><button id="c-look">Check for crowning</button><button id="c-kit">OB kit, gloves, gown, eyes</button><button id="c-warm">Warm the room and towels</button><button id="c-pos">Position her</button><button id="c-push">Coach: push now</button><button id="c-head">Support the head</button><button id="c-shoulders">Guide the shoulders</button><button id="c-tob">Note time of birth</button><button id="c-massage">Fundal massage</button><button id="c-tell">Tell the medic what changed</button><button id="c-heat">Heat up in the back</button><button id="c-nurse">Baby to the breast</button><button id="c-mvitals">Mom's vitals</button><button id="c-reass">Reassess both</button></div><div class="stat" id="c-contr"></div></div>
   <div class="grp hidden" id="g-cb-b"><h3>Baby</h3><div class="row three"><button id="b-dry">Dry and stimulate</button><button id="b-wrap">Dry towel and hat</button><button id="b-pos">Position airway</button><button id="b-suct">Suction: mouth, then nose</button><button id="b-hr">Check heart rate</button><button id="b-bvm">Infant BVM ready</button><button id="b-breath">Breath (40–60/min)</button><button id="b-sts">Skin-to-skin with mom</button><button id="b-cut" class="hidden">Clamp and cut the cord</button></div><div class="stat" id="b-txt"></div></div>
   <div class="grp hidden" id="g-dm"><h3>Patient</h3><div class="row three"><button id="d-keys">Car off, keys out</button><button id="d-abc">Primary: ABCs</button><button id="d-id">Look for a medical ID</button><button id="d-glu">Check blood glucose</button><button id="d-sw">"Squeeze my hands. Can you swallow?"</button><button id="d-vit">Vitals</button><button id="d-pos">Recovery position</button><button id="d-tube">Another tube of oral glucose</button><button id="d-tell">Tell the medic what changed</button><button id="d-ivset">Set up the IV for the medic</button></div><div class="stat" id="d-txt"></div></div>
+  <div class="grp hidden" id="g-pd-a"><h3>Patient</h3><div class="row three"><button id="p-calm">Calm: Mom holds him, get down to his level</button><button id="p-hist">History from Mom</button><button id="p-listen">Listen and count: breathing, sounds, words</button><button id="p-ox">Pulse ox on his toe</button><button id="p-o2b">Blow-by O₂: Mom holds it by his face</button><button id="p-o2m">Pediatric mask on his face</button><button id="p-reass">Reassess him</button></div><div class="stat" id="p-txt"></div></div>
+  <div class="grp hidden" id="g-pd-i"><h3>His inhaler</h3><div class="row"><button id="p-label">Read the label: whose name, what medicine</button><button id="p-date">Check the expiration date</button><button id="p-spacer">Shake it, spacer and mask on</button><button id="p-puff">Help him take it, Mom holding him</button></div><div class="stat" id="p-itxt"></div></div>
+  <div class="grp hidden" id="g-pd-b"><h3>Airway and breathing</h3><div class="row three"><button id="p-bvm">Child bag-mask, O₂ 15 on the bag</button><button id="p-breath">Breath (1 every 2–3 s)</button><button id="p-tell">Tell the medic what changed</button></div><div class="stat" id="p-btxt"></div></div>
+  <div class="grp hidden" id="g-pd-t"><h3>Moving</h3><div class="row"><button id="p-load">Onto the cot with Mom · power load</button><span></span></div></div>
   <div class="grp hidden" id="g-ride"><h3>In the back</h3><div class="row"><button id="a-reassess">Reassess with the medic</button><span></span></div></div>
 </div>
 
@@ -268,7 +279,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.27.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.28.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -285,7 +296,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door.</h1></div>
   <div class="card rdy" id="rdy"><div class="flex"><div style="min-width:0"><div class="small">Your readiness</div><b id="rdy-t" style="display:block;font-family:'Saira Condensed';font-size:22px;line-height:1.05"></b><div class="small" id="rdy-s"></div></div><div class="sp"></div><div class="num" id="rdy-n"></div></div></div>
   <button id="b-resume" class="go hidden" style="width:100%;margin-bottom:8px">Resume call</button>
-  <div class="card"><div class="small">What this is</div><p style="margin:4px 0 0;font-size:15px;line-height:1.45">Medical first response for the firefighter who gets there before the ambulance: eight calls with a working cardiac monitor, patients that change every run, quick drills and a lesson. You are the medical first responder; the EMT drives and the medic works the patient. <b>Protocols vary. On a real call, follow your medical control.</b></p></div>
+  <div class="card"><div class="small">What this is</div><p style="margin:4px 0 0;font-size:15px;line-height:1.45">Medical first response for the firefighter who gets there before the ambulance: nine calls with a working cardiac monitor, patients that change every run, quick drills and a lesson. You are the medical first responder; the EMT drives and the medic works the patient. <b>Protocols vary. On a real call, follow your medical control.</b></p></div>
   <div class="sec" style="margin-top:6px">1 · Learn</div>
   <button class="scen" id="b-lesson"><span class="bchip dim" id="chip-lesson">—</span><b>The lesson</b><span>Medical first response in 12 slides, each with a check · about 10 minutes</span></button>
   <div class="sec">2 · Calls</div>
@@ -299,6 +310,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call6"><span class="bchip dim" id="chip-fl">—</span><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
   <button class="scen" id="b-call7"><span class="bchip dim" id="chip-cb">—</span><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
   <button class="scen" id="b-call8"><span class="bchip dim" id="chip-dm">—</span><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
+  <button class="scen" id="b-call9"><span class="bchip dim" id="chip-pd">—</span><b>"My son can't breathe"</b><span>2:04 a.m. A 4-year-old on his mother's lap, working hard to breathe. Medic 1 is nine minutes out.</span></button>
   <div class="sec">3 · Drills and tools</div>
   <div class="row2"><button id="b-drills" class="go">Quick drills</button><button id="b-prog">My progress</button><button id="b-gindex">Protocol guide</button><button id="b-howto">How to play</button></div>
   <div class="sec">Drill night</div>
@@ -389,7 +401,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.27.0';
+const APP_VERSION='0.28.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -467,7 +479,7 @@ const VARIANTS={
  cb:()=>{const nuchal=Math.random()<.6,vig=Math.random()<.35;const v={nuchal,vig,label:`${nuchal?'Cord around the neck':'No nuchal cord'} · ${vig?'baby vigorous at birth':'baby needed breaths'}`,sub:[]};
    if(vig)v.sub.push(['limp — we bagged her, crying by about 90 seconds','crying at birth — dried, warmed, skin-to-skin'],['needed breaths','vigorous at birth'],['came out limp','came out crying']);if(!nuchal)v.sub.push(['nuchal cord, ','']);return v;}
 };
-function baseVariant(id){return {arrest:{open:'cpr',look:null,dnr:null,shock:true,outcome:'rosc',roscAt:15,label:'Witnessed · shockable rhythm (VF) · ROSC on scene',sub:[]},od:{L:1,label:'Needed two naloxone doses'},ep:{rebound:true,sev:.42,label:'Moderate reaction · symptoms returned in transport'},st:{side:'R',wake:false,lvo:false,label:'Right-sided weakness · found down · no large-vessel signs',sub:[]},fl:{label:'On Eliquis · down about 9½ hours · right hip',sub:[]},dm:{pill:false,low:false,label:'Type 1 on insulin · awake enough to swallow',sub:[]},mva:{warm:false,loss:300,label:'Cold, wet morning · bleeding started recently',sub:[]},cb:{nuchal:true,vig:false,label:'Cord around the neck · baby needed breaths',sub:[]}}[id]||{label:''};}
+function baseVariant(id){return {arrest:{open:'cpr',look:null,dnr:null,shock:true,outcome:'rosc',roscAt:15,label:'Witnessed · shockable rhythm (VF) · ROSC on scene',sub:[]},od:{L:1,label:'Needed two naloxone doses'},ep:{rebound:true,sev:.42,label:'Moderate reaction · symptoms returned in transport'},st:{side:'R',wake:false,lvo:false,label:'Right-sided weakness · found down · no large-vessel signs',sub:[]},fl:{label:'On Eliquis · down about 9½ hours · right hip',sub:[]},dm:{pill:false,low:false,label:'Type 1 on insulin · awake enough to swallow',sub:[]},mva:{warm:false,loss:300,label:'Cold, wet morning · bleeding started recently',sub:[]},cb:{nuchal:true,vig:false,label:'Cord around the neck · baby needed breaths',sub:[]},pd:{kind:'asthma',inh:'own',tire:false,label:'Asthma — his own inhaler and spacer, in date',sub:[]}}[id]||{label:''};}
 function pickVariant(id){const F=typeof window!=='undefined'&&window.FORCE_V&&window.FORCE_V[id];const v=F?Object.assign(baseVariant(id),F,{sub:[]}):RANDOM&&VARIANTS[id]?VARIANTS[id]():baseVariant(id);if(F&&VARIANTS[id]){const ref=VARIANTS[id];for(let k=0;k<400;k++){const c=ref();if(Object.keys(F).every(q=>c[q]===F[q])){Object.assign(v,c);break;}}}v.sub=v.sub||[];v.id=id;return v;}
 function vt(s){if(typeof s!=='string')return s;for(const [a,b] of (V.sub||[]))s=s.split(a).join(b);
   if(s.includes('{doses}')&&S.o)s=s.split('{doses}').join(String(S.o.doses||0));return s;}
@@ -527,6 +539,7 @@ function tick(dtReal){
   if(CALL==='fl'){tickFL(dtReal);return;}
   if(CALL==='cb'){tickCB(dtReal);return;}
   if(CALL==='dm'){tickDM(dtReal);return;}
+  if(CALL==='pd'){tickPD(dtReal);return;}
   const ph=aPh(),F=ph==='tx'||ph==='work'||ph==='ext'||ph==='tor'?4:ph==='nores'?6:3;const dt=dtReal*F;S.t+=dt;
   if(S.act){S.act.t-=dt;if(S.act.t<=0){const k=S.act.k;S.act=null;
     if(k==='breaths'||k==='suction'||k==='switch')startCPR();
@@ -790,9 +803,10 @@ const A_ROSC=()=>[{tag:'pack',title:'ROSC on scene',sub:'A pulse, here. Now the 
    {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}];
 function arrestMissions(){return V.open==='look'?[A_LOOK()]:[A_CPR(),A_ALS(),A_WORK()];}
 let M=[];
-function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;pca('begin','pc',id,()=>`mission-${S.mission+1}`);V=pickVariant(id);M=id==='arrest'?arrestMissions():id==='cb'?(V.vig?M_CB_VIG:M_CB):id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:id==='dm'?M_DM:arrestMissions();CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:id==='dm'?15*3600+40*60:14*3600+41*60;fresh();if(id==='arrest'&&V.open==='look')S.cpr.who='You';if(id==='dm')S.d=freshDM();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
-  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':id==='cb'?'Childbirth':id==='dm'?'Altered driver':'Cardiac arrest';
-  if(id==='dm')radio('Dispatch','Unit responding to assist PD — male driver slumped in a running vehicle, grocery store lot. Officer reports possible intoxication, combative. Medic 1 responding, nine minutes.');
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;pca('begin','pc',id,()=>`mission-${S.mission+1}`);V=pickVariant(id);M=id==='arrest'?arrestMissions():id==='cb'?(V.vig?M_CB_VIG:M_CB):id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:id==='dm'?M_DM:id==='pd'?M_PD():arrestMissions();CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:id==='dm'?15*3600+40*60:id==='pd'?2*3600+4*60:14*3600+41*60;fresh();if(id==='arrest'&&V.open==='look')S.cpr.who='You';if(id==='dm')S.d=freshDM();if(id==='pd')S.p=freshPD();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':id==='cb'?'Childbirth':id==='dm'?'Altered driver':id==='pd'?'Child, trouble breathing':'Cardiac arrest';
+  if(id==='pd')radio('Dispatch','Unit responding — 4-year-old male, trouble breathing, woke up struggling. Mother is the caller. Medic 1 responding, nine minutes.');
+  else if(id==='dm')radio('Dispatch','Unit responding to assist PD — male driver slumped in a running vehicle, grocery store lot. Officer reports possible intoxication, combative. Medic 1 responding, nine minutes.');
   else if(id==='cb')radio('Dispatch','Unit responding — 27-year-old female in active labor, says the baby is coming. Third pregnancy. Medic 1 responding from across the county, ten minutes, slick roads.');
   else if(id==='fl')radio('Dispatch','Unit responding — 82-year-old female, fallen, unable to get up. Daughter calling from out of state; key is under the mat. Medic 1 responding, eight minutes.');
   else if(id==='st')radio('Dispatch','Unit responding — 68-year-old female, slurred speech and weakness, possible stroke. Husband is the caller. Medic 1 responding, six minutes.');
@@ -821,7 +835,7 @@ function checkMission(dt){const m=M[S.mission];let all=true,done=0;if(S.dets)det
    It runs the same physics, tick by tick, and stops the moment anything happens: a radio call or a penalty,
    a decision, a step done, the patient changing, a skill the person must do in real time, or a reassessment
    coming due. Skipping never dodges a problem: whatever would have happened still happens. */
-const CS=()=>({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d})[CALL];
+const CS=()=>({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p})[CALL];
 function monGate(){const c=monCfg();return !!(c&&S.active&&c.need());}
 const FFC={
  mva:{tx:3,re:240,sig:()=>{const m=S.m,v=mvaV();return [shockClass(v.loss),v.gcs,m.extr.stage,m.extr.hold>0,m.ctrl,m.alsArr,(S.dets||[]).length].join();},
@@ -1037,6 +1051,7 @@ function finish(){keepAwake(false);pcFx('done');if(M[S.mission]&&M[S.mission].ne
   else if(last&&CALL==='fl'){h+=flDebrief();record();}
   else if(last&&CALL==='cb'){h+=cbDebrief();record();}
   else if(last&&CALL==='dm'){h+=dmDebrief();record();}
+  else if(last&&CALL==='pd'){h+=pdDebrief();record();}
   else if(last){h+=arrestDebrief();record();}
   if(last&&V.label)h=`<p style="font-size:15px;margin:4px 0 8px"><b>This patient:</b> ${esc(V.label)}</p>`+h;
   if(last)h+=timelineHTML();
@@ -1056,8 +1071,8 @@ function arrestDebrief(){const out=`<div class="mrow"><span>Outcome</span><b sty
   return `<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':V.shock===false?'no shockable rhythm':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Resuscitation on scene',mmss(Math.max(0,onScene))+`  (${COUNTY.name}: about ${COUNTY.torMin} min, then the medic consults)`]].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+out+`</div>`+plain;}
 /* ================= render ================= */
 let wave=[],phase=0;
-function render(){if(FF_ON)return;if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}if(CALL==='cb'){renderCB();return;}if(CALL==='dm'){renderDM();return;}
-  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
+function render(){if(FF_ON)return;if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}if(CALL==='cb'){renderCB();return;}if(CALL==='dm'){renderDM();return;}if(CALL==='pd'){renderPD();return;}
+  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));XG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
   ODG.forEach(i=>$(i).classList.add('hidden'));$('fattrack').classList.remove('hidden');$('mon-mode').style.color='';
   ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
   $('clock').textContent=clockStr();$('score').textContent=S.score;
@@ -1114,7 +1129,7 @@ const GUIDE={
  death:{name:'Signs of death and DNRs',what:'Definite signs of death: rigor mortis (stiffness), dependent lividity (color settled to the low side of the body), decomposition, or a body cold to the touch in a warm environment. Supporting context — mail piled up, flies at the windows of a locked house, an odor — is never enough on its own.',when:'Every unwitnessed arrest: look before you start. And on every arrest, ask the family whether there is a DNR.',wrong:'Withholding CPR on clues alone, calling a cold patient dead in a cold environment, or taking a family\'s word for a DNR nobody can produce.',tip:'Definite signs, or a valid DNR produced right away: do not start; notify (the medic confirms and calls the coroner), protect the scene, support the family. Anything less: start CPR. Cold from the weather is not death — not dead until warm and dead. A DNR that turns up mid-resuscitation goes to the medic, who verifies it and decides. When in doubt, start.',mca:'What makes a Michigan DNR valid (the state form, signatures, witnesses) is to confirm with the MCA. Hypothermia guidance is to confirm with the medical director.',rel:['tor','cpr','agonal']},
  bridge:{name:'Transport delays: the river crossings',what:'Monitor Township is on the west side of the Saginaw River; East Side Hospital is across it. The four Bay City drawbridges open for river traffic.',when:'Any transport across the river, especially in boating season.',wrong:'Being surprised by an opening. A bridge going up for a freighter can add minutes.',tip:'Crews can request through dispatch that a bridge be held down for a priority patient. Commercial ships already committed may not be able to wait. Plan your oxygen and your arms for the longer ride.',rel:['o2math']}
 };
-function incidentKey(w){const R=[[/without a binder/i,'pelvis'],[/condition changed|getting worse/i,'shock'],[/signs of death|DNR/i,'death'],[/glucose check|sugar dropped/i,'glucometer'],[/golden minute/i,'golden'],[/newborn left uncovered|lose heat in minutes/i,'nwarm'],[/too fast for a newborn/i,'nppv'],[/head delivered fast/i,'deliver'],[/postpartum hemorrhage/i,'pph'],[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
+function incidentKey(w){const R=[[/tiring|breathe for him/i,'tiring'],[/too fast for a child/i,'pbvm'],[/stridor/i,'croup'],[/without a binder/i,'pelvis'],[/condition changed|getting worse/i,'shock'],[/signs of death|DNR/i,'death'],[/glucose check|sugar dropped/i,'glucometer'],[/golden minute/i,'golden'],[/newborn left uncovered|lose heat in minutes/i,'nwarm'],[/too fast for a newborn/i,'nppv'],[/head delivered fast/i,'deliver'],[/postpartum hemorrhage/i,'pph'],[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
   const d=w.match(/^Decision — (.*)$/);if(d){const k=Object.keys(DEC).find(x=>DEC[x].tag===d[1]);return k?DEC[k].g:null;}for(const [r,k] of R)if(r.test(w))return k;return null;}
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
@@ -1208,7 +1223,7 @@ function tickMVA(dtReal){const m=S.m;const F=S.mission===3?7:3;const dt=dtReal*F
 function renderMVA(){if(FF_ON)return;const m=S.m;if(!m)return;
   $('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals'].forEach(i=>$(i).classList.add('hidden'));
-  ODG.forEach(i=>$(i).classList.add('hidden'));EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
+  ODG.forEach(i=>$(i).classList.add('hidden'));EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));XG.forEach(i=>$(i).classList.add('hidden'));['vitals-mva','mva-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!m.alsMon);
   $('eta-l').textContent=S.mission===3?'Regional Medical Center':'Medic 1';$('eta-v').textContent=S.mission===3?(m.tx.arrived?'Arrived':mmss(m.tx.total-m.tx.t)+' out'):m.alsArr?'On scene':mmss(m.eta)+' out';
   $('mon-name').textContent=m.alsMon?'Monitor':'Vitals — taken by hand';$('mon-mode').textContent=m.survey?(m.ctrl===2?'Bleeding controlled':m.ctrl===1?'Pressure on':'Arterial bleed!'):'—';
   const live=m.alsMon,v=live?mvaV():m.vit;
@@ -1413,7 +1428,7 @@ OX('o-tell').onclick=()=>{if(CALL!=='od')return;const o=S.o,d=detOpen('renarc');
 function triggerWithdrawal(why){const o=S.o;o.withdrawal=true;o.vomit=true;o.gurgle=true;o.recov=false;ding(10,why);radio('You','He\'s up — vomiting, swinging his arms, ripping the mask off! Roll him, suction!','bad');}
 function renderOD(){if(FF_ON)return;const o=S.o;if(!o)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));
-  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
+  EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));XG.forEach(i=>$(i).classList.add('hidden'));['vitals-od','od-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(o.ox&&o.pulse));
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-od-a',S.mission<=1);vis('g-od-b',S.mission<=1||S.mission===3);vis('g-od-n',S.mission<=1||S.mission===3);{const d=detOpen('renarc');$('o-reass').classList.toggle('hot',!!(d&&!d.found));$('o-tell').classList.toggle('hot',!!(d&&d.found&&!d.told&&o.alsArr));$('o-tell').classList.toggle('on',!!(d&&d.told));}vis('g-od-t',S.mission>=2);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(o.tx.arrived?'Arrived':mmss(o.tx.total-o.tx.t)+' out'):o.alsArr?'On scene':mmss(o.eta)+' out';
   $('mon-name').textContent=o.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!o.checked?'—':!o.pulse?'NO PULSE':o.withdrawal?'Agitated':o.rr<10?'Breathing inadequate':'Breathing on his own';$('mon-mode').style.color=!o.pulse||o.rr<10?'#ff8f8a':'';$('fattrack').classList.add('hidden');
@@ -1586,7 +1601,7 @@ function epSyr(){const v=S.e.vol;let g=`<rect x="20" y="16" width="230" height="
   g+=`<rect x="250" y="24" width="30" height="10" fill="#a9b7cc"/><rect x="${20+230*v-3}" y="10" width="6" height="38" fill="#e8eef6"/><line x1="0" y1="29" x2="20" y2="29" stroke="#e8eef6" stroke-width="2"/>`;$('syr').innerHTML=g;}
 function renderEP(){if(FF_ON)return;const e=S.e;if(!e)return;const v=epV();$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG).forEach(i=>$(i).classList.add('hidden'));
-  STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-ep','ep-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!e.ox);$('fattrack').classList.add('hidden');
+  STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));XG.forEach(i=>$(i).classList.add('hidden'));['vitals-ep','ep-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!e.ox);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-ep-a',S.mission!==1||e.doses.length>0);vis('g-ep-m',S.mission>=1);
   $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(e.tx.arrived?'Arrived':mmss(e.tx.total-e.tx.t)+' out'):e.alsArr?'On scene':mmss(e.eta)+' out';
   $('mon-name').textContent=e.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!e.assessed?'—':v.sev>.55?'Worsening':v.sev>.35?'Reacting':'Improving';$('mon-mode').style.color=v.sev>.55?'#ff8f8a':v.sev>.35?'#ffc23d':'';
@@ -1747,7 +1762,7 @@ function tickST(dtReal){const x=S.s;const F=S.mission===3?4:3;const dt=dtReal*F;
   checkMission(dt);renderST();}
 function renderST(){if(FF_ON)return;const x=S.s;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG).forEach(i=>$(i).classList.add('hidden'));
-  FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-st','st-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.ox);$('fattrack').classList.add('hidden');
+  FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));XG.forEach(i=>$(i).classList.add('hidden'));['vitals-st','st-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.ox);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-st-a',S.mission<=1);vis('g-st-b',S.mission<=1);vis('g-st-c',S.mission>=1);
   $('eta-l').textContent=S.mission===3?(V.lvo||x.tx.diverted?'Regional Medical Center':'East Side Hospital'):'Medic 1';$('eta-v').textContent=S.mission===3?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
   $('mon-name').textContent=x.ox?'Pulse oximeter':'No monitor';const n=Object.values(x.bf).filter(Boolean).length;$('mon-mode').textContent=!x.abc?'—':`BE-FAST ${n}/5 checked`;$('mon-mode').style.color=x.sev>.5?'#ff8f8a':'';
@@ -1882,7 +1897,7 @@ function tickFL(dtReal){const x=S.f;const F=S.mission===3?4:3;const dt=dtReal*F;
   checkMission(dt);renderFL();}
 function renderFL(){if(FF_ON)return;const x=S.f;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG).forEach(i=>$(i).classList.add('hidden'));
-  CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-fl','fl-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.vitCount);$('fattrack').classList.add('hidden');
+  CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));XG.forEach(i=>$(i).classList.add('hidden'));['vitals-fl','fl-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.vitCount);$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-fl-a',S.mission<=1);vis('g-fl-c',true);
   $('eta-l').textContent=S.mission===3?(x.tx.diverted?'Regional Medical Center':'East Side Hospital'):'Medic 1';$('eta-v').textContent=S.mission===3?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
   $('mon-name').textContent=x.vitCount?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!x.primary?'—':x.gcs<15?'Mental status changing':'Alert and talking';$('mon-mode').style.color=x.gcs<15?'#ff8f8a':'';
@@ -2052,7 +2067,7 @@ function tickCB(dtReal){const x=S.c;const F=S.mission===0?3:S.mission===1?2:S.mi
   checkMission(dt);renderCB();}
 function renderCB(){if(FF_ON)return;const x=S.c;if(!x)return;$('clock').textContent=clockStr();$('score').textContent=S.score;
   ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG,FLG).forEach(i=>$(i).classList.add('hidden'));
-  DMG.forEach(i=>$(i).classList.add('hidden'));['vitals-cb','cb-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(x.born&&x.hrKnown));$('fattrack').classList.add('hidden');
+  DMG.forEach(i=>$(i).classList.add('hidden'));XG.forEach(i=>$(i).classList.add('hidden'));['vitals-cb','cb-line'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!(x.born&&x.hrKnown));$('fattrack').classList.add('hidden');
   const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('g-cb-m',S.mission!==2);vis('g-cb-b',S.mission===2||(S.mission===3&&!x.sts)||!!x.dusky);
   for(const [id,ms] of [['c-hist',[0]],['c-look',[0]],['c-kit',[0]],['c-warm',[0]],['c-pos',[0]],['c-push',[1]],['c-head',[1]],['c-shoulders',[1]],['c-tob',[1]],['c-massage',[3,4]],['c-nurse',[3,4]],['c-mvitals',[3,4]],['c-reass',[3,4]],['c-tell',[3,4]],['c-heat',[4]]])vis(id,ms.includes(S.mission));
   {const dm=detOpen('mom'),db=detOpen('baby');$('c-reass').classList.toggle('hot',!!((dm&&!dm.found)||(db&&!db.found)));$('c-massage').classList.toggle('hot',!!(dm&&!x.massage));$('c-tell').classList.toggle('hot',!!(x.alsArr&&((dm&&dm.found&&!dm.told)||(db&&db.found&&!db.told))));$('c-heat').classList.toggle('on',!!x.heat);$('b-wrap').classList.toggle('hot',!!(x.dusky&&!x.rewrap));}
@@ -2246,7 +2261,7 @@ function tickDM(dtReal){const x=S.d;const dt=dtReal*3;S.t+=dt;
   if(x.alsArr&&!x.d10&&x.gl<70&&S.t-Math.max(x.alsT,x.toldT!=null?x.toldT-60:-1e9)>(x.ivSet?15:x.toldT!=null?30:60)){x.d10=true;x.d10T=S.t;x.gl=Math.max(x.gl,95);radio('Medic 1','IV is in — dextrose going. Watch him, he\'ll come around fast.','good');}
   checkMission(dt);renderDM();}
 function renderDM(){if(FF_ON)return;const x=S.d;if(!x)return;const v=dmV();$('clock').textContent=clockStr();$('score').textContent=S.score;
-  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG,FLG,CBG).forEach(i=>$(i).classList.add('hidden'));
+  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].concat(ODG,EPG,STG,FLG,CBG,XG).forEach(i=>$(i).classList.add('hidden'));
   ['vitals-dm','dm-line','g-dm'].forEach(i=>$(i).classList.remove('hidden'));$('trace').classList.toggle('hidden',!x.vit);$('fattrack').classList.add('hidden');
   $('eta-l').textContent='Medic 1';$('eta-v').textContent=x.alsArr?'On scene':mmss(x.eta)+' out';
   $('mon-name').textContent=x.vit?'Pulse oximeter':'No monitor';$('mon-mode').textContent=!x.abc?'—':v.gcs>=15?'Alert and oriented':v.gcs>=13?'Confused, slurring':'Not following commands';$('mon-mode').style.color=v.gcs<15?'#ff8f8a':'';
@@ -2344,6 +2359,240 @@ function dmDebrief(){const x=S.d;const rows=[['Glucose checked',x.firstGluT!==nu
   return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:15px;color:var(--soft);margin-top:10px">${msg}</p>`;}
 
 /* ===== balanced answer text: the right answer shouldn't be the longest one ===== */
+/* ================= Pediatric breathing: "My son can't breathe" (0.28.0) =================
+   A 4-year-old at 2 a.m., croup or asthma. Look before you touch, keep him calm on a parent's lap, oxygen he will accept
+   (blow-by), assist with his OWN in-date inhaler only (Bay County MFR scope, Max, October 7, 2026; pending MCA review),
+   and recognize the tiring child: quiet and sleepy is worse, and the response is bag-mask, one breath every 2 to 3 real seconds. */
+const XG=[];
+const PDG=['vitals-pd','pd-line','g-pd-a','g-pd-i','g-pd-b','g-pd-t'];XG.push(...PDG);
+function freshPD(){const cr=V.kind==='croup';return {door:null,what:null,hist:false,listen:false,ox:false,calm:false,calmT:null,o2:null,
+  agit:cr?.5:.35,crSev:cr?.55:0,sev:cr?0:(V.tire?.72:.58),fat:0,tired:false,tireFired:false,forceTire:false,assisted:false,tireFoundT:null,
+  spo2:cr?94:92,lowSpo2:cr?94:92,below90:0,hypoDing:false,upsets:0,
+  label:false,date:false,inhDec:null,inhDecT:null,spacer:false,puffs:0,puffT:null,puffEff:0,trapUsed:false,reassAfter:false,
+  bvm:false,lastBreathRt:-99,lastEffRt:-99,good:0,hyper:0,late:0,firstBagT:null,
+  act:null,eta:540,alsArr:false,alsT:null,toldT:null,medTx:false,medTxT:null,loaded:false,
+  tx:{t:0,total:480,arrived:false,reass:0,lastReass:-999},chaos:{eta:false,upset:false,tire:false}};}
+function pdV(){const x=S.p,cr=V.kind==='croup',ag=x.agit;let rr,hr,sound,words,wob;
+  if(cr){const s=x.crSev*(.55+ag);rr=28+24*s;hr=118+40*ag+20*s;sound=s>.45?'stridor at rest':'stridor when he cries';words=s>.6?'a word or two':'short sentences';wob=s>.45?'pulling in at his neck and ribs':'a little pulling in at the neck';}
+  else{const s=x.sev;rr=26+26*s;hr=120+40*s+15*ag;sound=s>.6?'a tight wheeze in and out':s>.3?'wheezing out loud':'a faint wheeze at the end of each breath';words=s>.55?'one or two words':s>.3?'short phrases':'full sentences';wob=s>.45?'pulling in between his ribs, leaning forward on his hands':'a little pulling in at the ribs';}
+  if(x.fat>.05){rr*=1-.55*x.fat;if(x.fat>.2){sound='quiet — barely moving air';words='none — too tired to talk';wob='less effort than before';}}
+  const ment=x.fat>.2?'sleepy, hard to keep awake':ag>.6?'scared and crying':'awake, watching you';
+  return {rr:Math.round(rr),hr:Math.round(hr),spo2:Math.round(x.spo2),sound,words,wob,ment};}
+function pdBase(){const x=S.p,cr=V.kind==='croup';let b=cr?98-14*Math.max(0,x.crSev*(.55+x.agit)-.3):98-16*Math.max(0,x.sev-.15);
+  if(x.o2==='blowby')b+=3;else if(x.o2==='mask')b+=5;b-=32*x.fat;return Math.min(99,b);}
+const pdVent=()=>S.p.bvm&&S.rt-S.p.lastEffRt<5;
+/* something upset him: crying narrows a croup airway; the asthmatic just works harder */
+function pdUpset(k,msg){const x=S.p;x.agit=Math.min(1,x.agit+k);if(msg)radio('Mom',msg,'bad');if(V.kind==='croup'&&x.agit>.7&&!detOpen('upset')){x.upsets++;x.calm=false;detFire('upset');}}
+function pdTire(){const x=S.p;if(!x.tireFired||!detOpen('tiring')){x.tireFired=true;x.tired=true;detFire('tiring');radio('Mom','He\'s getting so sleepy… he\'s finally calming down, right?','bad');}}
+const PX=k=>$(k);
+function pdNeed(){if(!S.p.door){radio('Partner','Look first — from the door.','bad');return true;}return false;}
+PX('p-calm').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed())return;if(x.calm&&x.agit<.35&&!detOpen('upset'))return;x.calm=true;x.calmT=x.calmT===null?S.t:x.calmT;x.agit=Math.max(.15,x.agit-.15);detAct('p-calm');
+  radio('You','Down on one knee, quiet voice, lights low, TV off. Mom keeps him on her lap, sitting up, and rocks him.');};
+PX('p-hist').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.hist||x.act)return;x.act={k:'hist',t:10};radio('You','Mom, tell me what happened tonight — any asthma, any medicines?');};
+PX('p-listen').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.act)return;x.act={k:'listen',t:10};};
+PX('p-reass').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.act)return;if(!x.listen){radio('Partner','Listen and count first.');return;}x.act={k:'reass',t:8};};
+PX('p-ox').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.ox)return;x.ox=true;
+  if(!x.calm){radio('You','Probe on his big toe, Mom holding his foot.');pdUpset(.3,'He\'s kicking and screaming at it — listen to him!');}else radio('You','Probe on his big toe while Mom talks to him — he barely notices.');};
+PX('p-o2b').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed())return;if(x.o2==='blowby'&&!detOpen('upset'))return;x.o2='blowby';detAct('p-o2b');radio('You','Oxygen at 10, Mom holds the mask a couple of inches from his face — nothing strapped on.');};
+PX('p-o2m').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.o2==='mask')return;
+  if(x.agit>=.35){pdUpset(.35,'He\'s fighting it — he ripped it off!');radio('You','He won\'t keep the mask on.','bad');return;}x.o2='mask';radio('You','Pediatric mask on, he\'s letting it stay. Oxygen at 10.');};
+PX('p-label').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.label||x.act)return;x.act={k:'label',t:4};};
+PX('p-date').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.date||x.act)return;x.act={k:'date',t:4};};
+PX('p-spacer').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.spacer)return;if(x.inhDec!=='good'||V.inh!=='own'){radio('Partner','Not with that inhaler.','bad');return;}x.spacer=true;radio('You','Shook it, spacer on, the child mask on the spacer.');};
+PX('p-puff').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.act)return;if(x.inhDec===null){radio('Partner','Whose is it, and is it in date? Check before anything.','bad');return;}if(x.inhDec!=='good'||V.inh!=='own'){radio('Partner','Not with that inhaler.','bad');return;}
+  if(!x.spacer){radio('Partner','Spacer first — he can\'t time a puff on his own.','bad');return;}if(x.puffT!==null&&S.t-x.puffT<240){radio('Partner','He just had it. Give it time, then reassess.');return;}
+  x.act={k:'puff',t:20};radio('You','Mom holds him, the mask snug on the spacer: one puff, six slow breaths… a second puff, six more.');};
+PX('p-bvm').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed()||x.bvm)return;
+  if(!x.tired){pdUpset(.4,'He\'s screaming — he doesn\'t want that on his face!');radio('Partner','He\'s breathing on his own — he fights the bag. Blow-by instead.','bad');return;}
+  x.bvm=true;detAct('p-bvm');radio('You','On the floor beside Mom, towel under his shoulders. Child bag, right-size mask, oxygen at 15 on the bag.');};
+PX('p-breath').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(pdNeed())return;if(!x.bvm){radio('Partner','Bag-mask first.','bad');return;}
+  const iv=S.rt-x.lastBreathRt;x.lastBreathRt=S.rt;x.lastEffRt=S.rt;if(x.firstBagT===null)x.firstBagT=S.t;detAct('p-breath');
+  if(iv<1.5){x.hyper++;if(x.hyper%3===1)ding(3,'Bagging too fast for a child — one breath every 2 to 3 seconds, just until the chest rises');}else if(iv<=4.5)x.good++;else{x.late++;if(iv>6&&iv<900)radio('Partner',`That one was ${Math.round(iv)} seconds late — one every 2 to 3.`);}};
+PX('p-tell').onclick=()=>{if(CALL!=='pd')return;const x=S.p,d=detOpen('tiring')||detOpen('upset');if(!x.alsArr){radio('You','Medic 1 isn\'t here yet. He\'s ours for now.');return;}if(!d){radio('Medic 1','Thanks. Keep watching him.');return;}if(d.told)return;
+  const v=pdV();if(x.toldT===null)x.toldT=S.t;else x.toldT=Math.min(x.toldT,S.t);
+  radio('You',d.id==='tiring'?`He's tiring out: sleepy, breathing ${v.rr}, barely moving air, SpO₂ ${v.spo2}. I'm bagging him every 2 to 3 seconds.`:`His stridor is at rest now — he got upset. SpO₂ ${v.spo2}, pulling in at the neck.`);
+  radio('Medic 1',d.id==='tiring'?'Keep bagging — I\'m putting the neb inline with your bag.':'Keep him on Mom. I\'m setting up a neb.','good');detAct('p-tell');};
+PX('p-load').onclick=()=>{if(CALL!=='pd')return;const x=S.p;if(S.mission!==2||x.loaded||x.act||S.briefing)return;x.act={k:'load',t:12};radio('You','Mom sits on the cot, he\'s buckled into the child restraint sitting up, oxygen with him. Power load.');};
+function pdRef(){const x=S.p;return Math.max(x.puffT!==null?x.puffT:-1e9,x.inhDecT!==null?x.inhDecT:-1e9,x.calmT!==null?x.calmT:-1e9,S.mStart||0);}
+function tickPD(dtReal){const x=S.p;const F=S.mission===3?4:3;const dt=dtReal*F;S.t+=dt;const cr=V.kind==='croup';
+  if(x.act){x.act.t-=dt;if(x.act.t<=0){const k=x.act.k;x.act=null;const v=pdV();
+    if(k==='hist'){x.hist=true;radio('Mom',cr?'He\'s had a cold for two days. Tonight he woke up with this barking cough and that noise when he breathes in. A low fever. No asthma, no allergies, nothing he could have swallowed.':
+      V.inh==='sibling'?'He has asthma, but his inhaler ran out last week and I didn\'t get it refilled. He\'s had a cold. His brother has an inhaler in the bathroom.':
+      V.inh==='expired'?'He has asthma. His inhaler is in the drawer — we haven\'t needed it in a long time. He\'s had a cold.':'He has asthma. His inhaler and the spacer are right here in my purse. He\'s had a cold and it started about an hour ago and kept getting worse.');}
+    if(k==='listen'){x.listen=true;radio('You',`Breathing ${v.rr}, ${v.sound}, ${v.wob}. He can say ${v.words}. ${v.ment[0].toUpperCase()+v.ment.slice(1)}.`);pdFind();}
+    if(k==='reass'){radio('You',`Reassess: breathing ${v.rr}, ${v.sound}, he can say ${v.words}, ${v.ment}${x.ox?', SpO₂ '+v.spo2:''}.`);detAct('p-reass');pdFind();
+      if(S.mission===1&&S.t-pdRef()>=120)x.reassAfter=true;if(S.mission===3&&S.t-x.tx.lastReass>=60){x.tx.lastReass=S.t;x.tx.reass++;}}
+    if(k==='label'){x.label=true;radio('You',V.inh==='sibling'?'Label: his brother Jacob\'s name, albuterol, Jacob\'s doctor. It isn\'t his.':'Label: his name, albuterol, his doctor.',V.inh==='sibling'?'bad':'');}
+    if(k==='date'){x.date=true;radio('You',V.inh==='expired'?'Expired — last April.':'Expires next August — in date.',V.inh==='expired'?'bad':'');}
+    if(k==='puff'){x.puffs++;x.puffT=S.t;x.puffEff+=V.tire?.12:.28;radio('You','Two puffs in through the spacer at '+clockStr()+'. I\'ll tell the medic the time.');}
+    if(k==='load'){x.loaded=true;}}}
+  /* agitation drifts toward calm only when someone is calming him */
+  const tgt=x.calm?.2:.45;x.agit+=(tgt-x.agit)*Math.min(1,dt/50);
+  if(cr){x.crSev=Math.min(.9,x.crSev+.00015*dt);if(x.agit>.7&&x.listen&&!detOpen('upset')){x.upsets++;x.calm=false;detFire('upset');}}
+  else{const before=x.sev;if(x.puffEff>0){const d=Math.min(x.puffEff,.0035*dt);x.sev-=d;x.puffEff-=d;}else if(!x.medTx&&x.puffs===0)x.sev=Math.min(.85,x.sev+.0004*dt);x.sev=Math.max(.08,x.sev);}
+  /* the medic's nebulizer, per Medstar/MMR protocol */
+  if(x.alsArr&&x.toldT!==null&&!x.medTx&&S.t-x.toldT>=60){x.medTx=true;x.medTxT=S.t;radio('Medic 1',cr?'Nebulized epinephrine and a steroid going, per Medstar/MMR protocol.':'Nebulized albuterol going, per Medstar/MMR protocol.','good');}
+  if(x.medTx){if(cr)x.crSev=Math.max(.15,x.crSev-.0025*dt);else x.sev=Math.max(.12,x.sev-.0025*dt);}
+  /* the tiring child */
+  if(!cr){if(TIER===2&&!x.chaos.tire&&S.t>360&&!x.tireFired){x.chaos.tire=true;x.forceTire=true;}
+    const grow=(V.tire||x.forceTire)&&!x.assisted&&(x.sev>.42||x.forceTire)&&S.t>300;
+    if(pdVent()){x.fat=Math.max(0,x.fat-.003*dt);if(x.good+x.late>=6)x.assisted=true;}else if(grow)x.fat=Math.min(.7,x.fat+.004*dt);
+    if(x.medTx&&x.sev<.35)x.fat=Math.max(0,x.fat-.004*dt);
+    if(x.fat>=.22&&!x.tireFired)pdTire();
+    if(x.tired&&x.fat<.15){x.tired=false;radio('You','He\'s pinking up and pushing the mask away — breathing on his own again. Back to blow-by on Mom\'s lap.','good');x.bvm=false;x.o2='blowby';}}
+  else if(TIER===2&&!x.chaos.upset&&S.t>200&&x.listen){x.chaos.upset=true;pdUpset(.5,'The dog started barking and he\'s panicking!');}
+  /* oxygen */
+  let tg=pdBase();if(pdVent())tg=Math.max(tg,96);x.spo2+=(tg-x.spo2)*Math.min(1,dt/25);x.lowSpo2=Math.min(x.lowSpo2,x.spo2);
+  if(x.spo2<90&&x.tired&&!pdVent()){x.below90+=dt;if(x.below90>120&&!x.hypoDing){x.hypoDing=true;ding(10,'Over two minutes below 90% oxygen — a tiring child needs you to breathe for him');}}
+  /* ALS */
+  if(!x.alsArr){x.eta-=dt;if(TIER===2&&!x.chaos.eta&&S.t>150){x.chaos.eta=true;x.eta+=120;radio('Dispatch','Medic 1 delayed — plus two minutes.','bad');medDelayFire();}if(x.eta<=0){x.alsArr=true;x.alsT=S.t;radio('Medic 1','Medic 1 inside — what have we got?','good');}}
+  if(S.mission===3&&!S.briefing){x.tx.t+=dt;if(!x.tx.arrived&&x.tx.t>=x.tx.total){x.tx.arrived=true;radio('EMT','East Side Hospital — the pediatric team is waiting.','good');}}
+  checkMission(dt);renderPD();}
+/* a reassessment during a deterioration finds it */
+function pdFind(){const x=S.p,v=pdV();if(detOpen('tiring')&&x.fat>.2){if(detFind('tiring',`He's tiring out: sleepy, breathing slower at ${v.rr}, the chest is quiet, SpO₂ ${v.spo2} and falling.`)&&x.tireFoundT===null)x.tireFoundT=S.t;}
+  if(detOpen('upset')&&V.kind==='croup')detFind('upset',`Stridor at rest now, ${v.wob} — he's upset and it's worse. SpO₂ ${v.spo2}.`);}
+function renderPD(){if(FF_ON)return;const x=S.p;if(!x)return;const v=pdV(),cr=V.kind==='croup';$('clock').textContent=clockStr();$('score').textContent=S.score;
+  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx','g-mshock'].concat(ODG,EPG,STG,FLG,CBG,DMG,XG).forEach(i=>$(i).classList.add('hidden'));
+  const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('vitals-pd',true);vis('pd-line',true);vis('g-pd-a',true);vis('g-pd-i',!cr&&S.mission>=1);vis('g-pd-b',x.listen);vis('g-pd-t',S.mission>=2);
+  $('trace').classList.toggle('hidden',!x.ox);$('fattrack').classList.add('hidden');
+  $('eta-l').textContent=S.mission===3?'East Side Hospital':'Medic 1';$('eta-v').textContent=S.mission===3?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
+  $('mon-name').textContent=x.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=x.door?v.ment:'—';$('mon-mode').style.color=x.fat>.2||x.agit>.6?'#ff8f8a':'';
+  $('pv-rr').textContent=x.listen?v.rr:'—';$('pv-spo2').textContent=x.ox?v.spo2:'—';$('pv-hr').textContent=x.ox?v.hr:'—';$('pv-words').textContent=x.listen?(x.fat>.2?'none':v.words.replace('a word or two','1–2').replace('one or two words','1–2').replace('short phrases','phrases').replace('short sentences','sentences').replace('full sentences','sentences')):'—';
+  $('pv-sound').textContent=x.listen?v.sound[0].toUpperCase()+v.sound.slice(1):'Not assessed';$('pv-age').textContent=pdVent()?'bagging':x.o2?(x.o2==='blowby'?'blow-by O₂':'mask O₂'):'';
+  const up=detOpen('upset'),ti=detOpen('tiring');
+  for(const [id,on] of [['p-calm',x.calm&&x.agit<.35&&!up],['p-hist',x.hist],['p-listen',x.listen],['p-ox',x.ox],['p-o2b',x.o2==='blowby'&&!up],['p-o2m',x.o2==='mask'],['p-label',x.label],['p-date',x.date],['p-spacer',x.spacer],['p-bvm',x.bvm],['p-load',x.loaded]])$(id).classList.toggle('on',on);
+  $('p-reass').classList.toggle('hot',!!((ti&&!ti.found)||(up&&!up.found)));$('p-tell').classList.toggle('hot',!!(((ti&&ti.found&&!ti.told)||(up&&up.found&&!up.told))&&x.alsArr));
+  $('p-breath').classList.toggle('hidden',!x.bvm);$('p-breath').classList.toggle('hot',x.bvm&&x.tired&&S.rt-x.lastBreathRt>=2.5);$('p-bvm').classList.toggle('hot',!!(ti&&ti.found&&!x.bvm));
+  $('p-spacer').classList.toggle('hidden',V.inh!=='own'||x.inhDec!=='good');$('p-puff').classList.toggle('hidden',V.inh!=='own'||x.inhDec!=='good');$('p-listen').textContent=x.act&&x.act.k==='listen'?'Listening…':'Listen and count: breathing, sounds, words';
+  $('p-btxt').textContent=x.bvm?`Last breath ${Math.round(Math.max(0,S.rt-x.lastBreathRt))}s ago · ${x.good} on time${x.hyper?` · ${x.hyper} too fast`:''}`:'';
+  $('p-itxt').textContent=x.puffs?`His inhaler: ${x.puffs} treatment${x.puffs>1?'s':''}, last ${mmss(S.t-x.puffT)} ago`:x.inhDec==='good'&&V.inh!=='own'?'Not used — it isn\'t his to use':'';$('p-load').classList.toggle('hot',S.mission===2&&!x.loaded&&x.alsArr);}
+function M_PD(){const cr=V.kind==='croup';return [
+ {title:'The doorway',sub:'Look before you touch.',
+  brief:'2:04 a.m. A 4-year-old boy on his mother\'s lap on the living room couch. She says he woke up and can\'t breathe. Medic 1 is nine minutes out. You have pediatric masks, a child-size bag-mask, oxygen and a pulse oximeter.',
+  skills:['pat','epiglottitis','blowby'],
+  steps:[{t:'Decision: what you see from the doorway',dec:'pdDoor',f:()=>true},
+   {t:'Calm: Mom holds him, you get down to his level',f:()=>S.p.calm},
+   {t:'History from Mom',f:()=>S.p.hist},{t:'Listen and count: breathing, sounds, words',f:()=>S.p.listen},
+   {t:'Pulse oximeter on his toe, gently',f:()=>S.p.ox},{t:'Oxygen he will accept',f:()=>S.p.o2!==null},
+   {t:'Decision: what is this?',dec:'pdWhat',f:()=>S.p.listen&&S.p.hist}]},
+ cr?{title:'Calm is the treatment',sub:'Every cry makes the airway smaller.',
+  brief:'His airway is swollen just below the vocal cords. Crying makes it worse and calm makes it better. Keep him upright on Mom\'s lap with oxygen near his face, leave his throat alone, and watch for a child who is getting tired.',
+  skills:['croup','epiglottitis','tiring'],
+  steps:[{t:'He settles on Mom\'s lap',wait:true,f:()=>S.p.calm&&S.p.agit<.35},
+   {t:'Decision: "Can you look in his throat?"',dec:'pdThroat',f:()=>true},
+   {t:'Reassess a few minutes later',wait:true,act:true,f:()=>S.p.reassAfter},
+   {t:'Decision: the cough syrup',dec:'pdSyrup',f:()=>S.p.reassAfter}]}:
+ {title:'His inhaler',sub:'Only his own, only in date.',
+  brief:'Mom hands you an inhaler. Bay County MFRs may assist a patient in taking their own prescribed inhaler (MCA review pending). Whose name is on it, and is it in date? Check before anything else.',
+  skills:['inhaler','pasthma','tiring'],
+  steps:[{t:'Read the label: whose name, what medicine',f:()=>S.p.label},{t:'Check the expiration date',f:()=>S.p.date},
+   {t:'Decision: the inhaler',dec:'pdInh',f:()=>S.p.label&&S.p.date},
+   {t:'If it\'s his and in date: spacer, then help him take it',f:()=>V.inh!=='own'||S.p.inhDec!=='good'||S.p.puffs>0},
+   {t:'Reassess a few minutes later',wait:true,act:true,f:()=>S.p.reassAfter},
+   {t:'Decision: the cough syrup',dec:'pdSyrup',f:()=>S.p.reassAfter}]},
+ {title:'Medic 1',sub:'Hand off what you saw and what changed.',
+  brief:'Medic 1 is pulling up. Give a short, complete handoff, then get him and Mom to the ambulance with him sitting up.',
+  skills:['handoff','tiring'],
+  steps:[{t:'Medic 1 arrives',wait:true,f:()=>S.p.alsArr},{t:'Decision: handoff to Medic 1',dec:'pdHand',f:()=>S.p.alsArr},
+   {t:'Decision: how he rides',dec:'pdRide',f:()=>S.p.alsArr},{t:'Onto the cot with Mom · power load',gate:()=>S.p.alsArr,f:()=>S.p.loaded}]},
+ {title:'The ride in',sub:'Keep watching him.',
+  brief:'East Side Hospital is about eight minutes away, across the river. Reassess on the way: how he looks, his breathing, his words, SpO₂.',
+  skills:['tiring','pbvm'],
+  steps:[{t:'Reassess on the way (twice)',wait:true,act:true,f:()=>S.p.tx.reass>=2},{t:'Arrive at East Side Hospital',wait:true,f:()=>S.p.tx.arrived}]}];}
+Object.assign(DEC,{
+ pdDoor:{tag:'Look before you touch',q:'You reach the living room doorway. He\'s on his mother\'s lap on the couch, and you can hear him from here. What do you do first?',
+  opts:[{t:'Stop at the door: how he looks, how hard he breathes, his color',r:'good',why:'Ten seconds from the door tells you how sick he is before you scare him: appearance, work of breathing, color.'},
+        {t:'Go right to him, lay him on the couch and listen to his chest',r:'bad',why:'Laying a child down and handling him first makes him cry, and crying makes a narrow airway narrower.'},
+        {t:'Ask his mom to carry him over to you under the kitchen light',r:'partial',why:'You\'d see him better, but moving him upsets him. Look from where you are first, then go to him.'}],
+  why:'Look before you touch: how he looks, how hard he works to breathe, and his color. Red flags for epiglottitis: drooling, a high fever, sitting bolt upright leaning forward, looking very sick. With any of them, keep him calm, nobody examines the throat, and tell the medic right away.',g:'pat',
+  after:()=>{const x=S.p;x.door=S.lastChoice;if(S.lastChoice!=='good')pdUpset(S.lastChoice==='bad'?.35:.2);
+    radio('You',V.kind==='croup'?'From the door: awake, scared, clinging to Mom. A barking cough like a seal, and a high-pitched noise breathing in when he cries. Pink. No drooling, sitting back against her.':
+      V.tire?'From the door: sitting bolt upright, leaning forward on his hands, breathing fast, the skin sucking in between his ribs. A wheeze I can hear from here. He only gets out a word at a time. Pale. No drooling.':
+      'From the door: sitting up, leaning forward, breathing fast, pulling in between the ribs. A wheeze I can hear from here. He talks in short phrases. Pink. No drooling.');}},
+ pdWhat:{tag:'Croup or asthma',q:()=>`He's ${pdV().words==='full sentences'?'talking':'working hard'}: ${pdV().sound}. Mom has told you his history. What is this most likely?`,
+  optsFn:()=>V.kind==='croup'?[
+    {t:'Croup: a barking cough, and stridor that gets worse when he cries',r:'good',why:'A cold, then a barking cough and stridor at night, worse when he\'s upset: croup.'},
+    {t:'Asthma: find an inhaler in the house and give him a couple of puffs',r:'bad',why:'There\'s no wheeze and no asthma history, and an inhaler that isn\'t his is never yours to give.'},
+    {t:'Something stuck: sweep his mouth with a finger to check for it',r:'partial',why:'A foreign body belongs on the list, but Mom says nothing was swallowed, and a blind finger sweep can push it deeper.'}]:[
+    {t:'Asthma: wheezing, working hard to breathe, and a known history',r:'good',why:'A wheeze, a long breath out, pulling in at the ribs, and a history of asthma.'},
+    {t:'Croup: keep him calm and wait for the medic, there\'s nothing more',r:'bad',why:'It\'s a wheeze, not a bark, and there is something more: oxygen, and his own inhaler if it checks out.'},
+    {t:'A bad cold: sit him in a steamy bathroom to loosen it all up',r:'partial',why:'He has a cold, but this is an asthma attack. Steam won\'t open his airways.'}],
+  why:'Croup barks and makes stridor breathing in; asthma wheezes breathing out. Both get oxygen and calm. Only asthma gets an inhaler, and only the child\'s own.',g:'croup',after:()=>{S.p.what=S.lastChoice;}},
+ pdThroat:{tag:'Leave the throat alone',q:'Mom: "Can you look in his throat? Maybe something\'s stuck in there."',
+  opts:[{t:'No — nobody looks in his throat; keep him calm and upright',r:'good',why:'Looking in the throat of a child with stridor can make him cry, gag, or worse. It changes nothing you would do.'},
+        {t:'Get a tongue depressor and a flashlight and take a quick look',r:'bad',why:'A tongue depressor in a swollen airway can trigger a spasm that closes it, and with epiglottitis it can be deadly.'},
+        {t:'Ask him to open his mouth wide on his own so you can peek in',r:'partial',why:'Gentler, but it still upsets him and tells you nothing that changes the plan.'}],
+  why:'With stridor, nobody examines the throat in the field. If you see drooling, a high fever, or a child sitting bolt upright leaning forward, think epiglottitis: calm, upright, oxygen, and the medic right away.',g:'epiglottitis'},
+ pdInh:{tag:'Only his own inhaler',q:()=>V.inh==='sibling'?'The label has his brother Jacob\'s name on it. Albuterol, in date. Mom: "It\'s the same medicine — just use it!"':V.inh==='expired'?'It\'s his: his name, albuterol. It expired last April. Mom: "It\'s all we have."':'It\'s his: his name, albuterol, in date, and the spacer is with it. What now?',
+  optsFn:()=>V.inh==='sibling'?[
+    {t:'Not this one: it\'s his brother\'s. Oxygen, calm, and tell the medic',r:'good',why:'You may assist a patient with their own prescribed inhaler. His brother\'s is not his, whatever is inside it.'},
+    {t:'Use it — it\'s the same medicine, and he needs it right now',r:'bad',why:'It isn\'t his, so it isn\'t yours to help with. Oxygen and the medic, who carries the same medicine.'},
+    {t:'Call his doctor\'s after-hours line and ask if it\'s all right',r:'partial',why:'Kind, but slow, and the answer for you doesn\'t change: not his, not used. Oxygen and the medic.'}]:V.inh==='expired'?[
+    {t:'Not this one: it\'s expired. Oxygen, calm, and tell the medic',r:'good',why:'An expired canister may not give a dose. Your scope is his own, in-date inhaler. The medic carries the medicine.'},
+    {t:'Use it — expired medicine still works about the same',r:'bad',why:'It may not, and the check is part of assisting: right patient, right medicine, in date. Oxygen and the medic.'},
+    {t:'Use it only if Mom says it worked for him last time',r:'partial',why:'What worked before doesn\'t make an expired canister safe. Oxygen and the medic.'}]:[
+    {t:'It\'s his and in date: spacer on, and help him take it with Mom',r:'good',why:'His own, the right medicine, in date: help him take it through the spacer, with Mom holding him. Then reassess.'},
+    {t:'Squirt two puffs straight into his mouth while he\'s crying',r:'bad',why:'A 4-year-old can\'t time a puff, and a crying child gets almost none of it. Use the spacer with the mask.'},
+    {t:'Leave it in the bag and wait for the medic to give him a neb',r:'partial',why:'Safe, but his own inhaler would help him now. It\'s in your scope to assist.'}],
+  why:'Bay County MFRs may assist a patient in taking their own prescribed inhaler (MCA review pending): the patient\'s own name, the right medicine, not expired, through a spacer, then reassess and tell the medic the time. Anything else: oxygen, calm, and the medic.',g:'inhaler',
+  after:()=>{const x=S.p;x.inhDec=S.lastChoice;x.inhDecT=S.t;if(S.lastChoice==='bad'){if(V.inh==='own'){x.puffs++;x.puffT=S.t;x.puffEff+=.1;pdUpset(.2,'He\'s screaming — I don\'t think he got any of it.');}else{x.trapUsed=true;x.puffs++;x.puffT=S.t;x.puffEff+=V.inh==='sibling'?.2:.06;radio('You',`Two puffs from ${V.inh==='sibling'?'his brother\'s':'the expired'} inhaler.`,'bad');}}}},
+ pdSyrup:{tag:'Nothing by mouth',q:'Mom: "Should I give him the cough syrup from the cabinet? Or some water?"',
+  opts:[{t:'Not now: nothing by mouth while he\'s working this hard to breathe',r:'good',why:'A child struggling to breathe can choke on liquids, and cough syrup does nothing for this. The hospital decides.'},
+        {t:'Sure — a spoonful of the cough syrup might settle the cough',r:'bad',why:'Cough syrup doesn\'t treat croup or asthma, and swallowing while breathing this hard risks choking.'},
+        {t:'Give him a little water first and see if that helps him',r:'partial',why:'Water won\'t help the airway, and drinking while struggling to breathe risks choking. Nothing by mouth for now.'}],
+  why:'Nothing by mouth for a child in respiratory distress: it doesn\'t help, and it can make him choke or vomit.',g:'pat'},
+ pdHand:{tag:'Pediatric handoff',q:'Medic 1: "What have we got?"',
+  optsFn:()=>[
+    {t:`Age 4, ${V.kind==='croup'?'croup':'asthma'}, how he looked, SpO₂, what he got and when, any change`,r:'good',why:'Age, what it is, what you saw, the numbers, what was given and when, and the trend. The medic can act on every word.'},
+    {t:'He\'s settled down now — probably just a bad cold, nothing much',r:'bad',why:'A settled child can be a tiring child. Give the medic the facts and let them decide.'},
+    {t:'His name, his age, his weight — the rest can wait for the hospital',r:'partial',why:'Weight helps with doses, but the medic needs what you saw, what he got, and how he\'s changed, now.'}],
+  why:'A good pediatric handoff: age and weight, what it is, how he looked from the door, work of breathing and SpO₂, what was given (his inhaler and when), and how he has changed.',g:'handoff',
+  after:()=>{const x=S.p;if(S.lastChoice==='good'&&x.toldT===null)x.toldT=S.t;else if(S.lastChoice!=='good'&&x.toldT===null)x.toldT=S.t+90;}},
+ pdRide:{tag:'How he rides',q:'How does he ride to the hospital?',
+  opts:[{t:'Sitting up in the child restraint on the cot, Mom right beside him',r:'good',why:'Upright is how he breathes best, the restraint keeps him safe in a crash, and Mom keeps him calm.'},
+        {t:'On Mom\'s lap on the bench seat, so she can hold him the whole way',r:'bad',why:'A child held on a lap is not restrained. In a sudden stop no one can hold on to him.'},
+        {t:'Strapped in lying flat on the cot so he can rest on the way',r:'partial',why:'Restrained is right, but lying flat makes breathing harder. Sitting up in the child restraint.'}],
+  why:'A child in breathing trouble rides sitting up, in a proper child restraint, with the parent beside him.',g:'pat'},
+ fam_pd:{tag:'Dad wants to drive',q:'Dad, keys in hand: "I\'ll just drive him in myself — it\'s faster!"',
+  opts:[{t:'He rides with us: oxygen, the medic, a child seat. You come along',r:'good',why:'In the ambulance he has oxygen, a medic and a restraint. In a car he has none of them if he tires out.'},
+        {t:'Go ahead and drive him in yourself — you know the way best',r:'bad',why:'A child who tires out in the back seat has nobody to breathe for him.'},
+        {t:'Let Dad decide; it\'s his son and he knows him better than us',r:'partial',why:'It is his son, so explain why the ambulance is safer and bring him along.'}],
+  why:'Families want to help. Give them the reason and a job: the ambulance carries oxygen and someone who can breathe for him.'}
+});
+Object.assign(GUIDE,{
+ pat:{name:'Look before you touch (children)',what:'From the doorway, three things tell you how sick a child is: how he looks (alert and watching you, or floppy, sleepy and not interested), how hard he works to breathe (noises, pulling in at the neck or between the ribs, nostrils flaring, leaning forward on his hands), and his color (pink, pale, mottled, blue).',when:'Every sick child, before you touch them.',wrong:'Walking straight in and handling the child. A scared child cries, and a crying child with a narrow airway gets worse.',tip:'Kneel to their level, talk to the parent first, let the parent hold the child, and touch last.',rel:['croup','pasthma','tiring']},
+ croup:{name:'Croup',what:'A viral swelling of the airway just below the vocal cords, most common in young children. A barking, seal-like cough, a hoarse voice, and stridor (a high-pitched noise breathing in), often worse at night and when the child is upset.',when:'A child with a cold who wakes up barking.',wrong:'Upsetting the child: forcing a mask, laying them down, looking in the throat. Crying makes the swelling and the stridor worse.',tip:'Calm is the treatment you carry: on the parent\'s lap, sitting up, blow-by oxygen. Stridor at rest, drooling, or a tiring child: tell the medic right away. Medications are the medic\'s, per protocol.',mca:'Medic treatments (nebulized epinephrine, steroids) are per Medstar/MMR protocol. Pending MCA review.',rel:['epiglottitis','blowby','tiring']},
+ epiglottitis:{name:'Epiglottitis: the red flags',what:'A rare but deadly infection that swells the flap above the vocal cords. The red flags: drooling because it hurts to swallow, a high fever, sitting bolt upright and leaning forward with the chin out, and looking very sick, usually with little or no barking cough.',when:'Any child with stridor and those signs.',wrong:'Looking in the throat, laying the child down, or forcing a mask. Any of them can close the airway completely.',tip:'Keep them calm and upright on the parent, blow-by oxygen, nobody examines the throat, and tell the medic right away.',rel:['croup','pat']},
+ pasthma:{name:'Asthma attack in a child',what:'The small airways tighten and swell. Wheezing, a long breath out, fast breathing, pulling in at the ribs, sitting up and leaning forward, talking in short phrases or single words.',when:'A child with asthma, often after a cold, who can\'t catch their breath.',wrong:'Being reassured by a quiet chest. When a child is too tired to move air, the wheeze fades: quiet and sleepy is worse, not better.',tip:'Count the words per breath and watch the effort. Oxygen, sitting up, his own inhaler with a spacer if it checks out, then reassess.',rel:['inhaler','tiring','blowby']},
+ inhaler:{name:'Assisting with a patient\'s own inhaler',what:'Bay County MFRs may assist a patient in taking their own prescribed inhaler. You are helping the patient take their own medicine, not giving a drug from your kit.',when:'A patient in an asthma attack with an inhaler prescribed to them.',wrong:'Using a brother\'s or sister\'s inhaler, or an expired one, because "it\'s the same medicine." It isn\'t the patient\'s, so it isn\'t yours to help with, and an expired canister may not give a dose.',tip:'Check the patient\'s own name, the right medicine, and the date. Shake it, use a spacer (with a mask for a small child), let the parent help, then slow breaths. Note the time, reassess, and tell the medic.',mca:'Bay County scope (Max, October 7, 2026): MFRs may assist a patient with their own prescribed inhaler. Pending MCA review; follow your protocol for the number of puffs and repeats.',rel:['pasthma','tiring']},
+ blowby:{name:'Oxygen for a child: blow-by',what:'Holding the oxygen mask or tubing a couple of inches from the child\'s face with the oxygen flowing, so they breathe it in without anything strapped on. A parent holding it works best.',when:'A scared child in breathing trouble who won\'t keep a mask on.',wrong:'Strapping a mask onto a crying child. The fight costs more than the oxygen gives.',tip:'Let the parent hold it near the nose and mouth and keep it there. Switch to a pediatric mask only if the child accepts it.',rel:['pat','croup']},
+ tiring:{name:'The tiring child',what:'A child in breathing trouble who is running out of energy: getting quiet and sleepy, breathing slower, less effort, a quieter chest, falling oxygen. It often comes right before they stop breathing.',when:'Any child who has been working hard to breathe and suddenly seems calmer or sleepy.',wrong:'Mistaking it for improvement.',tip:'Sleepy, slower and quieter means breathe for them: bag-mask with oxygen, one breath every 2 to 3 seconds, just until the chest rises. Tell the medic now.',rel:['pbvm','pasthma','croup']},
+ pbvm:{name:'Bag-mask for a child',what:'The child-size bag and a mask that covers the nose and mouth without pressing on the eyes, with oxygen at 15 on the bag.',when:'A child who isn\'t breathing well enough: too slow, too shallow, or too tired.',wrong:'Squeezing too hard or too fast. Over-bagging fills the stomach and brings on vomiting.',tip:'One breath every 2 to 3 seconds for a child with a pulse, each one just until the chest rises. A small towel under the shoulders helps keep the airway open.',rel:['tiring']}
+});
+DELAY_TAIL.pd='He\'s still yours, on Mom\'s lap.';
+VARIANTS.pd=()=>Object.assign({sub:[]},pickW([{w:30,kind:'croup',inh:null,tire:false,label:'Croup — barking cough, stridor when upset'},{w:24,kind:'asthma',inh:'own',tire:false,label:'Asthma — his own inhaler and spacer, in date'},{w:12,kind:'asthma',inh:'sibling',tire:false,label:'Asthma — the only inhaler is his brother\'s (not his to use)'},{w:12,kind:'asthma',inh:'expired',tire:false,label:'Asthma — his own inhaler, expired (not to be used)'},{w:22,kind:'asthma',inh:'own',tire:true,label:'Severe asthma — he tires out and needs breaths'}]));
+FFC.pd={tx:3,re:180,sig:()=>{const x=S.p,v=pdV();return [v.spo2>=94?2:v.spo2>=90?1:0,x.fat>.2,x.agit>.6,x.alsArr,x.medTx].join();},block:()=>S.p.tired,
+ due:()=>{const x=S.p;return S.mission===1&&!x.reassAfter&&!x.act&&S.t-pdRef()>=120;}};
+DET.push(
+ {call:'pd',id:'tiring',src:['natural','inject:worse'],name:'He tires out: quiet, sleepy, slower',find:/tiring out/,
+  acts:[['p-reass','scored'],['p-listen','scored'],['p-bvm','patient'],['p-breath','patient'],['p-tell','scored']],
+  done:()=>!S.p.tired,noAct:45,noActWhy:'He was tiring and nothing changed in his care — breathe for him: bag-mask, one breath every 2 to 3 seconds',
+  tell:120,tellIf:()=>S.p.alsArr,tellWhy:'Didn\'t tell the medic he was tiring'},
+ {call:'pd',id:'upset',src:['natural','inject:worse'],name:'Upset, and the stridor is at rest',find:/Stridor at rest/,
+  acts:[['p-listen','scored'],['p-reass','scored'],['p-calm','patient'],['p-o2b','patient'],['p-tell','scored']],
+  done:()=>S.p.agit<.35,noAct:60,noActWhy:'He was upset and his stridor got worse, and nothing changed — calm him on Mom\'s lap, blow-by oxygen',
+  tell:150,tellIf:()=>S.p.alsArr,tellWhy:'Didn\'t tell the medic his stridor got worse'},
+ {call:'pd',id:'delay',src:['inject:delay','chaos'],name:'Medic 1 delayed',dec:'medDelay'},
+ {call:'pd',id:'family',src:['inject:family'],name:'Dad wants to drive him',dec:'fam_pd'},
+ {call:'pd',id:'bridge',src:['inject:bridge'],name:'Stuck at the drawbridge',dec:'bridgeUp'});
+function pdDebrief(){const x=S.p,cr=V.kind==='croup';const rows=[['Looked from the door first',x.door==='good'?'yes':'no'],['What it was',cr?'croup':'asthma'],['Oxygen',x.o2==='blowby'?'blow-by':x.o2==='mask'?'pediatric mask':'none'],['Times he got upset',x.upsets]];
+  if(!cr)rows.push(['His inhaler',V.inh==='own'?(x.inhDec==='good'&&x.puffs?`his own, checked, through the spacer at ${clockStr(x.puffT)}`:x.inhDec==='bad'?'without the spacer':'not used'):x.trapUsed?`used ${V.inh==='sibling'?'his brother\'s':'an expired'} inhaler`:`correctly not used (${V.inh==='sibling'?'his brother\'s':'expired'})`]);
+  rows.push(['Lowest SpO₂',Math.round(x.lowSpo2)+'%']);
+  if(x.tireFired)rows.push(['He tired out',x.tireFoundT!==null?'recognized':'missed'],['Bag-mask breaths',x.firstBagT!==null?`${x.good} on time${x.hyper?`, ${x.hyper} too fast`:''}`:'none']);
+  rows.push(['Medic told',x.toldT!==null?'yes':'no']);
+  const msg=x.trapUsed?'An inhaler that isn\'t his, or isn\'t in date, isn\'t yours to help with. Oxygen, calm, and the medic.':x.tireFired&&x.firstBagT===null?'He went quiet because he was tiring, not because he was better. Sleepy and quiet means breathe for him.':x.upsets>1?'He kept getting upset. With croup, calm is the treatment you carry.':'You looked before you touched, kept him calm, gave him oxygen he would take'+(cr?'':', handled the inhaler right')+(x.tireFired?', and breathed for him when he tired.':'.');
+  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:15px;color:var(--soft);margin-top:10px">${msg}</p>`;}
+
 const OPT_TEXT={
  agonal:["Start compressions now — gasping like that is not breathing","Roll him into the recovery position and watch his breathing closely","Put him on a non-rebreather at 15 and recheck in one minute"],
  pads:["Below the right collarbone, and on the left side below the armpit","One centered on the front of his chest, one between his shoulder blades","Both side by side in the middle of his chest, over the sternum"],
@@ -2397,7 +2646,7 @@ for(const k in OPT_TEXT){if(DEC[k]&&DEC[k].opts)DEC[k].opts.forEach((o,i)=>{if(O
 (()=>{const a=DEC.lkw.after;DEC.lkw.after=()=>{a();if(S.lastChoice==='good'&&!V.wake)radio('Husband','…Now that you ask — she was on the phone with our daughter at 9:40. She sounded totally fine.','good');};})();
 
 /* ================= Cardiac monitor · lead placement · 12-lead · sound · timeline · progress ================= */
-const CALLNAME={arrest:'Cardiac arrest',mva:'Car versus tree',od:'Overdose',ep:'Anaphylaxis',st:'Stroke',fl:'Elderly fall',cb:'Childbirth',dm:'Diabetic emergency'};
+const CALLNAME={arrest:'Cardiac arrest',mva:'Car versus tree',od:'Overdose',ep:'Anaphylaxis',st:'Stroke',fl:'Elderly fall',cb:'Childbirth',dm:'Diabetic emergency',pd:'Pediatric breathing'};
 const MONCFG={
  arrest:{twelve:true,only12:true,need:()=>S.rosc,read12:'Inferior STEMI — ST elevation in II, III, and aVF, with reciprocal depression in I and aVL. I\'m activating the cath lab at East Side.',stemi:true},
  mva:{need:()=>S.m&&S.m.moved,rhythm:()=>({r:'sinus',hr:mvaV().hr}),read:()=>`Sinus tach at ${mvaV().hr}. No ectopy. Trauma alert going out.`},
@@ -2412,7 +2661,7 @@ function monState(){
   if(CALL==='arrest'){if(!S.aed.pads||S.terminated||S.noRes)return {kind:'none'};if(S.rosc)return {kind:'ecg',r:'sinus',hr:96,stemi:true,lead:S.mon.twelve?'II':'pads'};return {kind:'ecg',r:S.cpr.on?'cpr':'vf',hr:S.cpr.on?S.cpr.rate:0,lead:S.als.zoll?'pads':'AED'};}
   if(CALL==='cb'){const x=S.c;return x&&x.born&&x.hrKnown?{kind:'ecg',r:'sinus',hr:Math.max(40,x.hr),lead:'HR (counted)'}:{kind:'none'};}
   const c=monCfg();if(c&&S.mon.four&&c.rhythm)return Object.assign({kind:'ecg',lead:'II'},c.rhythm());
-  const ox={od:()=>S.o&&S.o.ox&&S.o.pulse&&{hr:S.o.hr},ep:()=>S.e&&S.e.ox&&{hr:epV().hr},st:()=>S.s&&S.s.ox&&{hr:88,irr:true},fl:()=>S.f&&S.f.vitCount&&{hr:98},dm:()=>S.d&&S.d.vit&&{hr:dmV().hr}}[CALL];
+  const ox={od:()=>S.o&&S.o.ox&&S.o.pulse&&{hr:S.o.hr},ep:()=>S.e&&S.e.ox&&{hr:epV().hr},st:()=>S.s&&S.s.ox&&{hr:88,irr:true},fl:()=>S.f&&S.f.vitCount&&{hr:98},dm:()=>S.d&&S.d.vit&&{hr:dmV().hr},pd:()=>S.p&&S.p.ox&&{hr:pdV().hr}}[CALL];
   const o=ox&&ox();return o?{kind:'pleth',hr:o.hr,irr:o.irr,lead:'SpO₂ pleth'}:{kind:'none'};}
 /* --- waveform math --- */
 const g=(t,c,w)=>Math.exp(-((t-c)*(t-c))/(2*w*w));const sm=(a,b,t)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
@@ -2634,7 +2883,7 @@ $('b-drills').onclick=()=>drillMenu();
 
 /* ================= Instructor mode ================= */
 let INST=false;
-function etaRef(){return CALL==='arrest'?(S.als&&!S.als.arrived?{o:S.als,k:'eta'}:null):({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d}[CALL]&&(()=>{const o={mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d}[CALL];return o&&!o.alsArr?{o,k:'eta'}:null;})());}
+function etaRef(){return CALL==='arrest'?(S.als&&!S.als.arrived?{o:S.als,k:'eta'}:null):({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p}[CALL]&&(()=>{const o={mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p}[CALL];return o&&!o.alsArr?{o,k:'eta'}:null;})());}
 function instLog(t){if(S.log)S.log.push({c:clockStr(),who:'Instructor',msg:t});}
 const INJECTS=[
  {id:'delay',label:'Medic 1 delayed (+2 min)',ok:()=>!!etaRef(),run:()=>{const r=etaRef();r.o[r.k]+=120;radio('Dispatch','Medic 1 is delayed — plus two minutes.','bad');if(CALL==='mva'){detFire('delay');decLater('mvaDelay');}else medDelayFire();}},
@@ -2643,16 +2892,17 @@ const INJECTS=[
  {id:'lucas',label:'LUCAS battery dies',ok:()=>CALL==='arrest'&&S.arrest&&S.als.lucas===2,run:()=>{S.als.lucas=0;S.cpr.on=false;S.cpr.who='You';S.fat.You=.2;startPause();radio('Medic 1','The LUCAS just died — battery! Manual compressions, now!','bad');detFire('lucas');}},
  {id:'rearrest',label:'Re-arrest after ROSC (in transport)',ok:()=>CALL==='arrest'&&S.rosc&&S.arrest===false&&aPh()==='tx',run:()=>{S.rosc=false;S.arrest=true;S.Q=0;S.cpr.on=false;if(S.als.lucas===3)S.als.lucas=2;S.cpr.who=S.als.lucas===2?'You':'You';startPause();radio('Medic 1','I\'ve lost the pulse — he\'s re-arrested! Compressions!','bad');detFire('rearrest');S.als.rcNext=S.t+120;}},
  {id:'o2',label:'O₂ cylinder runs out',ok:()=>CALL==='arrest'&&S.air.o2&&!S.als.arrived&&S.o2psi>220,run:()=>{S.o2psi=190;S.o2ok=false;radio('Partner','The D cylinder just hit empty!','bad');detFire('o2');}},
- {id:'worse',label:'Patient deteriorates',ok:()=>({arrest:()=>false,mva:()=>S.m.moved&&!detOpen('shock'),od:()=>S.o.checked&&S.o.pulse&&!detOpen('renarc'),ep:()=>S.e.assessed&&!detOpen('worse'),st:()=>S.mission===3&&!detOpen('worse'),fl:()=>S.mission===3&&!detOpen('decline'),cb:()=>S.c.born&&!detOpen('mom')&&!detOpen('baby'),dm:()=>S.d.abc&&!detOpen('falling')}[CALL]||(()=>false))(),
+ {id:'worse',label:'Patient deteriorates',ok:()=>({arrest:()=>false,mva:()=>S.m.moved&&!detOpen('shock'),od:()=>S.o.checked&&S.o.pulse&&!detOpen('renarc'),ep:()=>S.e.assessed&&!detOpen('worse'),st:()=>S.mission===3&&!detOpen('worse'),fl:()=>S.mission===3&&!detOpen('decline'),cb:()=>S.c.born&&!detOpen('mom')&&!detOpen('baby'),dm:()=>S.d.abc&&!detOpen('falling'),pd:()=>S.p.listen&&!detOpen('tiring')&&!detOpen('upset')&&!(V.kind!=='croup'&&S.p.tired)}[CALL]||(()=>false))(),
   run:()=>{({mva:()=>{S.m.lost+=600;detFire('shock');radio(S.mon.four?'Monitor':'Partner',S.mon.four?`Blood pressure alarm: ${mvaV().sbp}/${mvaV().dbp}. Heart rate ${mvaV().hr}.`:'She\'s getting paler and more confused.','bad');},
     od:()=>{odResedate(.35);radio('Partner','He\'s nodding off again — breathing\'s slowing down.','bad');},
     ep:()=>{S.e.sev=Math.min(1,S.e.sev+.3);radio('Patient','My throat… it\'s closing again…','bad');if(S.e.doses.length&&!detOpen('worse'))detFire('worse');},
     st:()=>{stWorsen();radio('Medic 1','She\'s gone quiet back there. Check her.','bad');},
     fl:()=>{const x=S.f;x.tx.decline=true;x.declineT=x.declineT||S.t;x.gcs=Math.max(12,x.gcs-1);radio('Patient','…What happened? Where am I?','bad');if(!detOpen('decline'))detFire('decline');},
     cb:()=>{const x=S.c;if(S.mission>=3&&!x.momHit&&!detOpen('mom')){x.momHit=true;x.loss+=400;x.massage=false;radio('Partner','Mom\'s bleeding picked up — the pads are soaking through!','bad');detFire('mom');}else if(!x.vigorous){x.hr=Math.max(45,x.hr-20);radio('You','Her heart rate is dropping!','bad');}else{radio('Partner','Baby\'s getting a little dusky — is she staying warm?','bad');cbDusky();}},
+    pd:()=>{const x=S.p;if(V.kind==='croup'){x.crSev=Math.min(.9,x.crSev+.1);pdUpset(.6,'He\'s panicking — listen to that noise!');}else{x.forceTire=true;x.fat=Math.max(x.fat,.4);pdTire();}},
     dm:()=>{S.d.gl=Math.max(22,S.d.gl-12);radio('Partner','He\'s less responsive than he was.','bad');if(S.d.og!==null&&!S.d.d10&&!detOpen('falling'))detFire('falling');}})[CALL]();}},
- {id:'bridge',label:'Drawbridge goes up',ok:()=>(CALL==='arrest'&&aPh()==='tx'&&!S.tx.arrived)||S.mission===3&&((CALL==='st'&&!V.lvo&&!S.s.tx.arrived)||(CALL==='od'&&!S.o.tx.arrived)||(CALL==='ep'&&!S.e.tx.arrived)),run:()=>{const t=CALL==='arrest'?S.tx:CALL==='st'?S.s.tx:CALL==='od'?S.o.tx:S.e.tx;t.total+=180;radio('EMT','The bridge is going up in front of us — freighter. We\'re stuck about three minutes.','bad');detFire('bridge');decLater('bridgeUp');}},
- {id:'family',label:'Family member gets in the way',ok:()=>S.active&&(CALL==='arrest'?S.arrest&&['contact','als','work','ext','tor','look'].includes(aPh()):S.mission<=1),run:()=>{const line={arrest:['Son','Why aren\'t you shocking him?! Do something!'],mva:['Bystander','I\'m a nurse — let me in there with her!'],od:['Roommate','Is he going to jail? Don\'t tell the cops!'],ep:['Wife','He hates hospitals — just give him Benadryl!'],st:['Husband','Can\'t you just give her an aspirin?'],fl:['Daughter (phone)','Just put her in bed, she\'ll be fine!'],cb:['Husband','Should I drive her? I can drive her!'],dm:['Officer','He\'s faking it. I\'m taking him in.']}[CALL]||['Bystander','What\'s happening?!'];radio(line[0],line[1],'bad');detFire('family');decLater(CALL==='mva'?'mvaNurse':'fam_'+CALL);}}
+ {id:'bridge',label:'Drawbridge goes up',ok:()=>(CALL==='arrest'&&aPh()==='tx'&&!S.tx.arrived)||S.mission===3&&((CALL==='st'&&!V.lvo&&!S.s.tx.arrived)||(CALL==='od'&&!S.o.tx.arrived)||(CALL==='ep'&&!S.e.tx.arrived)||(CALL==='pd'&&!S.p.tx.arrived)),run:()=>{const t=CALL==='arrest'?S.tx:CALL==='st'?S.s.tx:CALL==='od'?S.o.tx:CALL==='pd'?S.p.tx:S.e.tx;t.total+=180;radio('EMT','The bridge is going up in front of us — freighter. We\'re stuck about three minutes.','bad');detFire('bridge');decLater('bridgeUp');}},
+ {id:'family',label:'Family member gets in the way',ok:()=>S.active&&(CALL==='arrest'?S.arrest&&['contact','als','work','ext','tor','look'].includes(aPh()):S.mission<=1),run:()=>{const line={arrest:['Son','Why aren\'t you shocking him?! Do something!'],mva:['Bystander','I\'m a nurse — let me in there with her!'],od:['Roommate','Is he going to jail? Don\'t tell the cops!'],ep:['Wife','He hates hospitals — just give him Benadryl!'],st:['Husband','Can\'t you just give her an aspirin?'],fl:['Daughter (phone)','Just put her in bed, she\'ll be fine!'],cb:['Husband','Should I drive her? I can drive her!'],dm:['Officer','He\'s faking it. I\'m taking him in.'],pd:['Dad','I\'ll just drive him in myself — it\'s faster!']}[CALL]||['Bystander','What\'s happening?!'];radio(line[0],line[1],'bad');detFire('family');decLater(CALL==='mva'?'mvaNurse':'fam_'+CALL);}}
 ];
 function instOpen(){if(!S.active)return;S.instWasRunning=S.running;S.running=false;instRender();$('instov').classList.remove('hidden');}
 function instClose(){$('instov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing&&$('discov').classList.contains('hidden')&&S.instWasRunning!==false)S.running=true;}
@@ -2731,10 +2981,11 @@ $('lesson-box').onclick=e=>{const b=e.target.closest&&e.target.closest('[data-l]
 $('b-lesson').onclick=lessonStart;$('ld-again').onclick=()=>{$('ldone').classList.add('hidden');lessonStart();};$('ld-menu').onclick=()=>{$('ldone').classList.add('hidden');showMenu();};
 function showMenu(){keepAwake(false);S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');homeRender();$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
-$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-call7').onclick=()=>loadCall('cb');$('b-call8').onclick=()=>loadCall('dm');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
+$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-call7').onclick=()=>loadCall('cb');$('b-call8').onclick=()=>loadCall('dm');$('b-call9').onclick=()=>loadCall('pd');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
 $('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
 $('b-start').onclick=()=>{$('intro').classList.add('hidden');const p=load();p.seen=true;save(p);showMenu();};
-function snapshot(){if(CALL==='dm'){const x=S.d;return [`Patient Contact report — v${APP_VERSION}`,`Call: diabetic · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · glucose ${Math.round(x.gl)} · GCS ${dmV().gcs} · tubes ${x.tubes} · swallow ${x.sw}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+function snapshot(){if(CALL==='pd'){const x=S.p,v=pdV();return [`Patient Contact report — v${APP_VERSION}`,`Call: pediatric breathing (${V.kind}) · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${v.rr} SpO2 ${v.spo2} HR ${v.hr} · agitation ${x.agit.toFixed(2)} · fatigue ${x.fat.toFixed(2)} · inhaler ${x.inhDec||'—'} puffs ${x.puffs} · bag ${x.good}/${x.hyper}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+  if(CALL==='dm'){const x=S.d;return [`Patient Contact report — v${APP_VERSION}`,`Call: diabetic · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · glucose ${Math.round(x.gl)} · GCS ${dmV().gcs} · tubes ${x.tubes} · swallow ${x.sw}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='cb'){const x=S.c;return [`Patient Contact report — v${APP_VERSION}`,`Call: childbirth · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · born ${x.born} · baby HR ${Math.round(x.hr)} ${x.breath} · good breaths ${x.good} · mom loss ${Math.round(x.loss)} mL`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='fl'){const x=S.f;return [`Patient Contact report — v${APP_VERSION}`,`Call: fall · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · found: head ${x.head} meds ${x.meds} why ${x.why} · GCS ${x.gcs} · lifted ${x.lifted}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='st'){const x=S.s;return [`Patient Contact report — v${APP_VERSION}`,`Call: stroke · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · BE-FAST ${Object.keys(x.bf).filter(k=>x.bf[k]).join('')} · LKW ${x.lkw||'—'} · glucose ${x.glu?'done':'no'}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}

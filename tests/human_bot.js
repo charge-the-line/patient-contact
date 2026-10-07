@@ -7,7 +7,7 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
   const after=(key,cond,delay=2)=>{if(!cond){delete react[key];return false;}if(react[key]===undefined)react[key]=rt;return rt-react[key]>=delay;};
   while(rt<1800){const S=api.S();if(opts.stopAt&&S.active&&opts.stopAt(S,api))return {stopped:true,api,els,S,rt};
     if(!hid('briefov')){if(after('brief',true,3))$('brief-go').onclick();rt+=.25;continue;}
-    if(api.DECO()){if(after('dec',true,4)){const D=api.DECO();const i=D.opts.findIndex(o=>o.r==='good');$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});$('dec-go').onclick();}rt+=.25;continue;}
+    if(api.DECO()){if(after('dec',true,4)){const D=api.DECO();const want=opts.pick&&opts.pick[D.key]||'good';let i=D.opts.findIndex(o=>o.r===want);if(i<0)i=D.opts.findIndex(o=>o.r==='good');$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});$('dec-go').onclick();}rt+=.25;continue;}
     if(!S.running&&!hid('done')){if(after('done',true,2)){missions.push(Math.round(rt));if(S.mission>=api.M().length-1)break;$('b-next').onclick();}rt+=.25;continue;}
     const sig=S.mission+':'+api.stepsDone().join(',');if(sig!==lastSig){lastSig=sig;lastProgress=rt;}
     if(rt-lastProgress>150&&!stuckAt){const j=api.stepsDone().findIndex(x=>!x);stuckAt={mission:S.mission,step:api.M()[S.mission].steps[j]&&api.M()[S.mission].steps[j].t};}
@@ -15,7 +15,7 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
     if(opts.instChaos&&S.running&&Math.random()<.004){const ok=api.INJECTS.filter(x=>{try{return x.ok()&&['delay','family','worse','vomit','bridge'].includes(x.id);}catch(e){return false;}});if(ok.length){api.instAct({a:'inj',i:ok[Math.floor(Math.random()*ok.length)].id});opts._inj=(opts._inj||0)+1;}}
     if(opts.ff&&S.running){const w=api.ffWhy();
       if(!w&&rt>=nextTap){(opts.ffLog=opts.ffLog||[]).push(api.ffGo());nextTap=rt+1.2;rt+=.25;continue;}
-      if(w==='due'&&!(S.dets||[]).some(x=>!x.closed)&&(call==='dm'||(call==='arrest'?(api.M()[S.mission]||{}).tag==='tx':S.mission===api.FFC[call].tx)))tap({mva:'m-reass',od:'o-reass',ep:'e-reass',st:'s-reass',fl:'f-reass',arrest:'a-reassess',dm:'d-glu'}[call]);}
+      if(w==='due'&&!(S.dets||[]).some(x=>!x.closed)&&(call==='dm'||call==='pd'||(call==='arrest'?(api.M()[S.mission]||{}).tag==='tx':S.mission===api.FFC[call].tx)))tap({mva:'m-reass',od:'o-reass',ep:'e-reass',st:'s-reass',fl:'f-reass',arrest:'a-reassess',dm:'d-glu',pd:'p-reass'}[call]);}
     if(S.running){
       if(call==='od'){const o=S.o;
         if(!o.checked)tap('o-check');
@@ -63,6 +63,14 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
       if(call==='dm'){const x=S.d;const dd=(S.dets||[]).find(q=>q.id==='falling'&&!q.closed);
         if(dd&&!opts.noDet&&!x.act){if(after('detdm',true,2)){if(!dd.found)tap('d-glu');else if(x.alsArr&&!dd.told)tap('d-tell');else if(x.alsArr&&!x.ivSet)tap('d-ivset');else if(!x.alsArr&&x.sw&&api.dmV().gcs>=13)tap('d-tube');else if(!x.pos)tap('d-pos');}}else delete react.detdm;
         if(!x.act){if(!x.keys)tap('d-keys');else if(!x.abc)tap('d-abc');else if(!x.id)tap('d-id');else if(!x.glu)tap('d-glu');else if(x.swT===null)tap('d-sw');else if(!x.vit)tap('d-vit');else if(x.doseT.length&&!x.recheck&&S.t-x.doseT[0]>=200&&S.t-(x.gluT||0)>100)tap('d-glu');else if(x.d10&&x.glu<2)tap('d-glu');}}
+      if(call==='pd'){const x=S.p,V=api.V();const ti=(S.dets||[]).find(q=>q.id==='tiring'&&!q.closed),up=(S.dets||[]).find(q=>q.id==='upset'&&!q.closed);
+        if(x.bvm&&x.tired&&rt-lastBreath>=(opts.breathEvery||(opts.sloppy?1.8+Math.random()*2.6:2.5))){$('p-breath').onclick();lastBreath=rt;}
+        if((ti||up)&&!opts.noDet){if(after('detpd',true,2)&&!x.act){const d=ti||up;if(!d.found)tap('p-reass');else if(ti&&!x.bvm)tap('p-bvm');else if(up&&x.agit>=.35)tap('p-calm');else if(x.alsArr&&!d.told)tap('p-tell');}}else delete react.detpd;
+        if(!x.act&&!ti&&!up){if(!x.calm)tap('p-calm');else if(!x.hist)tap('p-hist');else if(!x.listen)tap('p-listen');else if(!x.ox)tap('p-ox');else if(!x.o2)tap('p-o2b');
+          else if(S.mission===1&&V.kind!=='croup'){if(!x.label)tap('p-label');else if(!x.date)tap('p-date');else if(V.inh==='own'&&x.inhDec==='good'&&!x.spacer)tap('p-spacer');else if(V.inh==='own'&&x.inhDec==='good'&&!x.puffs)tap('p-puff');else if(S.t-api.pdRef()>=120&&!x.reassAfter)tap('p-reass');}
+          else if(S.mission===1&&V.kind==='croup'){if(S.t-api.pdRef()>=120&&!x.reassAfter)tap('p-reass');}
+          else if(S.mission===2&&x.alsArr)tap('p-load');
+          else if(S.mission===3&&S.t-x.tx.lastReass>=60)tap('p-reass');}}
       if(call==='st'){const x=S.s;if(!x.abc)tap('s-abc');else if(!x.act){const k=['B','E','F','A','S'].find(k=>!x.bf[k]);if(k)tap('s-'+k);else for(const id of ['s-time','s-glu','s-meds','s-vitals'])if(tap(id))break;}
         if(x.vomit)tap('s-suct');if(x.alsArr){tap('s-fam');tap('s-cot');}if(S.mission===2)tap('s-load');
         {const dd=(S.dets||[]).filter(q=>q.id==='worse').pop();if(dd&&!dd.closed&&!opts.noDet){if(after('detst',true,2)){if(!dd.found)tap('s-reass');else if(!dd.told)tap('s-tell');else if(x.secr&&!x.suct2)tap('s-suct');else if(!x.side)tap('s-side');else if(x.spo2<94&&!x.o2on)tap('s-o2');else if(!x.glu2&&!x.act)tap('s-glu2');}}else{delete react.detst;if(S.mission===3)tap('s-reass');}}}

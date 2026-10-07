@@ -11,7 +11,7 @@ errs, rows = [], []
 with sync_playwright() as p:
     b = p.chromium.launch()
     for w in (320, 390):
-        for n in range(1, 9):
+        for n in range(1, 10):
             pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True)
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click(f'#b-call{n}'); pg.wait_for_timeout(200)
@@ -182,6 +182,37 @@ with sync_playwright() as p:
             if pg.is_visible('#b-ff'): try_ff(pg)
             pg.wait_for_timeout(300)
         rows.append((w, 'transport with fast-forward (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and not any('without reassessing' in x for x in pg.evaluate('S.incidents')) else 99))); pg.close()
+    # pediatric breathing, played from the start with slow real taps on buttons found by their visible text; the tiring child is bagged every 2 to 3 real seconds
+    PD_NEXT = """(()=>{const x=S.p;if(!x||x.act||!S.running)return '';const ti=detOpen('tiring'),up=detOpen('upset');
+      if(x.bvm&&x.tired)return S.rt-x.lastBreathRt>=2.3?'BREATH':'';
+      if(ti||up){const d=ti||up;if(!d.found)return 'Reassess him';if(ti&&!x.bvm)return 'Child bag-mask';if(up&&x.agit>=.35&&!x.calm)return 'Calm: Mom holds him';if(x.alsArr&&!d.told)return 'Tell the medic what changed';return '';}
+      if(!x.calm)return 'Calm: Mom holds him';if(!x.hist)return 'History from Mom';if(!x.listen)return 'Listen and count';if(!x.ox)return 'Pulse ox on his toe';if(!x.o2)return 'Blow-by O₂';
+      if(S.mission===1&&V.kind!=='croup'){if(!x.label)return 'Read the label';if(!x.date)return 'Check the expiration';if(V.inh==='own'&&x.inhDec==='good'&&!x.spacer)return 'Shake it, spacer';if(V.inh==='own'&&x.inhDec==='good'&&!x.puffs)return 'Help him take it';}
+      if((S.mission===1&&!x.reassAfter&&S.t-pdRef()>=120)||(S.mission===3&&ffWhy()==='due'))return 'Reassess him';
+      if(S.mission===2&&x.alsArr&&!x.loaded)return 'Onto the cot with Mom';return '';})()"""
+    for w, force, label, want in ((390, "{kind:'croup'}", 'pediatric croup', 'Times he got upset'), (320, "{kind:'asthma',inh:'own',tire:true}", 'pediatric asthma, tires out', 'recognized')):
+        pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={pd:%s}" % force); pg.click('#b-call9'); pg.wait_for_timeout(200); pg.click('#brief-go'); pg.wait_for_timeout(500)
+        rows.append((w, label + ': doorway card', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#decov') and 'drooling' not in pg.inner_text('#dec-q') else 99))); answer(pg)
+        shots = set()
+        for _ in range(500):
+            if pg.is_visible('#decov'): answer(pg); continue
+            if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(300); continue
+            if pg.is_visible('#done'):
+                if pg.evaluate("S.mission<M.length-1"): pg.click('#b-next', delay=200); pg.wait_for_timeout(400); continue
+                break
+            nxt = pg.evaluate(PD_NEXT)
+            if nxt == 'BREATH':
+                if 'bagging' not in shots: shots.add('bagging'); rows.append((w, label + ': bagging on screen', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+                pg.locator('button:visible', has_text='Breath (1 every 2–3 s)').first.click(delay=200); continue
+            if nxt:
+                if pg.evaluate("S.mission")==1 and 'inhaler' not in shots and pg.is_visible('#g-pd-i'): shots.add('inhaler'); rows.append((w, label + ': inhaler on screen', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+                tap(pg, nxt); continue
+            if pg.is_visible('#b-ff') and not pg.evaluate("S.p.tired"): try_ff(pg)
+            pg.wait_for_timeout(300)
+        ok = pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and want in pg.inner_html('#done-b')
+        if not ok: print('   detail:', label, pg.evaluate('S.incidents'), pg.evaluate('S.mission'), pg.evaluate("S.p.tireFired"))
+        rows.append((w, label + ' (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if ok else 99))); pg.close()
     # the Start CPR or not? drill, answered by visible text
     pg = b.new_page(viewport={'width': 390, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click('#b-drills'); pg.wait_for_timeout(200); tap(pg, 'Start CPR or not?')

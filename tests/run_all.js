@@ -3,11 +3,11 @@
    Usage:  node tests/run_all.js            (everything, ~4–6 minutes)
            node tests/run_all.js quick      (syntax, balance, drills, instructor, a short fuzz — under a minute)
            node tests/run_all.js fast human variants   (pick sections)
-   Sections: syntax balance fast human sloppy variants protocol drills instructor drill home ff deter fuzz
+   Sections: syntax balance fast human sloppy variants protocol drills instructor drill home ff deter peds fuzz
    Exit code 0 = all passed. */
 global.window=global.window||{};
 const path=require('path'),fs=require('fs'),vm=require('vm');
-const ALL=['syntax','balance','fast','human','sloppy','variants','protocol','drills','instructor','drill','home','ff','deter','fuzz'];
+const ALL=['syntax','balance','fast','human','sloppy','variants','protocol','drills','instructor','drill','home','ff','deter','peds','fuzz'];
 let want=process.argv.slice(2);if(!want.length)want=ALL;if(want.includes('quick'))want=['syntax','balance','drills','instructor','fuzz'];
 const results=[];let failed=0;const T0=Date.now();
 function report(section,name,ok,detail=''){results.push({section,name,ok,detail});if(!ok)failed++;console.log(`${ok?'PASS':'FAIL'}  ${section.padEnd(10)} ${name}${detail?'  — '+detail:''}`);}
@@ -55,7 +55,7 @@ if(want.includes('balance')){const {boot}=require('./pc_mock.js');const {api}=bo
 if(want.includes('fast')){for(const [file,call] of [['pc_bot','arrest'],['mva_bot','mva'],['od_bot','od'],['ep_bot','ep'],['st_bot','stroke'],['fl_bot','fall']]){const {play}=require('./'+file);let ok=0,n=0;
   for(const tier of [0,1,2])for(const ch of ['good','partial','bad']){n++;const r=quiet(()=>play(tier,ch));if(r.finished||r.ok)ok++;}report('fast',`${call}: every tier × every decision path completes`,ok===n,`${ok}/${n}`);}}
 
-if(want.includes('human')){const {play}=require('./human_bot.js');for(const call of ['arrest','mva','od','ep','st','fl','dm']){let ok=0,perfect=0;
+if(want.includes('human')){const {play}=require('./human_bot.js');for(const call of ['arrest','mva','od','ep','st','fl','dm','pd']){let ok=0,perfect=0;
   for(const tier of [0,1,2]){const r=quiet(()=>play(call,tier));if(r.finished)ok++;if(r.score===100)perfect++;}report('human',`${call}: completes at human pace, scores 100 when played well`,ok===3&&perfect===3,`${ok}/3 complete, ${perfect}/3 perfect`);}
   for(const [file,call] of [['cb_bot','childbirth'],['dm_bot','diabetic']]){const {play}=require('./'+file);let ok=0;for(const tier of [0,1,2])for(const ch of ['good','partial','bad'])if(quiet(()=>play(tier,ch)).ok)ok++;report('human',`${call}: every tier × decision path at human pace`,ok===9,`${ok}/9`);}}
 
@@ -66,7 +66,7 @@ if(want.includes('sloppy')){const {play}=require('./human_bot.js');const {play:c
   for(const call of ['arrest','od']){const r=quiet(()=>play(call,0,{breathEvery:11}));report('sloppy',`${call}: breaths every 11 s (late) still count`,!!r.finished,r.finished?'':'stuck: '+JSON.stringify(r.stuckAt));}}
 
 if(want.includes('variants')){const {play}=require('./human_bot.js');const {play:cbp}=require('./cb_bot.js');const {play:dmp}=require('./dm_bot.js');
-  const cases={arrest:[{open:'cpr',outcome:'rosc',shock:true},{open:'cpr',outcome:'rosc',shock:false},{open:'cpr',outcome:'tor',shock:true,dnr:null},{open:'cpr',outcome:'tor',shock:false},{open:'cpr',outcome:'extend'},{dnr:'late'},{look:'obvious'},{look:'cold'},{look:'warm'},{dnr:'valid'},{dnr:'missing'}],od:[{L:.65},{L:1},{L:1.3}],ep:[{rebound:true},{rebound:false},{sev:.55}],st:[{side:'R',wake:false,lvo:false},{side:'L',wake:true,lvo:true},{side:'R',wake:false,lvo:true}],mva:[{warm:true},{warm:false,loss:600}],dm:[{pill:false,low:false},{pill:true,low:true}],cb:[{nuchal:true,vig:false},{nuchal:false,vig:true}]};
+  const cases={arrest:[{open:'cpr',outcome:'rosc',shock:true},{open:'cpr',outcome:'rosc',shock:false},{open:'cpr',outcome:'tor',shock:true,dnr:null},{open:'cpr',outcome:'tor',shock:false},{open:'cpr',outcome:'extend'},{dnr:'late'},{look:'obvious'},{look:'cold'},{look:'warm'},{dnr:'valid'},{dnr:'missing'}],od:[{L:.65},{L:1},{L:1.3}],ep:[{rebound:true},{rebound:false},{sev:.55}],st:[{side:'R',wake:false,lvo:false},{side:'L',wake:true,lvo:true},{side:'R',wake:false,lvo:true}],mva:[{warm:true},{warm:false,loss:600}],dm:[{pill:false,low:false},{pill:true,low:true}],cb:[{nuchal:true,vig:false},{nuchal:false,vig:true}],pd:[{kind:'croup'},{kind:'asthma',inh:'own',tire:false},{kind:'asthma',inh:'sibling'},{kind:'asthma',inh:'expired'},{kind:'asthma',inh:'own',tire:true}]};
   for(const call in cases)for(const F of cases[call]){global.window.FORCE_V={[call]:F};const r=quiet(()=>call==='cb'?cbp(0,'good'):call==='dm'?dmp(0,'good'):play(call,0));const ok=r.ok||r.finished;report('variants',`${call} ${JSON.stringify(F)}`,ok&&r.score===100,`score ${r.score}`);}
   global.window.FORCE_V=null;}
 
@@ -142,7 +142,7 @@ if(want.includes('drills')){let NOW=0;const realPerf=global.performance;const {b
   global.performance=realPerf;}
 
 if(want.includes('instructor')){const {boot}=require('./pc_mock.js');
-  const setups={arrest:S=>{S.checked=true;S.arrest=true;S.air.o2=true;S.o2psi=1000;},mva:S=>{S.m.sized=true;S.m.inside=true;},od:S=>{S.o.checked=true;},ep:S=>{S.e.assessed=true;},st:S=>{S.s.abc=true;},fl:S=>{S.f.primary=true;},cb:S=>{S.c.born=true;S.c.birthRt=S.rt;},dm:S=>{S.d.abc=true;}};
+  const setups={arrest:S=>{S.checked=true;S.arrest=true;S.air.o2=true;S.o2psi=1000;},mva:S=>{S.m.sized=true;S.m.inside=true;},od:S=>{S.o.checked=true;},ep:S=>{S.e.assessed=true;},st:S=>{S.s.abc=true;},fl:S=>{S.f.primary=true;},cb:S=>{S.c.born=true;S.c.birthRt=S.rt;},dm:S=>{S.d.abc=true;},pd:S=>{S.p.door='good';S.p.listen=true;}};
   for(const call in setups){const {api}=boot();api.loadCall(call);const S=api.S();api.$('brief-go').onclick();setups[call](S);const offered=api.INJECTS.filter(x=>x.ok());let fired=0;
     for(const x of offered){const n=S.log.length;api.instAct({a:'inj',i:x.id});if(S.log.length>n)fired++;}report('instructor',`${call}: every offered complication fires`,offered.length>0&&fired===offered.length,`${fired}/${offered.length}`);}
   {const {api}=boot();global.window.FORCE_V={arrest:{open:'cpr',outcome:'rosc',shock:true}};api.loadCall('arrest');global.window.FORCE_V=null;const S=api.S();api.$('brief-go').onclick();
@@ -160,8 +160,8 @@ if(want.includes('drill')){const {boot}=require('./pc_mock.js');const fakeAudio=
 if(want.includes('home')){const {boot}=require('./pc_mock.js');
   {// the home list: readiness card, a chip per call and for the lesson, Due/Again from the shared spacing
    const old=new Date(Date.now()-10*864e5).toISOString();const {api,els}=boot({'patient-contact':JSON.stringify({runs:[{call:'arrest',score:95,d:new Date().toISOString(),tier:0},{call:'st',score:60,d:old,tier:1},{call:'fl',score:88,d:old,tier:0}],drillRuns:[{drill:'cpr',score:100,d:old}]})});api.showMenu();const R=api.readiness();
-   report('home','home list: readiness counts lesson + 8 calls + 8 drills (17), chips show best, Due and Again, the empty lesson chip reads —',R.total===17&&R.done===4&&els['chip-arrest'].textContent==='95'&&els['chip-st'].textContent==='Again'&&els['chip-fl'].textContent==='Due'&&els['chip-lesson'].textContent==='—'&&els['rdy-t'].textContent==='4 of 17 activities'&&els['rdy-n'].textContent==='24%'&&/2 due for review/.test(els['rdy-s'].textContent)&&/id="b-lesson"/.test(html)&&/class="sec"[^>]*>1 · Learn/.test(html)&&/3 · Drills and tools/.test(html),`${R.done}/${R.total} · arrest ${els['chip-arrest'].textContent}, st ${els['chip-st'].textContent}, fl ${els['chip-fl'].textContent}`);
-   const e=boot();e.api.showMenu();report('home','empty phone: 0 of 17, the card points at the lesson or a call',e.els['rdy-t'].textContent==='0 of 17 activities'&&/Start with the lesson/.test(e.els['rdy-s'].textContent));}
+   report('home','home list: readiness counts lesson + 9 calls + 8 drills (18), chips show best, Due and Again, the empty lesson chip reads —',R.total===18&&R.done===4&&els['chip-arrest'].textContent==='95'&&els['chip-st'].textContent==='Again'&&els['chip-fl'].textContent==='Due'&&els['chip-lesson'].textContent==='—'&&els['rdy-t'].textContent==='4 of 18 activities'&&els['rdy-n'].textContent==='22%'&&/2 due for review/.test(els['rdy-s'].textContent)&&/id="b-lesson"/.test(html)&&/class="sec"[^>]*>1 · Learn/.test(html)&&/3 · Drills and tools/.test(html),`${R.done}/${R.total} · arrest ${els['chip-arrest'].textContent}, st ${els['chip-st'].textContent}, fl ${els['chip-fl'].textContent}`);
+   const e=boot();e.api.showMenu();report('home','empty phone: 0 of 18, the card points at the lesson or a call',e.els['rdy-t'].textContent==='0 of 18 activities'&&/Start with the lesson/.test(e.els['rdy-s'].textContent));}
   {// the lesson: 12 slides, first-try scoring, no skipping, saved under drillRuns as 'lesson' and credited on the chip
    const {api,els,store}=boot();api.lessonStart();const L=api.LESSON;let skipped=false;
    for(let i=0;i<L.length;i++){const before=api.LS().i;api.lessonAct({l:'next'});if(api.LS()&&api.LS().i!==before)skipped=true;api.lessonAct({l:'ans',k:L[i].o.findIndex(o=>o[1]==='good')});api.lessonAct({l:'next'});}
@@ -177,9 +177,10 @@ if(want.includes('drill')){const {boot}=require('./pc_mock.js');global.__loc={se
 
 if(want.includes('ff'))require('./ff_test.js')(report);
 if(want.includes('deter'))require('./det_test.js')(report);
+if(want.includes('peds'))require('./pd_test.js')(report);
 if(want.includes('fuzz')){const {boot}=require('./pc_mock.js');const prevNoMon=boot.noMon;boot.noMon=true;let crashes=0,runs=want.length<=5?24:80;const errs=[];
-  const ids=['a-cpr','a-analyze','a-clear','a-shock','a-breath','a-breaths','a-suction','m-size','m-enter','m-tq','o-check','o-breath','o-nal','e-check','e-syr','e-p10','e-drawn','e-xcheck','e-inject','s-abc','s-B','s-time','f-primary','f-head','c-push','c-shoulders','b-breath','b-cut','d-glu','d-sw','mon-4','mon-12','inst-fab','disc-go','brief-go','brief-menu','b-resume','b-next','b-restart'];
-  for(let run=0;run<runs;run++){const {api}=boot();const {$}=api;api.setTier(run%3);api.setInst(run%2===0);api.loadCall(['arrest','mva','od','ep','st','fl','cb','dm'][run%8]);
+  const ids=['a-cpr','a-analyze','a-clear','a-shock','a-breath','a-breaths','a-suction','m-size','m-enter','m-tq','o-check','o-breath','o-nal','e-check','e-syr','e-p10','e-drawn','e-xcheck','e-inject','s-abc','s-B','s-time','f-primary','f-head','c-push','c-shoulders','b-breath','b-cut','d-glu','d-sw','p-calm','p-o2m','p-ox','p-bvm','p-breath','p-puff','p-label','p-reass','mon-4','mon-12','inst-fab','disc-go','brief-go','brief-menu','b-resume','b-next','b-restart'];
+  for(let run=0;run<runs;run++){const {api}=boot();const {$}=api;api.setTier(run%3);api.setInst(run%2===0);api.loadCall(['arrest','mva','od','ep','st','fl','cb','dm','pd'][run%9]);
     try{for(let i=0;i<1200;i++){if(i%4===0)api.monSync();if(api.DECO()){$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i%3)}})}});$('dec-go').onclick();}
       if(Math.random()<.45){const b=$(ids[Math.floor(Math.random()*ids.length)]);b.onclick&&b.onclick();}if(api.S().running)api.tick(.25);const s=api.S();if(!Number.isFinite(s.t)||!Number.isFinite(s.score))throw new Error('non-finite state');}}
     catch(e){crashes++;errs.push(e.message);}}
