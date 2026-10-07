@@ -3,11 +3,11 @@
    Usage:  node tests/run_all.js            (everything, ~4–6 minutes)
            node tests/run_all.js quick      (syntax, balance, drills, instructor, a short fuzz — under a minute)
            node tests/run_all.js fast human variants   (pick sections)
-   Sections: syntax balance fast human sloppy variants protocol drills instructor drill home ff deter peds chest fuzz
+   Sections: syntax balance fast human sloppy variants protocol drills instructor drill home ff deter peds chest teach fuzz
    Exit code 0 = all passed. */
 global.window=global.window||{};
 const path=require('path'),fs=require('fs'),vm=require('vm');
-const ALL=['syntax','balance','fast','human','sloppy','variants','protocol','drills','instructor','drill','home','ff','deter','peds','chest','fuzz'];
+const ALL=['syntax','balance','fast','human','sloppy','variants','protocol','drills','instructor','drill','home','ff','deter','peds','chest','teach','fuzz'];
 let want=process.argv.slice(2);if(!want.length)want=ALL;if(want.includes('quick'))want=['syntax','balance','drills','instructor','fuzz'];
 const results=[];let failed=0;const T0=Date.now();
 function report(section,name,ok,detail=''){results.push({section,name,ok,detail});if(!ok)failed++;console.log(`${ok?'PASS':'FAIL'}  ${section.padEnd(10)} ${name}${detail?'  — '+detail:''}`);}
@@ -179,6 +179,7 @@ if(want.includes('ff'))require('./ff_test.js')(report);
 if(want.includes('deter'))require('./det_test.js')(report);
 if(want.includes('peds'))require('./pd_test.js')(report);
 if(want.includes('chest'))require('./cp_test.js')(report);
+if(want.includes('teach'))require('./teach_test.js')(report);
 if(want.includes('fuzz')){const {boot}=require('./pc_mock.js');const prevNoMon=boot.noMon;boot.noMon=true;let crashes=0,runs=want.length<=5?24:80;const errs=[];
   const ids=['a-cpr','a-analyze','a-clear','a-shock','a-breath','a-breaths','a-suction','m-size','m-enter','m-tq','o-check','o-breath','o-nal','e-check','e-syr','e-p10','e-drawn','e-xcheck','e-inject','s-abc','s-B','s-time','f-primary','f-head','c-push','c-shoulders','b-breath','b-cut','d-glu','d-sw','p-calm','p-o2m','p-ox','p-bvm','p-breath','p-puff','p-label','p-reass','k-abc','k-vit','k-o2','k-flat','k-qall','k-chew','k-chk','k-cpr','k-pads','k-analyze','k-clear','k-shock','k-tell','k-move','k-load','mon-4','mon-12','inst-fab','disc-go','brief-go','brief-menu','b-resume','b-next','b-restart'];
   for(let run=0;run<runs;run++){const {api}=boot();const {$}=api;api.setTier(run%3);api.setInst(run%2===0);api.loadCall(['arrest','mva','od','ep','st','fl','cb','dm','pd','cp'][run%10]);

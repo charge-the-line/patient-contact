@@ -13,12 +13,13 @@ module.exports=function(report){
     report('peds',`${inh==='sibling'?'his brother\'s':'an expired'} inhaler: the right call is not to use it; no puffs, the help buttons stay hidden, the debrief says so, 100`,g.finished&&g.score===100&&g.S.p.puffs===0&&g.S.p.inhDec==='good'&&/correctly not used/.test(body),`score ${g.score}, puffs ${g.S.p.puffs}`);
     F({kind:'asthma',inh});const b=quiet(()=>human.play('pd',0,{pick:{pdInh:'bad'}}));F(null);const bb=global.__lastBoot.els['done-b'].innerHTML;
     report('peds',`${inh==='sibling'?'his brother\'s':'an expired'} inhaler used anyway: the decision costs 10 and the debrief names it`,b.finished&&b.score===90&&b.S.p.trapUsed&&/used (his brother's|an expired) inhaler/.test(bb),`score ${b.score}`);}
-  // his own: nothing before the label and the date, then the spacer, then the puffs, and the time goes to the medic
-  {F({kind:'asthma',inh:'own',tire:false});const {api}=boot();api.loadCall('pd');F(null);const S=api.S();start(api);api.$('p-calm').onclick();
-    api.$('p-puff').onclick();const early=/Check before anything/.test(last(api))&&S.p.puffs===0;
-    api.setM(api.M());S.p.label=true;S.p.date=true;S.p.inhDec='good';api.$('p-puff').onclick();const noSpacer=/Spacer first/.test(last(api));
-    api.$('p-spacer').onclick();api.$('p-puff').onclick();for(let i=0;i<40;i++)api.tick(.25);
-    report('peds','his own inhaler: refused before the label, date and decision, refused without the spacer, then two puffs through the spacer with the time noted',early&&noSpacer&&S.p.puffs===1&&/spacer at \d\d:\d\d/.test(S.log.map(e=>e.msg).join(' ')),`puffs ${S.p.puffs}`);}
+  // his own: helping before the label and date, or without the spacer, is allowed, costs points and is named; the checked way costs nothing
+  {F({kind:'asthma',inh:'own',tire:false});const {api}=boot();api.loadCall('pd');F(null);const S=api.S();start(api);api.$('p-calm').onclick();const s0=S.score;
+    api.$('p-puff').onclick();for(let i=0;i<40;i++)api.tick(.25);const inc=S.incidents.join(' | ');
+    const early=S.p.puffs===1&&S.p.puffKind==='nospacer'&&/before reading the label and the date/.test(inc)&&/without the spacer/.test(inc)&&s0-S.score===8;
+    F({kind:'asthma',inh:'own',tire:false});const b=boot().api;b.loadCall('pd');F(null);const T=b.S();start(b);b.$('p-calm').onclick();b.setM(b.M());T.p.label=true;T.p.date=true;T.p.inhDec='good';const t0=T.score;
+    b.$('p-spacer').onclick();b.$('p-puff').onclick();for(let i=0;i<40;i++)b.tick(.25);
+    report('peds','his own inhaler: a puff before the label and date and without the spacer goes in, costs 5 and 3 and is named; checked and through the spacer it costs nothing, with the time noted',early&&T.p.puffs===1&&T.score===t0&&/spacer at \d\d:\d\d/.test(T.log.map(e=>e.msg).join(' ')),`early: puffs ${S.p.puffs}, −${s0-S.score}`);}
   // croup: handling him before he is calm upsets him, a forced mask makes it worse, and calm brings it back
   {F({kind:'croup'});const {api}=boot();api.loadCall('pd');F(null);const S=api.S();start(api);const a0=S.p.agit;
     api.$('p-ox').onclick();const a1=S.p.agit;api.$('p-o2m').onclick();const fought=S.p.o2===null&&/won't keep the mask on/.test(S.log.map(e=>e.msg).join(' '));

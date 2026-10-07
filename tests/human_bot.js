@@ -85,7 +85,7 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
           if((dd||dp)&&!opts.noDet&&!x.act){if(after('detcp',true,2)){const d=dd||dp;if(!d.found)tap('k-reass');else if(dd&&!x.flat)tap('k-flat');else if(dp&&!x.o2)tap('k-o2');else if(x.alsArr&&!d.told)tap('k-tell');}}else delete react.detcp;
           if(!x.act&&!dd&&!dp){if(!x.abc)tap('k-abc');else if(!x.opq)tap('k-opq');else if(!x.sample)tap('k-sample');else if(!x.vit)tap('k-vit');
             else if(S.mission===1){if(!x.qall)tap('k-qall');else if(!x.qbleed)tap('k-qbleed');else if(!x.qthin)tap('k-qthin');else if(!x.qtoday)tap('k-qtoday');else if(x.asaDec==='good'&&!x.asaGiven&&!(V.allergy||V.thin||V.today))tap('k-chew');else if(V.nitro&&!x.qed)tap('k-qed');}
-            else if(x.alsArr&&S.mon.twelve&&!x.moved)tap('k-move');else if(x.moved&&!x.loaded)tap('k-load');
+            else if(opts.wrongO2&&!x.o2&&!x.o2Wrong&&x.vit)tap('k-o2');else if(x.alsArr&&S.mon.twelve&&!x.moved)tap('k-move');else if(x.moved&&!x.loaded)tap('k-load');
             else if(S.mission===api.M().length-1&&S.t-x.tx.lastReass>=60)tap('k-reass');}}}
       if(call==='st'){const x=S.s;if(!x.abc)tap('s-abc');else if(!x.act){const k=['B','E','F','A','S'].find(k=>!x.bf[k]);if(k)tap('s-'+k);else for(const id of ['s-time','s-glu','s-meds','s-vitals'])if(tap(id))break;}
         if(x.vomit)tap('s-suct');if(x.alsArr){tap('s-fam');tap('s-cot');}if(S.mission===2)tap('s-load');

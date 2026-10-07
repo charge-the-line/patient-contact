@@ -24,12 +24,14 @@ module.exports=function(report){
   // the medic's answer to a held aspirin: per protocol, never the MFR's call
   {F({key:'thin'});const g=quiet(()=>human.play('cp',0));F(null);const t=g.S.log.map(e=>e.msg).join(' ');
     report('chest','a blood thinner: the medic decides on the aspirin with medical control, per Medstar/MMR protocol',/Eliquis — I'll decide on aspirin with medical control, per Medstar\/MMR protocol/.test(t));}
-  // no aspirin before all four checks and the decision; the chewables are chewed
-  {F({key:'classic'});const {api}=boot();api.loadCall('cp');F(null);const S=api.S();api.$('brief-go').onclick();S.h.abc=true;
-    api.$('k-chew').onclick();const early=!S.h.asaGiven&&!S.h.act&&/hold it/.test(logText(api));
-    const hidden=api.$('k-chew')._cls.has('hidden')||(api.tick(.25),api.$('k-chew')._cls.has('hidden'));
-    S.h.asaDec='good';api.$('k-chew').onclick();for(let i=0;i<40;i++)api.tick(.25);
-    report('chest','the chew button is hidden and refused until the four checks and the decision clear it; then 324 mg chewed, the time noted',early&&hidden&&S.h.asaGiven&&/324 milligrams, chewed, at \d\d:\d\d/.test(logText(api)));}
+  // aspirin before the checks, or after the checks said hold, goes in and is taught; the right way costs nothing
+  {F({key:'classic'});const {api}=boot();api.loadCall('cp');F(null);const S=api.S();api.$('brief-go').onclick();S.h.abc=true;const s0=S.score;
+    api.$('k-chew').onclick();for(let i=0;i<40;i++)api.tick(.25);const early=S.h.asaGiven&&S.h.asaEarly&&s0-S.score===5&&/before the four checks/.test(S.incidents.join(' '));
+    F({key:'thin'});const b=boot().api;b.loadCall('cp');F(null);const T=b.S();b.$('brief-go').onclick();T.h.abc=true;Object.assign(T.h,{qall:true,qbleed:true,qthin:true,qtoday:true,asaDec:'good'});const t0=T.score;
+    b.$('k-chew').onclick();for(let i=0;i<40;i++)b.tick(.25);const held=T.h.asaGiven&&T.h.asaWrong&&t0-T.score===10&&/blood thinner/.test(T.incidents.join(' '));
+    F({key:'classic'});const c2=boot().api;c2.loadCall('cp');F(null);const U=c2.S();c2.$('brief-go').onclick();U.h.abc=true;Object.assign(U.h,{qall:true,qbleed:true,qthin:true,qtoday:true,asaDec:'good'});const u0=U.score;
+    c2.$('k-chew').onclick();for(let i=0;i<40;i++)c2.tick(.25);
+    report('chest','aspirin before the four checks goes in and costs 5; on a blood thinner after the checks said hold it costs 10; checked and clear, 324 mg chewed with the time, free',early&&held&&U.h.asaGiven&&U.score===u0&&/324 milligrams, chewed, at \d\d:\d\d/.test(c2.S().log.map(e=>e.msg).join(' ')),`early −${s0-S.score}, held −${t0-T.score}`);}
   // nitroglycerin: never assisted; ask about erection drugs; tell the medic
   {const btn=[...html.matchAll(/<button[^>]*id="k-[^"]+"[^>]*>([^<]*)</g)].map(m=>m[1]);const helps=btn.filter(t=>/nitro/i.test(t));
     const d=quiet(()=>{F({key:'classic'});const {api}=boot();api.loadCall('cp');F(null);return api.DEC.cpNitro;});
@@ -38,14 +40,18 @@ module.exports=function(report){
     report('chest','helping him take his nitro costs 10 and the debrief names it',b.finished&&b.score===90&&b.S.h.nitroTaken&&/taken with your help/.test(bb),`score ${b.score}`);
     F({key:'ed'});const g=quiet(()=>human.play('cp',0));F(null);
     report('chest','an erection drug: he is asked, the medic hears "no nitro with the Viagra", 100',g.finished&&g.score===100&&g.S.h.qed&&/no nitro with the Viagra/.test(g.S.log.map(e=>e.msg).join(' ')),`score ${g.score}`);}
-  // oxygen: one setting, only below it
+  // oxygen: one setting; with a normal SpO₂ it goes on, costs 3 and Max's line teaches why; below the setting it is the right call
   {F({key:'classic'});const {api}=boot();api.loadCall('cp');F(null);const S=api.S();api.$('brief-go').onclick();S.h.abc=true;S.h.ox=true;
-    const one=api.COUNTY.o2Min===94&&(block.match(/o2Min/g)||[]).length>=4&&!/spo2\s*[<>]=?\s*9[04]\b/i.test(block);
-    api.$('k-o2').onclick();const refused=!S.h.o2&&/no oxygen needed per protocol/.test(logText(api));
-    S.h.spo2=91;api.$('k-o2').onclick();const given=S.h.o2&&/per protocol/.test(S.log.slice(-1)[0].msg);
-    api.COUNTY.o2Min=90;S.h.o2=false;S.h.spo2=92;api.$('k-o2').onclick();const moved=!S.h.o2;api.tick(.25);const label=/under 90/.test(api.$('k-o2').textContent);api.COUNTY.o2Min=94;
-    report('chest','oxygen: one setting (COUNTY.o2Min, 94 until the MCA review), refused at or above it, given below it; change the setting and the threshold moves',one&&refused&&given&&moved&&label);
+    const one=api.COUNTY.o2Min===94&&(block.match(/o2Min/g)||[]).length>=4&&!/spo2\s*[<>]=?\s*9[04]\b/i.test(block);const s0=S.score;
+    api.$('k-o2').onclick();const wrong=S.h.o2&&s0-S.score===3&&S.incidents.includes("Not indicated with SpO₂ at or above 94 per protocol. Extra oxygen doesn't help a heart attack and may cause harm.");
+    api.$('k-o2').onclick();const off=!S.h.o2;
+    S.h.painT=S.t;S.h.spo2=91;const s1=S.score;api.$('k-o2').onclick();const right=S.h.o2&&S.score===s1;
+    api.COUNTY.o2Min=90;const b=boot().api;F({key:'classic'});b.loadCall('cp');F(null);const T=b.S();b.$('brief-go').onclick();T.h.abc=true;T.h.ox=true;T.h.painT=T.t;T.h.spo2=91;b.COUNTY.o2Min=90;const t0=T.score;b.$('k-o2').onclick();
+    const moved=T.h.o2&&t0-T.score===3&&/at or above 90/.test(T.incidents.join(' '));b.tick(.25);const label=/under 90/.test(b.$('k-o2').textContent);b.COUNTY.o2Min=94;api.COUNTY.o2Min=94;
+    report('chest','oxygen: one setting (COUNTY.o2Min, 94 until the MCA review); with a normal SpO₂ it goes on, costs 3 and says why; tap again to take it off; when the SpO₂ drops below the setting it is free; move the setting and the line moves',one&&wrong&&off&&right&&moved&&label,`wrong ${wrong}, off ${off}, right ${right}, moved ${moved}`);
     report('chest','the oxygen guide card says per protocol, names 90 or 94, and is flagged for the MCA review',/per protocol/.test(api.GUIDE.o2acs.mca)&&/90 or 94/.test(api.GUIDE.o2acs.mca)&&/MCA review/.test(api.GUIDE.o2acs.mca));}
+  {F({key:'classic'});const g=quiet(()=>human.play('cp',0,{wrongO2:true}));F(null);
+    report('chest','oxygen on a normal SpO₂ during a full run costs only the 3, the run finishes, and the debrief says not indicated',g.finished&&g.score===97&&/not indicated/.test(global.__lastBoot.els['done-b'].innerHTML)&&g.S.h.o2,`score ${g.score}`);}
   // nobody walks
   {F({key:'classic'});const b=quiet(()=>human.play('cp',0,{pick:{cpWalk:'bad'}}));F(null);const bb=global.__lastBoot.els['done-b'].innerHTML;
     report('chest','letting him walk to the ambulance costs 10 and the debrief says he walked',b.finished&&b.score===90&&/Walked to the ambulance<\/span><b>yes/.test(bb),`score ${b.score}`);}
@@ -60,9 +66,10 @@ module.exports=function(report){
     F({key:'vf'});const s=quiet(()=>human.play('cp',1,{arrReact:20}));F(null);
     report('chest','VF arrest: freezing for 20 real seconds before checking him costs the slow start',s.finished&&s.incidents.some(i=>/Slow to start compressions/.test(i))&&s.score<=90,`score ${s.score}`);
     F({key:'vf'});const {api}=boot();api.loadCall('cp');F(null);const S=api.S();api.$('brief-go').onclick();S.h.abc=true;S.h.arr=true;S.h.arrRt=S.rt;S.h.arrT=S.t;
-    api.$('k-cpr').onclick();const noCheck=!S.h.cpr;api.$('k-chk').onclick();for(let i=0;i<8;i++)api.tick(.25);api.$('k-pads').onclick();for(let i=0;i<12;i++)api.tick(.25);
-    api.$('k-cpr').onclick();api.$('k-analyze').onclick();for(let i=0;i<24;i++)api.tick(.25);const sc=S.score;api.$('k-shock').onclick();
-    report('chest','VF arrest: no CPR before the check; shocking without calling clear costs 15',noCheck&&S.h.shocks===1&&sc-S.score>=15);}
+    const s0=S.score;api.$('k-cpr').onclick();const early=S.h.cpr&&S.h.arrChecked&&s0-S.score===3&&/before the 10-second check/.test(S.incidents.join(' '));
+    api.$('k-pads').onclick();for(let i=0;i<12;i++)api.tick(.25);api.$('k-analyze').onclick();api.tick(.25);const s1=S.score;api.$('k-cpr').onclick();const touch=s1-S.score===5&&S.h.aed==='analyzing'&&!S.h.cpr;
+    for(let i=0;i<24;i++)api.tick(.25);const sc=S.score;api.$('k-shock').onclick();
+    report('chest','VF arrest: compressions before the check go on and cost 3; touching him during analysis costs 5 and restarts it; shocking without calling clear costs 15',early&&touch&&S.h.shocks===1&&sc-S.score>=15,`early ${early}, touch ${touch}`);}
   // the arrest inject on the woman with no chest pain speaks of her, not him
   {F({key:'atypical'});const {api}=boot();api.loadCall('cp');F(null);const S=api.S();api.$('brief-go').onclick();S.h.abc=true;api.INJECTS.find(q=>q.id==='vf').run();api.$('k-chk').onclick();for(let i=0;i<8;i++)api.tick(.25);const t=logText(api);
     report('chest','the arrest inject on her: "She just slumped over", "She\'s in arrest", never "he"',/She just slumped over/.test(t)&&/She's in arrest!/.test(t)&&!/He just slumped|He's in arrest/.test(t)&&(S.dets||[]).some(x=>x.id==='vf'&&x.found));}

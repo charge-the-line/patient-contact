@@ -14,7 +14,7 @@ function play(tier,choice='good',o={}){const {api,els}=boot();const {$}=api;api.
       if(S.mission===1){if($('c-push')._cls.has('hot'))tap('c-push');if(x.crown&&!x.head&&!o.noHead)tap('c-head');if($('c-shoulders')._cls.has('hot'))tap('c-shoulders');if(x.born)tap('c-tob');}
       if(S.mission===2&&!(o.slow&&rt-(x.birthRt||rt)<o.slow)){if(!x.act)for(const id of ['b-dry','b-wrap','b-pos','b-suct'])if(tap(id))break;if(x.vigorous&&x.wrapped)tap('b-sts');if(x.posA&&!x.gurgly&&x.hrChecks<1)tap('b-hr');if(x.hrChecks>=1)tap('b-bvm');
         if(x.bvm&&!x.vigorous&&rt-lastB>=(o.sloppy?.8+Math.random()*2.8:1.2)){$('b-breath').onclick();lastB=rt;}if(x.good>=14&&x.hrChecks<2&&!x.act)tap('b-hr');if(x.vigorous)tap('b-sts');if(x.vigorous&&!x.cut&&rt-(x.birthRt||rt)>35)tap('b-cut');}
-      if(S.mission===3){for(const id of ['c-massage','c-nurse'])if(tap(id))break;if(x.mvit<1&&!x.act)tap('c-mvitals');}
+      if(S.mission===3){for(const id of (x.placenta?['c-massage','c-nurse']:['c-nurse']))if(tap(id))break;if(x.mvit<1&&!x.act)tap('c-mvitals');}
       if(S.mission===4&&rt%40<1)tap('c-reass');
       api.tick(.25);}
     rt+=.25;}
