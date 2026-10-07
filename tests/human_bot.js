@@ -15,7 +15,7 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
     if(opts.instChaos&&S.running&&Math.random()<.004){const ok=api.INJECTS.filter(x=>{try{return x.ok()&&['delay','family','worse','vomit','bridge'].includes(x.id);}catch(e){return false;}});if(ok.length){api.instAct({a:'inj',i:ok[Math.floor(Math.random()*ok.length)].id});opts._inj=(opts._inj||0)+1;}}
     if(opts.ff&&S.running){const w=api.ffWhy();
       if(!w&&rt>=nextTap){(opts.ffLog=opts.ffLog||[]).push(api.ffGo());nextTap=rt+1.2;rt+=.25;continue;}
-      if(w==='due'&&!(S.dets||[]).some(x=>!x.closed)&&(call==='dm'||call==='pd'||(call==='arrest'?(api.M()[S.mission]||{}).tag==='tx':S.mission===api.FFC[call].tx)))tap({mva:'m-reass',od:'o-reass',ep:'e-reass',st:'s-reass',fl:'f-reass',arrest:'a-reassess',dm:'d-glu',pd:'p-reass'}[call]);}
+      if(w==='due'&&!(S.dets||[]).some(x=>!x.closed)&&(call==='dm'||call==='pd'||call==='cp'&&S.mission===api.M().length-1||(call==='arrest'?(api.M()[S.mission]||{}).tag==='tx':S.mission===api.FFC[call].tx)))tap({mva:'m-reass',od:'o-reass',ep:'e-reass',st:'s-reass',fl:'f-reass',arrest:'a-reassess',dm:'d-glu',pd:'p-reass',cp:'k-reass'}[call]);}
     if(S.running){
       if(call==='od'){const o=S.o;
         if(!o.checked)tap('o-check');
@@ -71,6 +71,22 @@ function play(call,tier,opts={}){const {api,els}=boot();const {$}=api;api.setTie
           else if(S.mission===1&&V.kind==='croup'){if(S.t-api.pdRef()>=120&&!x.reassAfter)tap('p-reass');}
           else if(S.mission===2&&x.alsArr)tap('p-load');
           else if(S.mission===3&&S.t-x.tx.lastReass>=60)tap('p-reass');}}
+      if(call==='cp'){const x=S.h,V=api.V();const open=id=>(S.dets||[]).find(q=>q.id===id&&!q.closed);const dv=open('vf'),dd=open('drop'),dp=open('pain');
+        if(x.arr&&!x.rosc){
+          if(!x.arrChecked){if(after('arr',true,opts.arrReact||2)&&!x.act)tap('k-chk');}
+          else if(x.roscSign){if(!x.act&&after('rsign',true,1.5))tap('k-chk');}
+          else if(x.aed==='ready'){if(!x.clear)tap('k-clear');else tap('k-shock');}
+          else if(!x.cpr&&x.aed!=='analyzing')tap('k-cpr');
+          else if(!x.pads&&!x.act)tap('k-pads');
+          else if(x.pads&&x.shocks===0&&x.aed==='idle')tap('k-analyze');
+          if(x.alsArr&&dv&&!dv.told)tap('k-tell2');}
+        else{delete react.arr;delete react.rsign;
+          if(dv&&x.alsArr&&!dv.told)tap('k-tell');
+          if((dd||dp)&&!opts.noDet&&!x.act){if(after('detcp',true,2)){const d=dd||dp;if(!d.found)tap('k-reass');else if(dd&&!x.flat)tap('k-flat');else if(dp&&!x.o2)tap('k-o2');else if(x.alsArr&&!d.told)tap('k-tell');}}else delete react.detcp;
+          if(!x.act&&!dd&&!dp){if(!x.abc)tap('k-abc');else if(!x.opq)tap('k-opq');else if(!x.sample)tap('k-sample');else if(!x.vit)tap('k-vit');
+            else if(S.mission===1){if(!x.qall)tap('k-qall');else if(!x.qbleed)tap('k-qbleed');else if(!x.qthin)tap('k-qthin');else if(!x.qtoday)tap('k-qtoday');else if(x.asaDec==='good'&&!x.asaGiven&&!(V.allergy||V.thin||V.today))tap('k-chew');else if(V.nitro&&!x.qed)tap('k-qed');}
+            else if(x.alsArr&&S.mon.twelve&&!x.moved)tap('k-move');else if(x.moved&&!x.loaded)tap('k-load');
+            else if(S.mission===api.M().length-1&&S.t-x.tx.lastReass>=60)tap('k-reass');}}}
       if(call==='st'){const x=S.s;if(!x.abc)tap('s-abc');else if(!x.act){const k=['B','E','F','A','S'].find(k=>!x.bf[k]);if(k)tap('s-'+k);else for(const id of ['s-time','s-glu','s-meds','s-vitals'])if(tap(id))break;}
         if(x.vomit)tap('s-suct');if(x.alsArr){tap('s-fam');tap('s-cot');}if(S.mission===2)tap('s-load');
         {const dd=(S.dets||[]).filter(q=>q.id==='worse').pop();if(dd&&!dd.closed&&!opts.noDet){if(after('detst',true,2)){if(!dd.found)tap('s-reass');else if(!dd.told)tap('s-tell');else if(x.secr&&!x.suct2)tap('s-suct');else if(!x.side)tap('s-side');else if(x.spo2<94&&!x.o2on)tap('s-o2');else if(!x.glu2&&!x.act)tap('s-glu2');}}else{delete react.detst;if(S.mission===3)tap('s-reass');}}}

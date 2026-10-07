@@ -18,11 +18,13 @@ const PLAN=[
  ['dm','falling',['natural','inject:worse'],3],['dm','seizure',['natural'],3],['dm','delay',['inject:delay','chaos'],3],['dm','family',['inject:family'],3],
  ['arrest','vomit',['inject:vomit','chaos'],3],['arrest','lucas',['inject:lucas'],3],['arrest','rearrest',['inject:rearrest'],3],['arrest','o2',['inject:o2'],3],
  ['arrest','delay',['inject:delay','chaos'],3],['arrest','bridge',['inject:bridge'],3],['arrest','family',['inject:family'],3],
- ['pd','tiring',['natural','inject:worse'],4],['pd','upset',['natural','inject:worse'],4],['pd','delay',['inject:delay','chaos'],4],['pd','family',['inject:family'],4],['pd','bridge',['inject:bridge'],4]];
+ ['pd','tiring',['natural','inject:worse'],4],['pd','upset',['natural','inject:worse'],4],['pd','delay',['inject:delay','chaos'],4],['pd','family',['inject:family'],4],['pd','bridge',['inject:bridge'],4],
+ ['cp','vf',['natural','inject:vf'],4],['cp','drop',['natural','inject:worse'],4],['cp','pain',['natural'],4],['cp','delay',['inject:delay','chaos'],4],['cp','family',['inject:family'],4],['cp','bridge',['inject:bridge'],4]];
 const answer=(api,pick='good')=>{const D=api.DECO();if(!D)return null;let i=D.opts.findIndex(o=>o.r===pick);if(i<0)i=0;const key=D.key;api.$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});api.$('dec-go').onclick();return key;};
 const HTML=require('fs').readFileSync(require('path').join(__dirname,'..','index.html'),'utf8');
 const groupOf=id=>{const m=[...HTML.matchAll(/<div class="grp hidden" id="([^"]+)">([\s\S]*?)<\/div><\/div>/g)].find(g=>g[2].includes(`id="${id}"`));return m?m[1]:null;};
 // a button a person could tap right now: it exists, has a handler, isn't hidden, and its group is on screen
+const cpArr=S=>{const x=S.h;if(x.rosc||x.act)return null;if(!x.arrChecked||x.roscSign)return 'k-chk';if(x.aed==='ready')return x.clear?'k-shock':'k-clear';if(!x.cpr&&x.aed!=='analyzing')return 'k-cpr';if(!x.pads)return 'k-pads';if(x.shocks===0&&x.aed==='idle')return 'k-analyze';return null;};
 const shown=(api,id)=>{const e=api.$(id);if(!e||!e.onclick||e._cls.has('hidden'))return false;const g=groupOf(id);return !g||!api.$(g)._cls.has('hidden');};
 function snap(api){return {S:JSON.stringify(api.S()),done:api.stepsDone().slice()};}
 function restore(api,x){const S=api.S(),b=JSON.parse(x.S);for(const k of Object.keys(S))delete S[k];Object.assign(S,b);x.done.forEach((v,j)=>api.stepsDone()[j]=v);}
@@ -55,7 +57,7 @@ module.exports=function(report){
     report('deter','every entry answers with a decision card, or with two or more actions including one that changes the patient, a finding and a penalty for ignoring it',bad.length===0,bad.map(d=>d.call+':'+d.id).join(', ')||`${DET.length} entries`);
     const decs=DET.filter(d=>d.dec).filter(d=>!a0.DEC[d.dec]);report('deter','every decision card in the table exists',decs.length===0,decs.map(d=>d.dec).join(', '));}
   // 2. every inject that can fire in a call is in the audit plan (so a new inject can't arrive without a planned response)
-  {const seen={};for(const call of ['mva','od','ep','st','fl','dm','arrest','pd'])for(const tier of [0,2])quiet(()=>human.play(call,tier,{stopAt:(S,api)=>{for(const x of api.INJECTS){let ok=false;try{ok=x.ok();}catch(e){}if(ok)(seen[call]=seen[call]||new Set()).add(x.id);}return false;}}));
+  {const seen={};for(const call of ['mva','od','ep','st','fl','dm','arrest','pd','cp'])for(const tier of [0,2])quiet(()=>human.play(call,tier,{stopAt:(S,api)=>{for(const x of api.INJECTS){let ok=false;try{ok=x.ok();}catch(e){}if(ok)(seen[call]=seen[call]||new Set()).add(x.id);}return false;}}));
     const lost=[];for(const call in seen)for(const id of seen[call])if(!PLAN.some(p=>p[0]===call&&p[2].includes('inject:'+id)))lost.push(call+':'+id);
     report('deter','every instructor inject that can fire in a call has a planned response',lost.length===0,lost.join(', ')||Object.keys(seen).map(c=>c+' '+seen[c].size).join(', '));}
   // 3. car versus tree: her shock gets worse on the cot, on its own and as an inject, with and without an unstable pelvis
@@ -149,9 +151,18 @@ module.exports=function(report){
     metric:S=>-S.p.agit*100,mlab:'agitation (lower is better)',need:15},
    {k:'pd.upset',lab:'pediatric: croup, upset again on the inject (Recall)',call:'pd',tier:1,force:{kind:'croup'},stop:S=>S.mission===1&&S.running&&!S.briefing&&S.p.agit<.35,fire:api=>api.INJECTS.find(x=>x.id==='worse').run(),H:150,
     resp:S=>{const x=S.p,d=S.dets.find(q=>q.id==='upset');if(x.act)return null;if(!d.found)return 'p-reass';if(x.agit>=.35&&!x.calm)return 'p-calm';if(x.alsArr&&!d.told)return 'p-tell';return null;},
-    metric:S=>-S.p.agit*100,mlab:'agitation (lower is better)',need:15}];
+    metric:S=>-S.p.agit*100,mlab:'agitation (lower is better)',need:15},
+   // pass 4: chest pain (0.29.0)
+   {k:'cp.vf',lab:'chest pain: he goes into VF in front of the crew (on its own)',call:'cp',tier:0,force:{key:'vf'},stop:S=>S.h.arr,H:200,resp:S=>cpArr(S),metric:S=>S.h.rosc?10:0,mlab:'pulse back',need:10},
+   {k:'cp.vf',lab:'chest pain: VF arrest on the inject during the aspirin checks (Recall)',call:'cp',tier:1,force:{key:'classic'},stop:S=>S.mission===1&&S.running&&!S.briefing&&S.h.qall,fire:api=>api.INJECTS.find(x=>x.id==='vf').run(),H:200,resp:S=>cpArr(S),metric:S=>S.h.rosc?10:0,mlab:'pulse back',need:10},
+   {k:'cp.drop',lab:'chest pain: nitro taken after an erection drug, the pressure drops',call:'cp',tier:0,force:{key:'ed'},pick:{cpNitro:'bad'},stop:S=>(S.dets||[]).some(x=>x.id==='drop'),H:150,
+    resp:S=>{const x=S.h,d=S.dets.find(q=>q.id==='drop');if(x.act)return null;if(!d.found)return 'k-reass';if(!x.flat)return 'k-flat';if(x.alsArr&&!d.told)return 'k-tell';return null;},metric:S=>S.h.sbp,mlab:'systolic pressure',need:5},
+   {k:'cp.drop',lab:'chest pain: the pressure drops on the inject (Recall)',call:'cp',tier:1,force:{key:'classic'},stop:S=>S.mission===1&&S.running&&!S.briefing&&S.h.qthin,fire:api=>api.INJECTS.find(x=>x.id==='worse').run(),H:150,
+    resp:S=>{const x=S.h,d=S.dets.find(q=>q.id==='drop');if(x.act)return null;if(!d.found)return 'k-reass';if(!x.flat)return 'k-flat';if(x.alsArr&&!d.told)return 'k-tell';return null;},metric:S=>S.h.sbp,mlab:'systolic pressure',need:5},
+   {k:'cp.pain',lab:'chest pain: the pain comes back in the ambulance with a low SpO₂',call:'cp',tier:0,force:{key:'classic'},stop:S=>(S.dets||[]).some(x=>x.id==='pain'),H:200,
+    resp:S=>{const x=S.h,d=S.dets.find(q=>q.id==='pain');if(x.act)return null;if(!d.found)return 'k-reass';if(!x.o2)return 'k-o2';if(!d.told)return 'k-tell';return null;},metric:S=>S.h.spo2,mlab:'SpO₂',need:2}];
   const covered=new Set();
-  for(const c of SC){F(c.force?{[c.call]:c.force}:null);const r=quiet(()=>c.call==='cb'?cbBot.play(c.tier,'good',{noDet:true,stopAt:c.stop}):human.play(c.call,c.tier,{noDet:true,stopAt:c.stop}));F(null);
+  for(const c of SC){F(c.force?{[c.call]:c.force}:null);const r=quiet(()=>c.call==='cb'?cbBot.play(c.tier,'good',{noDet:true,stopAt:c.stop}):human.play(c.call,c.tier,{noDet:true,stopAt:c.stop,pick:c.pick}));F(null);
     const name=`${c.lab} · ${['Guided','Recall','Chaos'][c.tier]}`;
     if(!r.stopped){report('deter',`${name}: reaches the moment`,false);continue;}
     const api=r.api,S=api.S();if(c.fire)c.fire(api);api.tick(.25);api.tick(.25);
@@ -178,7 +189,8 @@ module.exports=function(report){
       ['dm','delay',{},S=>S.d.abc&&S.mission===0&&!S.d.alsArr&&S.running],['dm','family',{},S=>S.d.abc&&S.mission===0&&S.running],
       ['arrest','delay',{open:'cpr',outcome:'rosc',shock:true},S=>S.arrest&&S.cpr.on&&!S.als.arrived&&S.compT>30],['arrest','family',{open:'cpr',outcome:'rosc',shock:true},S=>S.arrest&&S.cpr.on&&S.compT>30],['arrest','bridge',{open:'cpr',outcome:'rosc',shock:true},(S,api)=>api.aPh()==='tx'&&S.running&&!S.briefing&&S.tx.t>20],
       ['cb','delay',{},S=>S.c.hist&&S.mission===0&&!S.c.alsArr&&S.running],['cb','family',{},S=>S.c.hist&&S.mission===0&&S.running],
-      ['pd','delay',{kind:'croup'},S=>S.p.listen&&S.mission===0&&!S.p.alsArr&&S.running],['pd','family',{kind:'croup'},S=>S.p.listen&&S.mission===0&&S.running],['pd','bridge',{kind:'croup'},S=>S.mission===3&&S.running&&!S.briefing&&S.p.tx.t>20]];
+      ['pd','delay',{kind:'croup'},S=>S.p.listen&&S.mission===0&&!S.p.alsArr&&S.running],['pd','family',{kind:'croup'},S=>S.p.listen&&S.mission===0&&S.running],['pd','bridge',{kind:'croup'},S=>S.mission===3&&S.running&&!S.briefing&&S.p.tx.t>20],
+      ['cp','delay',{key:'classic'},S=>S.h.abc&&S.mission===0&&!S.h.alsArr&&S.running],['cp','family',{key:'classic'},S=>S.h.abc&&S.mission===0&&S.running],['cp','bridge',{key:'classic'},(S,api)=>S.mission===api.M().length-1&&S.running&&!S.briefing&&S.h.tx.t>20]];
     for(const [call,id,force,at] of C){const det=a0.DET().find(d=>d.call===call&&d.id===id);const inj=id;
       for(const pick of ['good','bad']){F({[call]:force});const r=quiet(()=>call==='cb'?cbBot.play(0,'good',{noDet:true,stopAt:at}):human.play(call,0,{noDet:true,stopAt:at}));F(null);
         const lab=`${call} · ${det?det.name:id} (inject): a card asks for a response (${pick==='good'?'right call costs nothing':'wrong call costs 10'})`;

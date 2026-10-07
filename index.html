@@ -202,6 +202,13 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
     <div class="v g"><div class="l">Pulse</div><div class="n" id="pv-hr">—</div></div>
     <div class="v w"><div class="l">Words</div><div class="n" id="pv-words" style="font-size:20px">—</div></div>
   </div>
+  <div class="vitals hidden" id="vitals-cp">
+    <div class="v y"><div class="l">BP</div><div class="n" id="kv-bp" style="font-size:26px">—</div></div>
+    <div class="v g"><div class="l">Pulse</div><div class="n" id="kv-hr">—</div></div>
+    <div class="v c"><div class="l">SpO₂</div><div class="n" id="kv-spo2">—</div></div>
+    <div class="v w"><div class="l">Pain</div><div class="n" id="kv-pain" style="font-size:24px">—</div></div>
+  </div>
+  <div class="cprbar hidden" id="cp-line"><span id="kv-skin">Not assessed</span><span id="kv-age"></span></div>
   <div class="cprbar hidden" id="pd-line"><span id="pv-sound">Not assessed</span><span id="pv-age"></span></div>
   <div class="cprbar hidden" id="dm-line"><span id="dv-skin">—</span><span id="dv-age"></span></div>
   <div class="cprbar hidden" id="od-line"><span id="ov-air">—</span><span id="ov-age"></span></div>
@@ -260,6 +267,10 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="grp hidden" id="g-pd-i"><h3>His inhaler</h3><div class="row"><button id="p-label">Read the label: whose name, what medicine</button><button id="p-date">Check the expiration date</button><button id="p-spacer">Shake it, spacer and mask on</button><button id="p-puff">Help him take it, Mom holding him</button></div><div class="stat" id="p-itxt"></div></div>
   <div class="grp hidden" id="g-pd-b"><h3>Airway and breathing</h3><div class="row three"><button id="p-bvm">Child bag-mask, O₂ 15 on the bag</button><button id="p-breath">Breath (1 every 2–3 s)</button><button id="p-tell">Tell the medic what changed</button></div><div class="stat" id="p-btxt"></div></div>
   <div class="grp hidden" id="g-pd-t"><h3>Moving</h3><div class="row"><button id="p-load">Onto the cot with Mom · power load</button><span></span></div></div>
+  <div class="grp hidden" id="g-cp-a"><h3>Patient</h3><div class="row three"><button id="k-abc">Primary: ABCs, how they look</button><button id="k-opq">OPQRST: the pain or symptoms</button><button id="k-sample">SAMPLE: meds and history</button><button id="k-vit">Vitals and pulse ox</button><button id="k-o2">O₂ only if SpO₂ is low (per protocol)</button><button id="k-flat">Lay flat if the pressure drops</button><button id="k-reass">Reassess</button><button id="k-tell">Tell the medic what changed</button></div></div>
+  <div class="grp hidden" id="g-cp-q"><h3>Aspirin checks</h3><div class="row three"><button id="k-qall">Allergic to aspirin?</button><button id="k-qbleed">Any bleeding lately?</button><button id="k-qthin">Any blood thinners?</button><button id="k-qtoday">Any aspirin already today?</button><button id="k-qed">Erection drugs in the last two days?</button><button id="k-chew">Help with aspirin: four 81 mg, chewed</button></div><div class="stat" id="k-qtxt"></div></div>
+  <div class="grp hidden" id="g-cp-r"><h3>Cardiac arrest</h3><div class="row three"><button id="k-chk">Check: responsive, breathing, pulse (10 s)</button><button id="k-cpr">Start CPR</button><button id="k-pads">AED pads on</button><button id="k-analyze">AED: analyze</button><button id="k-clear">Call "Clear!"</button><button id="k-shock">Shock</button><button id="k-tell2">Tell the medic</button></div><div class="stat" id="k-rtxt"></div></div>
+  <div class="grp hidden" id="g-cp-t"><h3>Moving</h3><div class="row"><button id="k-move">Stair chair to the cot · no walking</button><button id="k-load">Power load</button></div></div>
   <div class="grp hidden" id="g-ride"><h3>In the back</h3><div class="row"><button id="a-reassess">Reassess with the medic</button><span></span></div></div>
 </div>
 
@@ -279,7 +290,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.28.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.29.0 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -296,7 +307,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door.</h1></div>
   <div class="card rdy" id="rdy"><div class="flex"><div style="min-width:0"><div class="small">Your readiness</div><b id="rdy-t" style="display:block;font-family:'Saira Condensed';font-size:22px;line-height:1.05"></b><div class="small" id="rdy-s"></div></div><div class="sp"></div><div class="num" id="rdy-n"></div></div></div>
   <button id="b-resume" class="go hidden" style="width:100%;margin-bottom:8px">Resume call</button>
-  <div class="card"><div class="small">What this is</div><p style="margin:4px 0 0;font-size:15px;line-height:1.45">Medical first response for the firefighter who gets there before the ambulance: nine calls with a working cardiac monitor, patients that change every run, quick drills and a lesson. You are the medical first responder; the EMT drives and the medic works the patient. <b>Protocols vary. On a real call, follow your medical control.</b></p></div>
+  <div class="card"><div class="small">What this is</div><p style="margin:4px 0 0;font-size:15px;line-height:1.45">Medical first response for the firefighter who gets there before the ambulance: ten calls with a working cardiac monitor, patients that change every run, quick drills and a lesson. You are the medical first responder; the EMT drives and the medic works the patient. <b>Protocols vary. On a real call, follow your medical control.</b></p></div>
   <div class="sec" style="margin-top:6px">1 · Learn</div>
   <button class="scen" id="b-lesson"><span class="bchip dim" id="chip-lesson">—</span><b>The lesson</b><span>Medical first response in 12 slides, each with a check · about 10 minutes</span></button>
   <div class="sec">2 · Calls</div>
@@ -311,6 +322,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call7"><span class="bchip dim" id="chip-cb">—</span><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
   <button class="scen" id="b-call8"><span class="bchip dim" id="chip-dm">—</span><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
   <button class="scen" id="b-call9"><span class="bchip dim" id="chip-pd">—</span><b>"My son can't breathe"</b><span>2:04 a.m. A 4-year-old on his mother's lap, working hard to breathe. Medic 1 is nine minutes out.</span></button>
+  <button class="scen" id="b-call10"><span class="bchip dim" id="chip-cp">—</span><b>"It feels like an elephant on my chest"</b><span>9:14 a.m. Chest pressure — or is it? Medic 1 is ten minutes out.</span></button>
   <div class="sec">3 · Drills and tools</div>
   <div class="row2"><button id="b-drills" class="go">Quick drills</button><button id="b-prog">My progress</button><button id="b-gindex">Protocol guide</button><button id="b-howto">How to play</button></div>
   <div class="sec">Drill night</div>
@@ -401,7 +413,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.28.0';
+const APP_VERSION='0.29.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -479,7 +491,7 @@ const VARIANTS={
  cb:()=>{const nuchal=Math.random()<.6,vig=Math.random()<.35;const v={nuchal,vig,label:`${nuchal?'Cord around the neck':'No nuchal cord'} · ${vig?'baby vigorous at birth':'baby needed breaths'}`,sub:[]};
    if(vig)v.sub.push(['limp — we bagged her, crying by about 90 seconds','crying at birth — dried, warmed, skin-to-skin'],['needed breaths','vigorous at birth'],['came out limp','came out crying']);if(!nuchal)v.sub.push(['nuchal cord, ','']);return v;}
 };
-function baseVariant(id){return {arrest:{open:'cpr',look:null,dnr:null,shock:true,outcome:'rosc',roscAt:15,label:'Witnessed · shockable rhythm (VF) · ROSC on scene',sub:[]},od:{L:1,label:'Needed two naloxone doses'},ep:{rebound:true,sev:.42,label:'Moderate reaction · symptoms returned in transport'},st:{side:'R',wake:false,lvo:false,label:'Right-sided weakness · found down · no large-vessel signs',sub:[]},fl:{label:'On Eliquis · down about 9½ hours · right hip',sub:[]},dm:{pill:false,low:false,label:'Type 1 on insulin · awake enough to swallow',sub:[]},mva:{warm:false,loss:300,label:'Cold, wet morning · bleeding started recently',sub:[]},cb:{nuchal:true,vig:false,label:'Cord around the neck · baby needed breaths',sub:[]},pd:{kind:'asthma',inh:'own',tire:false,label:'Asthma — his own inhaler and spacer, in date',sub:[]}}[id]||{label:''};}
+function baseVariant(id){return {arrest:{open:'cpr',look:null,dnr:null,shock:true,outcome:'rosc',roscAt:15,label:'Witnessed · shockable rhythm (VF) · ROSC on scene',sub:[]},od:{L:1,label:'Needed two naloxone doses'},ep:{rebound:true,sev:.42,label:'Moderate reaction · symptoms returned in transport'},st:{side:'R',wake:false,lvo:false,label:'Right-sided weakness · found down · no large-vessel signs',sub:[]},fl:{label:'On Eliquis · down about 9½ hours · right hip',sub:[]},dm:{pill:false,low:false,label:'Type 1 on insulin · awake enough to swallow',sub:[]},mva:{warm:false,loss:300,label:'Cold, wet morning · bleeding started recently',sub:[]},cb:{nuchal:true,vig:false,label:'Cord around the neck · baby needed breaths',sub:[]},pd:{kind:'asthma',inh:'own',tire:false,label:'Asthma — his own inhaler and spacer, in date',sub:[]},cp:{key:'classic',nitro:true,label:'Classic: pressure into his left arm and jaw, sweating · inferior STEMI',sub:[]}}[id]||{label:''};}
 function pickVariant(id){const F=typeof window!=='undefined'&&window.FORCE_V&&window.FORCE_V[id];const v=F?Object.assign(baseVariant(id),F,{sub:[]}):RANDOM&&VARIANTS[id]?VARIANTS[id]():baseVariant(id);if(F&&VARIANTS[id]){const ref=VARIANTS[id];for(let k=0;k<400;k++){const c=ref();if(Object.keys(F).every(q=>c[q]===F[q])){Object.assign(v,c);break;}}}v.sub=v.sub||[];v.id=id;return v;}
 function vt(s){if(typeof s!=='string')return s;for(const [a,b] of (V.sub||[]))s=s.split(a).join(b);
   if(s.includes('{doses}')&&S.o)s=s.split('{doses}').join(String(S.o.doses||0));return s;}
@@ -540,6 +552,7 @@ function tick(dtReal){
   if(CALL==='cb'){tickCB(dtReal);return;}
   if(CALL==='dm'){tickDM(dtReal);return;}
   if(CALL==='pd'){tickPD(dtReal);return;}
+  if(CALL==='cp'){tickCP(dtReal);return;}
   const ph=aPh(),F=ph==='tx'||ph==='work'||ph==='ext'||ph==='tor'?4:ph==='nores'?6:3;const dt=dtReal*F;S.t+=dt;
   if(S.act){S.act.t-=dt;if(S.act.t<=0){const k=S.act.k;S.act=null;
     if(k==='breaths'||k==='suction'||k==='switch')startCPR();
@@ -803,8 +816,9 @@ const A_ROSC=()=>[{tag:'pack',title:'ROSC on scene',sub:'A pulse, here. Now the 
    {t:'Decision: ER handoff',dec:'erHand',f:()=>S.tx.arrived}]}];
 function arrestMissions(){return V.open==='look'?[A_LOOK()]:[A_CPR(),A_ALS(),A_WORK()];}
 let M=[];
-function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;pca('begin','pc',id,()=>`mission-${S.mission+1}`);V=pickVariant(id);M=id==='arrest'?arrestMissions():id==='cb'?(V.vig?M_CB_VIG:M_CB):id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:id==='dm'?M_DM:id==='pd'?M_PD():arrestMissions();CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:id==='dm'?15*3600+40*60:id==='pd'?2*3600+4*60:14*3600+41*60;fresh();if(id==='arrest'&&V.open==='look')S.cpr.who='You';if(id==='dm')S.d=freshDM();if(id==='pd')S.p=freshPD();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
-  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':id==='cb'?'Childbirth':id==='dm'?'Altered driver':id==='pd'?'Child, trouble breathing':'Cardiac arrest';
+function loadCall(id){if(typeof id!=='string')id=CALL;CALL=id;pca('begin','pc',id,()=>`mission-${S.mission+1}`);V=pickVariant(id);M=id==='arrest'?arrestMissions():id==='cb'?(V.vig?M_CB_VIG:M_CB):id==='mva'?M_MVA:id==='od'?M_OD:id==='ep'?M_EP:id==='st'?M_ST:id==='fl'?M_FL:id==='cb'?M_CB:id==='dm'?M_DM:id==='pd'?M_PD():id==='cp'?M_CP():arrestMissions();CALL0=id==='mva'?6*3600+12*60:id==='od'?23*3600+47*60:id==='ep'?16*3600+20*60:id==='st'?10*3600+7*60:id==='fl'?7*3600+34*60:id==='cb'?2*3600+18*60:id==='dm'?15*3600+40*60:id==='pd'?2*3600+4*60:id==='cp'?9*3600+14*60:14*3600+41*60;fresh();if(id==='arrest'&&V.open==='look')S.cpr.who='You';if(id==='dm')S.d=freshDM();if(id==='pd')S.p=freshPD();if(id==='cp')S.h=freshCP();if(id==='cb')S.c=freshCB();if(id==='fl')S.f=freshFL();if(id==='st')S.s=freshST();if(id==='mva')S.m=freshMVA();if(id==='od')S.o=freshOD();if(id==='ep')S.e=freshEP();S.active=true;S.running=true;DEC_OPEN=null;['menu','intro','done','decov','guideov','briefov'].forEach(i=>$(i).classList.add('hidden'));$('radio').innerHTML='';wave=[];
+  $('title').textContent=id==='mva'?'Car versus tree':id==='od'?'Suspected overdose':id==='ep'?'Allergic reaction':id==='st'?'Possible stroke':id==='fl'?'Fall, elderly':id==='cb'?'Childbirth':id==='dm'?'Altered driver':id==='pd'?'Child, trouble breathing':id==='cp'?'Chest pain':'Cardiac arrest';
+  if(id==='cp')radio('Dispatch',V.fem?'Unit responding — 64-year-old female, weak and nauseated, short of breath. Husband is the caller. Medic 1 responding, ten minutes.':'Unit responding — 58-year-old male, chest pain. Wife is the caller. Medic 1 responding, ten minutes.');
   if(id==='pd')radio('Dispatch','Unit responding — 4-year-old male, trouble breathing, woke up struggling. Mother is the caller. Medic 1 responding, nine minutes.');
   else if(id==='dm')radio('Dispatch','Unit responding to assist PD — male driver slumped in a running vehicle, grocery store lot. Officer reports possible intoxication, combative. Medic 1 responding, nine minutes.');
   else if(id==='cb')radio('Dispatch','Unit responding — 27-year-old female in active labor, says the baby is coming. Third pregnancy. Medic 1 responding from across the county, ten minutes, slick roads.');
@@ -835,7 +849,7 @@ function checkMission(dt){const m=M[S.mission];let all=true,done=0;if(S.dets)det
    It runs the same physics, tick by tick, and stops the moment anything happens: a radio call or a penalty,
    a decision, a step done, the patient changing, a skill the person must do in real time, or a reassessment
    coming due. Skipping never dodges a problem: whatever would have happened still happens. */
-const CS=()=>({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p})[CALL];
+const CS=()=>({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p,cp:S.h})[CALL];
 function monGate(){const c=monCfg();return !!(c&&S.active&&c.need());}
 const FFC={
  mva:{tx:3,re:240,sig:()=>{const m=S.m,v=mvaV();return [shockClass(v.loss),v.gcs,m.extr.stage,m.extr.hold>0,m.ctrl,m.alsArr,(S.dets||[]).length].join();},
@@ -1052,6 +1066,7 @@ function finish(){keepAwake(false);pcFx('done');if(M[S.mission]&&M[S.mission].ne
   else if(last&&CALL==='cb'){h+=cbDebrief();record();}
   else if(last&&CALL==='dm'){h+=dmDebrief();record();}
   else if(last&&CALL==='pd'){h+=pdDebrief();record();}
+  else if(last&&CALL==='cp'){h+=cpDebrief();record();}
   else if(last){h+=arrestDebrief();record();}
   if(last&&V.label)h=`<p style="font-size:15px;margin:4px 0 8px"><b>This patient:</b> ${esc(V.label)}</p>`+h;
   if(last)h+=timelineHTML();
@@ -1071,7 +1086,7 @@ function arrestDebrief(){const out=`<div class="mrow"><span>Outcome</span><b sty
   return `<div style="margin-top:6px">`+[['Compression fraction (CCF)',ccf+'%  (aim 80%+)'],['Average manual rate',avg+' /min  (100–120)'],['Time to first shock',S.aed.firstShockT!==null?mmss(S.aed.firstShockT)+' after contact':V.shock===false?'no shockable rhythm':'—'],['Longest hands-off pause',Math.round(S.pause.longest)+' s  (under 10)'],['Longest AED / rhythm-check pause',Math.round(S.pause.peri||0)+' s'],['Your manual CPR quality',Math.round((S.manT?S.Qm/S.manT:0)*100)+'%  (85%+ gives him a chance)'],['Pauses over 10 seconds',S.pause.over10],['Compressor switches',S.switches],['Hyperventilation events',S.vent.hyper],['Resuscitation on scene',mmss(Math.max(0,onScene))+`  (${COUNTY.name}: about ${COUNTY.torMin} min, then the medic consults)`]].map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+out+`</div>`+plain;}
 /* ================= render ================= */
 let wave=[],phase=0;
-function render(){if(FF_ON)return;if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}if(CALL==='cb'){renderCB();return;}if(CALL==='dm'){renderDM();return;}if(CALL==='pd'){renderPD();return;}
+function render(){if(FF_ON)return;if(CALL==='mva'){renderMVA();return;}if(CALL==='od'){renderOD();return;}if(CALL==='ep'){renderEP();return;}if(CALL==='st'){renderST();return;}if(CALL==='fl'){renderFL();return;}if(CALL==='cb'){renderCB();return;}if(CALL==='dm'){renderDM();return;}if(CALL==='pd'){renderPD();return;}if(CALL==='cp'){renderCP();return;}
   EPG.forEach(i=>$(i).classList.add('hidden'));STG.forEach(i=>$(i).classList.add('hidden'));FLG.forEach(i=>$(i).classList.add('hidden'));CBG.forEach(i=>$(i).classList.add('hidden'));DMG.forEach(i=>$(i).classList.add('hidden'));XG.forEach(i=>$(i).classList.add('hidden'));const A=S.aed;
   ODG.forEach(i=>$(i).classList.add('hidden'));$('fattrack').classList.remove('hidden');$('mon-mode').style.color='';
   ['vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx'].forEach(i=>$(i).classList.add('hidden'));['aedmsg','vitals','trace'].forEach(i=>$(i).classList.remove('hidden'));
@@ -1129,7 +1144,7 @@ const GUIDE={
  death:{name:'Signs of death and DNRs',what:'Definite signs of death: rigor mortis (stiffness), dependent lividity (color settled to the low side of the body), decomposition, or a body cold to the touch in a warm environment. Supporting context — mail piled up, flies at the windows of a locked house, an odor — is never enough on its own.',when:'Every unwitnessed arrest: look before you start. And on every arrest, ask the family whether there is a DNR.',wrong:'Withholding CPR on clues alone, calling a cold patient dead in a cold environment, or taking a family\'s word for a DNR nobody can produce.',tip:'Definite signs, or a valid DNR produced right away: do not start; notify (the medic confirms and calls the coroner), protect the scene, support the family. Anything less: start CPR. Cold from the weather is not death — not dead until warm and dead. A DNR that turns up mid-resuscitation goes to the medic, who verifies it and decides. When in doubt, start.',mca:'What makes a Michigan DNR valid (the state form, signatures, witnesses) is to confirm with the MCA. Hypothermia guidance is to confirm with the medical director.',rel:['tor','cpr','agonal']},
  bridge:{name:'Transport delays: the river crossings',what:'Monitor Township is on the west side of the Saginaw River; East Side Hospital is across it. The four Bay City drawbridges open for river traffic.',when:'Any transport across the river, especially in boating season.',wrong:'Being surprised by an opening. A bridge going up for a freighter can add minutes.',tip:'Crews can request through dispatch that a bridge be held down for a priority patient. Commercial ships already committed may not be able to wait. Plan your oxygen and your arms for the longer ride.',rel:['o2math']}
 };
-function incidentKey(w){const R=[[/tiring|breathe for him/i,'tiring'],[/too fast for a child/i,'pbvm'],[/stridor/i,'croup'],[/without a binder/i,'pelvis'],[/condition changed|getting worse/i,'shock'],[/signs of death|DNR/i,'death'],[/glucose check|sugar dropped/i,'glucometer'],[/golden minute/i,'golden'],[/newborn left uncovered|lose heat in minutes/i,'nwarm'],[/too fast for a newborn/i,'nppv'],[/head delivered fast/i,'deliver'],[/postpartum hemorrhage/i,'pph'],[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
+function incidentKey(w){const R=[[/arrested and nothing|Slow to start compressions|within 90 seconds/i,'cprhq'],[/back on the chest/i,'pause'],[/pressure dropped/i,'acs'],[/pain came back/i,'o2acs'],[/tiring|breathe for him/i,'tiring'],[/too fast for a child/i,'pbvm'],[/stridor/i,'croup'],[/without a binder/i,'pelvis'],[/condition changed|getting worse/i,'shock'],[/signs of death|DNR/i,'death'],[/glucose check|sugar dropped/i,'glucometer'],[/golden minute/i,'golden'],[/newborn left uncovered|lose heat in minutes/i,'nwarm'],[/too fast for a newborn/i,'nppv'],[/head delivered fast/i,'deliver'],[/postpartum hemorrhage/i,'pph'],[/long lie|cold floor/i,'longlie'],[/scene time|on scene/i,'befast'],[/epinephrine overdose|underdosed|wrong volume/i,'conc'],[/filter needle/i,'drawup'],[/without a cross-check/i,'rights'],[/to epinephrine/i,'epi'],[/nearly passing out/i,'anaph'],[/withdrawal/i,'withdrawal'],[/too soon/i,'naloxone'],[/lost his pulse from hypoxia/i,'breathfirst'],[/stabilized/i,'stab'],[/X first|arterial bleeding/i,'xabc'],[/glass came in/i,'protect'],[/cold/i,'hypo'],[/head and neck/i,'smr'],[/reassessing an unstable/i,'vitals'],[/pause|hands-off|off the chest|resume/i,'pause'],[/hyperventilation|too fast/i,'vent'],[/two minutes|depth is falling/i,'rotate'],[/motion|touched|analysis|without calling clear/i,'aed'],[/cylinder/i,'o2math']];
   const d=w.match(/^Decision — (.*)$/);if(d){const k=Object.keys(DEC).find(x=>DEC[x].tag===d[1]);return k?DEC[k].g:null;}for(const [r,k] of R)if(r.test(w))return k;return null;}
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
@@ -2593,6 +2608,245 @@ function pdDebrief(){const x=S.p,cr=V.kind==='croup';const rows=[['Looked from t
   const msg=x.trapUsed?'An inhaler that isn\'t his, or isn\'t in date, isn\'t yours to help with. Oxygen, calm, and the medic.':x.tireFired&&x.firstBagT===null?'He went quiet because he was tiring, not because he was better. Sleepy and quiet means breathe for him.':x.upsets>1?'He kept getting upset. With croup, calm is the treatment you carry.':'You looked before you touched, kept him calm, gave him oxygen he would take'+(cr?'':', handled the inhaler right')+(x.tireFired?', and breathed for him when he tired.':'.');
   return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:15px;color:var(--soft);margin-top:10px">${msg}</p>`;}
 
+/* ================= Chest pain: "It feels like an elephant on my chest" (0.29.0) =================
+   Recognize ACS, including the woman with no chest pain. Bay County MFR scope (Max, October 7, 2026; pending MCA review):
+   MFRs may ASSIST a patient in taking aspirin: 324 mg, four 81 mg chewables, chewed. Before assisting: allergy, recent bleeding,
+   blood thinners, any aspirin already today. Any aspirin already today (a daily dose or for this pain): ask the medic. A blood
+   thinner: hold it and ask the medic. An aspirin allergy: no aspirin. The MFR never assists with nitroglycerin: ask about
+   erection drugs and tell the medic. Oxygen only below the protocol's SpO₂ threshold (COUNTY.o2Min; protocols use 90 or 94).
+   Rest, no walking. The medic finds the STEMI on the 12-lead you help place. One patient goes into VF in front of the crew. */
+const CPG=['vitals-cp','cp-line','g-cp-a','g-cp-q','g-cp-r','g-cp-t'];XG.push(...CPG);
+const HP=()=>V.fem?{he:'she',He:'She',his:'her',His:'Her',him:'her',fam:'husband',Fam:'Husband'}:{he:'he',He:'He',his:'his',His:'His',him:'him',fam:'wife',Fam:'Wife'};
+/* why the aspirin waits for the medic, or isn't given: null when all four checks are clear */
+function cpReason(){return V.allergy?'allergy':V.thin?'thinner':V.today?'today':null;}
+function freshCP(){const f=V.fem;return {abc:false,opq:false,sample:false,vit:false,ox:false,o2:false,what:null,flat:false,
+  qall:false,qbleed:false,qthin:false,qtoday:false,qed:false,asaDec:null,asaT:null,asaGiven:false,asaWrong:false,nitroDec:null,nitroTaken:false,
+  sbp:f?138:152,dbp:f?84:94,hr:f?98:92,spo2:f?95:96,pain:f?0:8,dropT:null,fluids:false,painT:null,
+  walk:null,moved:false,loaded:false,handed:false,stemi:false,
+  arr:false,arrRt:null,arrT:null,arrChecked:false,cpr:false,cprStartRt:null,compRt:0,pauseRt:null,pauseDinged:false,longest:0,pads:false,aed:'off',aedRt:null,clear:false,shocks:0,firstShockRt:null,lastShockRt:null,roscSign:false,roscSignRt:null,rosc:false,roscT:null,slowDing:false,shockDing:false,
+  act:null,eta:600,alsArr:false,alsT:null,toldT:null,medFluids:false,
+  tx:{t:0,total:540,arrived:false,reass:0,lastReass:-999},chaos:{eta:false}};}
+function cpV(){const x=S.h;return {sbp:Math.round(x.sbp),dbp:Math.round(x.dbp),hr:Math.round(x.hr),spo2:Math.round(x.spo2),
+  skin:x.arr&&!x.rosc?'gray, not breathing':x.sbp<90?'pale, cool and clammy':V.fem?'pale and sweaty':'pale, sweaty, gray'};}
+const KX=k=>$(k);
+function cpNeed(){if(!S.h.abc){radio('Partner','Primary first.','bad');return true;}return false;}
+function cpFind(){const x=S.h,v=cpV(),p=HP();
+  if(detOpen('drop')&&x.sbp<90)detFind('drop',`BP ${v.sbp}/${v.dbp}, pulse ${v.hr}, ${v.skin}: ${p.his} pressure has dropped.`);
+  if(detOpen('pain')&&x.painT!==null)detFind('pain',`The pain is back up to ${x.pain} out of 10 and ${p.he}'s short of breath now: SpO₂ ${v.spo2}.`);}
+KX('k-abc').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(x.abc||x.act)return;x.act={k:'abc',t:8};radio('You',V.fem?'Ma\'am, I\'m with the fire department. Can you tell me your name?':'Sir, I\'m with the fire department. Can you tell me your name?');};
+KX('k-opq').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(cpNeed()||x.opq||x.act)return;x.act={k:'opq',t:12};};
+KX('k-sample').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(cpNeed()||x.sample||x.act)return;x.act={k:'sample',t:12};};
+KX('k-vit').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(cpNeed()||x.act||x.arr&&!x.rosc)return;x.act={k:'vit',t:14};};
+KX('k-reass').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(cpNeed()||x.act||x.arr&&!x.rosc)return;x.act={k:'reass',t:8};};
+KX('k-o2').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(cpNeed()||x.o2)return;if(!x.ox){radio('Partner','Pulse ox first — we need the number.','bad');return;}
+  const v=cpV();if(v.spo2>=COUNTY.o2Min){radio('Partner',`SpO₂ is ${v.spo2} — at or above ${COUNTY.o2Min}, no oxygen needed per protocol.`);return;}
+  x.o2=true;detAct('k-o2');radio('You',`SpO₂ ${v.spo2}: nasal cannula at 4 per protocol.`);};
+KX('k-flat').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(cpNeed()||x.flat)return;if(x.sbp>=90&&!detOpen('drop')){radio('Partner',`${HP().His} pressure is fine — let ${HP().him} sit the way it's easiest to breathe.`);return;}
+  x.flat=true;x.sbp+=8;x.dbp+=4;detAct('k-flat');radio('You','Laying flat, legs level. Keep still, we\'ve got you.');};
+KX('k-tell').onclick=()=>{if(CALL!=='cp')return;const x=S.h,d=detOpen('vf')||detOpen('drop')||detOpen('pain');if(!x.alsArr){radio('You','Medic 1 isn\'t here yet.');return;}if(!d){radio('Medic 1','Thanks. Keep watching.');return;}if(d.told)return;
+  const v=cpV(),p=HP();if(x.toldT===null)x.toldT=S.t;x.toldChg=S.t;
+  radio('You',d.id==='drop'?`${p.His} pressure dropped: ${v.sbp}/${v.dbp}, pulse ${v.hr}. ${x.nitroTaken?'He took a nitro after his Viagra last night. ':''}Laid flat.`:d.id==='pain'?`Pain back to ${x.pain} out of 10, new short of breath, SpO₂ ${v.spo2}.`:`${p.He}'s in arrest: collapsed at ${clockStr(x.arrT)}, CPR running, ${x.shocks} shock${x.shocks===1?'':'s'}.`);
+  radio('Medic 1',d.id==='drop'?'IV fluids, per Medstar/MMR protocol.':d.id==='pain'?'Pain medicine and nitro are my call, per Medstar/MMR protocol.':'Pads to my monitor. Keep compressing.','good');detAct('k-tell');};
+KX('k-tell2').onclick=()=>KX('k-tell').onclick();
+/* the aspirin checks */
+const ASK=(id,k,txt)=>KX(id).onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(cpNeed()||x[k]||x.act)return;x[k]=true;radio(...txt());};
+ASK('k-qall','qall',()=>['Patient',V.allergy?'Aspirin? It gives me hives — last time my throat got tight.':'No — no allergies to anything.',V.allergy?'bad':'']);
+ASK('k-qbleed','qbleed',()=>['Patient','No bleeding. No black stools, nothing in my stomach, no surgery.']);
+ASK('k-qthin','qthin',()=>['Patient',V.thin?'I take Eliquis — for my A-fib.':'No blood thinners.',V.thin?'bad':'']);
+ASK('k-qtoday','qtoday',()=>V.today==='pain'?[HP().Fam,'I gave him four of the baby aspirin about twenty minutes ago, when it started.','bad']:V.today==='daily'?['Patient','I take a baby aspirin every morning. Took it at seven.','bad']:['Patient','No, nothing today.']);
+ASK('k-qed','qed',()=>['Patient',V.ed?'…Yes. I took a Viagra last night.':'No. None of that.',V.ed?'bad':'']);
+KX('k-chew').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(cpNeed()||x.act||x.asaGiven)return;if(x.asaDec!=='good'||cpReason()){radio('Partner','Not now — the checks say hold it.','bad');return;}x.act={k:'chew',t:20};radio('You','Four 81 milligram chewables. Chew them all up, then swallow.');};
+/* the arrest, measured on the real clock (S.rt) */
+KX('k-chk').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(!x.arr||x.act)return;if(x.rosc){radio('You',`Pulse is strong. Breathing on ${HP().his} own.`);return;}if(x.arrChecked&&!x.roscSign){radio('You','Still pulseless — keep going.');return;}x.act={k:'chk',t:4};if(x.cpr){x.cpr=false;x.pauseRt=S.rt;x.pauseDinged=false;}};
+KX('k-cpr').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(!x.arr||x.rosc)return;if(!x.arrChecked){radio('Partner',`Check ${HP().him} first — ten seconds: responsive, breathing, pulse.`,'bad');return;}
+  if(x.aed==='analyzing'||x.aed==='ready'){radio('AED','Do not touch the patient.','bad');return;}
+  if(x.cpr){x.cpr=false;x.pauseRt=S.rt;x.pauseDinged=false;radio('You','Holding compressions.');return;}
+  x.cpr=true;if(x.cprStartRt===null){x.cprStartRt=S.rt;if(S.rt-x.arrRt>15&&!x.slowDing){x.slowDing=true;ding(10,'Slow to start compressions — CPR within seconds of finding no pulse');}}
+  if(x.pauseRt!==null){x.longest=Math.max(x.longest,S.rt-x.pauseRt);x.pauseRt=null;}
+  if(x.aed==='shocked'){if(S.rt-x.lastShockRt>5)ding(5,'Slow back on the chest after the shock — compressions right away');x.aed='idle';}
+  detAct('k-cpr');radio('You','On the chest: hard and fast, 110 a minute, full recoil. Partner, AED.');};
+KX('k-pads').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(!x.arr||x.rosc||x.pads||x.act)return;if(!x.arrChecked){radio('Partner','Confirm the arrest first.');return;}x.act={k:'pads',t:6};};
+KX('k-analyze').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(!x.arr||x.rosc||!x.pads||x.aed==='analyzing'||x.aed==='ready')return;
+  if(x.cpr){x.cpr=false;x.pauseRt=S.rt;x.pauseDinged=false;}x.aed='analyzing';x.aedRt=S.rt;x.clear=false;detAct('k-analyze');radio('AED','Analyzing heart rhythm. Do not touch the patient.');};
+KX('k-clear').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(x.aed!=='ready')return;x.clear=true;radio('You','I\'m clear, you\'re clear, everybody\'s clear!');};
+KX('k-shock').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(x.aed!=='ready')return;if(!x.clear)ding(15,'Shocked without calling clear — someone could have been touching the patient');
+  x.shocks++;x.lastShockRt=S.rt;if(x.firstShockRt===null)x.firstShockRt=S.rt;x.aed='shocked';x.roscSignRt=S.rt+20;detAct('k-shock');radio('AED','Shock delivered. Begin CPR.');};
+function cpArrest(){const x=S.h;if(x.arr)return;x.act=null;x.arr=true;x.arrRt=S.rt;x.arrT=S.t;x.flat=true;radio(HP().Fam,`${HP().He} just slumped over! ${HP().He}'s not answering me!`,'bad');detFire('vf');}
+KX('k-move').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(x.moved||x.act||S.briefing)return;if(x.walk===null&&!V.vf){radio('Partner','How is he getting to the ambulance? Decide first.');return;}x.act={k:'move',t:15};radio('You',V.vf?'On three, onto the cot — AED pads stay on.':'Stair chair — we carry, you sit still. Then onto the cot.');};
+KX('k-load').onclick=()=>{if(CALL!=='cp')return;const x=S.h;if(!x.moved||x.loaded||x.act)return;x.act={k:'load',t:8};radio('EMT','Power load engaged — cot\'s locked in.');};
+function tickCP(dtReal){const x=S.h;const last=S.mission===M.length-1;const F=last?4:3;const dt=dtReal*F;S.t+=dt;const p=HP();
+  if(x.act){x.act.t-=dt;if(x.act.t<=0){const k=x.act.k;x.act=null;const v=cpV();
+    if(k==='abc'){x.abc=true;radio('You',V.fem?'Airway open, talking in full sentences. Breathing a little fast. Pulse fast and regular. Pale, sweaty, cool to the touch.':'Airway open, talking. Breathing fine. Pulse regular. Pale, gray and sweaty — he looks sick.','bad');}
+    if(k==='opq'){x.opq=true;radio('Patient',V.fem?'It started about an hour ago. I\'m sick to my stomach, so tired, and I can\'t catch my breath just walking to the bathroom. No pain — just a heaviness. I thought it was the flu.':'Started about nine, just sitting reading the paper. Nothing makes it better. Pressure — like an elephant on my chest. Goes into my left arm and my jaw. Eight out of ten. Constant.');}
+    if(k==='sample'){x.sample=true;radio('Patient',V.fem?'Diabetic for twenty years — metformin and insulin. Lisinopril for blood pressure. Ate a little toast at seven.':`Lisinopril, atorvastatin${V.thin?', Eliquis for A-fib':''}, and nitroglycerin if I need it. High blood pressure, a stent four years ago. Breakfast at eight.${V.allergy?' Allergies: aspirin.':''}`);}
+    if(k==='vit'||k==='reass'){if(k==='vit'){x.vit=true;x.ox=true;}radio(k==='vit'?'Partner':'You',`BP ${v.sbp}/${v.dbp}, pulse ${v.hr}, resp ${V.fem?22:20}, SpO₂ ${v.spo2}. Skin ${v.skin}.${x.pain?' Pain '+x.pain+' out of 10.':''}`);detAct('k-'+k);cpFind();
+      if(k==='reass'&&last&&S.t-x.tx.lastReass>=60){x.tx.lastReass=S.t;x.tx.reass++;}}
+    if(k==='chew'){x.asaGiven=true;x.asaT=S.t;radio('You',`324 milligrams, chewed, at ${clockStr()}. I'll tell the medic the time.`);}
+    if(k==='pads'){x.pads=true;x.aed='idle';detAct('k-pads');radio('Partner','Pads on — one under the right collarbone, one on the left side.');}
+    if(k==='chk'){if(x.roscSign){x.rosc=true;x.roscT=S.t;x.cpr=false;x.sbp=104;x.dbp=68;x.hr=96;x.spo2=92;x.pain=0;radio('You',`Pulse — strong, about 96. ${HP().He}'s breathing on ${HP().his} own! ROSC.`,'good');}
+      else{x.arrChecked=true;radio('You',`Unresponsive, not breathing — just gasping. No pulse. ${HP().He}'s in arrest!`,'bad');detFind('vf');detAct('k-chk');}}
+    if(k==='move'){x.moved=true;}if(k==='load'){x.loaded=true;}}}
+  /* the arrest */
+  if(V.vf&&!x.arr&&M[S.mission]&&M[S.mission].vf&&S.t-S.mStart>=20&&S.running)cpArrest();
+  if(x.arr&&!x.rosc){if(x.cpr)x.compRt+=dtReal;
+    if(x.aed==='analyzing'&&S.rt-x.aedRt>=5){x.aed='ready';radio('AED','Shock advised. Charging. Stand clear.','bad');}
+    if(!x.cpr&&x.arrChecked&&x.aed!=='analyzing'&&x.aed!=='ready'&&x.pauseRt!==null&&S.rt-x.pauseRt>10&&!x.pauseDinged){x.pauseDinged=true;ding(5,`Hands-off pause over 10 seconds — back on the chest`);}
+    if(x.cprStartRt===null&&S.rt-x.arrRt>15&&!x.slowDing){x.slowDing=true;ding(10,'Slow to start compressions — CPR within seconds of finding no pulse');}
+    if(x.shocks===0&&S.rt-x.arrRt>90&&!x.shockDing){x.shockDing=true;ding(5,'No shock within 90 seconds of the collapse — pads on and analyze as soon as you have the AED');}
+    if(x.shocks>0&&!x.roscSign&&x.cpr&&S.rt>=x.roscSignRt){x.roscSign=true;radio('Partner',`${HP().He}'s moving — coughing, pushing at your hands! Check ${HP().him}!`,'good');}
+    if(x.alsArr&&x.shocks===0&&S.t-Math.max(x.alsT,x.arrT)>60&&!x.medShock){x.medShock=true;x.pads=true;x.aed='ready';x.clear=true;radio('Medic 1','Pads to my monitor — VF. Clear! Shocking.','bad');x.shocks++;x.lastShockRt=S.rt;x.firstShockRt=S.rt;x.aed='shocked';x.roscSignRt=S.rt+20;x.cpr=true;}}
+  else{
+    /* vitals ease; the medic's fluids raise a low pressure */
+    if(x.alsArr&&x.toldChg!=null&&detOpen('drop')&&!x.medFluids&&S.t-x.toldChg>=60){x.medFluids=true;radio('Medic 1','Fluids are running, per Medstar/MMR protocol.','good');}
+    if(x.medFluids)x.sbp=Math.min(108,x.sbp+.15*dt);
+    const tg=(x.o2?4:0)+(x.painT!==null?91:x.dropT!==null&&x.sbp<90?93:x.rosc?92:V.fem?95:96);x.spo2+=(Math.min(98,tg)-x.spo2)*Math.min(1,dt/25);
+    if(x.painT!==null&&x.alsArr&&x.toldChg!=null&&S.t-x.toldChg>=60&&x.pain>4){x.pain=4;radio('Medic 1','Pain medicine is in, per Medstar/MMR protocol.','good');}
+    /* the pain comes back in the ambulance (not after a cardiac arrest) */
+    if(last&&!V.vf&&!x.rosc&&x.tx.t>200&&x.painT===null&&!V.fem){x.painT=S.t;x.pain=9;detFire('pain');radio('Patient','It\'s coming back… worse… I can\'t get a breath.','bad');}}
+  /* ALS */
+  if(!x.alsArr){x.eta-=dt;if(TIER===2&&!x.chaos.eta&&S.t>150){x.chaos.eta=true;x.eta+=120;radio('Dispatch','Medic 1 delayed — plus two minutes.','bad');medDelayFire();}if(x.eta<=0){x.alsArr=true;x.alsT=S.t;radio('Medic 1','Medic 1 inside — what have we got?','good');}}
+  if(last&&!S.briefing){x.tx.t+=dt;if(!x.tx.arrived&&x.tx.t>=x.tx.total){x.tx.arrived=true;radio('EMT','East Side Hospital — the cath lab team is at the doors.','good');}}
+  if(x.arr&&!x.rosc&&!(M[S.mission]&&M[S.mission].vf)){if(S.dets)detTick();}else checkMission(dt);renderCP();}
+/* the medic reads the 12-lead you helped place */
+function cpStemi(){const x=S.h;x.stemi=true;radio('Medic 1',`${V.fem?'Inferior STEMI — no chest pain, and it\'s a heart attack.':'Inferior STEMI.'} Dispatch, Medic 1: cath lab alert to East Side Hospital.`,'good');}
+function renderCP(){if(FF_ON)return;const x=S.h;if(!x)return;const v=cpV(),p=HP(),inArr=x.arr&&!x.rosc;$('clock').textContent=clockStr();$('score').textContent=S.score;
+  ['g-assess','g-cpr','g-air','g-aed','g-als','g-move','g-ride','aedmsg','vitals','vitals-mva','mva-line','g-scene','g-pt','g-extr','g-mtx','g-mshock'].concat(ODG,EPG,STG,FLG,CBG,DMG,XG).forEach(i=>$(i).classList.add('hidden'));
+  const vis=(id,on)=>$(id).classList.toggle('hidden',!on);vis('vitals-cp',true);vis('cp-line',true);vis('g-cp-a',!inArr);vis('g-cp-q',!inArr&&S.mission>=1&&!x.arr);vis('g-cp-r',x.arr);vis('g-cp-t',!inArr&&x.alsArr&&S.mon.twelve);
+  $('trace').classList.toggle('hidden',!(x.ox||x.pads||S.mon.four));$('fattrack').classList.add('hidden');
+  const last=S.mission===M.length-1;$('eta-l').textContent=last?'East Side Hospital':'Medic 1';$('eta-v').textContent=last?(x.tx.arrived?'Arrived':mmss(x.tx.total-x.tx.t)+' out'):x.alsArr?'On scene':mmss(x.eta)+' out';
+  $('mon-name').textContent=x.pads?'AED':x.ox?'Pulse oximeter':'No monitor';$('mon-mode').textContent=inArr?'NO PULSE':x.abc?(x.sbp<90?'Low pressure':x.stemi?'STEMI':'Chest pain'):'—';$('mon-mode').style.color=inArr||x.sbp<90?'#ff8f8a':'';
+  $('kv-bp').textContent=x.vit&&!inArr?`${v.sbp}/${v.dbp}`:'—';$('kv-hr').textContent=x.vit&&!inArr?v.hr:'—';$('kv-spo2').textContent=x.ox&&!inArr?v.spo2:'—';$('kv-pain').textContent=x.opq&&!inArr?(V.fem&&!x.painT?'none':x.pain+'/10'):'—';
+  $('kv-skin').textContent=x.abc?'Skin '+v.skin:'Not assessed';$('kv-age').textContent=inArr?(x.cpr?'CPR running':'hands off'):x.o2?'O₂ per protocol':'';
+  for(const [id,on] of [['k-abc',x.abc],['k-opq',x.opq],['k-sample',x.sample],['k-vit',x.vit],['k-o2',x.o2],['k-flat',x.flat&&!inArr],['k-qall',x.qall],['k-qbleed',x.qbleed],['k-qthin',x.qthin],['k-qtoday',x.qtoday],['k-qed',x.qed],['k-chew',x.asaGiven],['k-pads',x.pads],['k-move',x.moved],['k-load',x.loaded]])$(id).classList.toggle('on',on);
+  $('k-o2').textContent=`O₂ only if SpO₂ under ${COUNTY.o2Min} (per protocol)`;$('k-chew').classList.toggle('hidden',x.asaDec!=='good'||!!cpReason());$('k-qed').classList.toggle('hidden',!V.nitro);
+  const d=detOpen('drop')||detOpen('pain');$('k-reass').classList.toggle('hot',!!(d&&!d.found));$('k-tell').classList.toggle('hot',!!(((d&&d.found&&!d.told)||(detOpen('vf')&&!detOpen('vf').told))&&x.alsArr));$('k-flat').classList.toggle('hot',!!(detOpen('drop')&&detOpen('drop').found&&!x.flat));
+  $('k-cpr').textContent=x.cpr?'Hold CPR':'Start CPR';$('k-chk').classList.toggle('hot',x.arr&&(!x.arrChecked||x.roscSign)&&!x.rosc);$('k-cpr').classList.toggle('hot',x.arrChecked&&!x.cpr&&!x.rosc&&x.aed!=='analyzing'&&x.aed!=='ready');
+  $('k-analyze').classList.toggle('hot',x.pads&&!x.rosc&&x.aed==='idle'&&x.shocks===0);$('k-clear').classList.toggle('hot',x.aed==='ready'&&!x.clear);$('k-shock').classList.toggle('hot',x.aed==='ready'&&x.clear);
+  $('k-rtxt').textContent=x.arr?(x.rosc?`ROSC at ${clockStr(x.roscT)} · ${x.shocks} shock${x.shocks===1?'':'s'}`:`Collapsed ${Math.round(S.rt-x.arrRt)} s ago · ${x.cpr?'CPR running':'hands off'}${x.aed==='analyzing'?' · analyzing':x.aed==='ready'?' · shock advised':''} · ${x.shocks} shock${x.shocks===1?'':'s'}`):'';
+  $('k-qtxt').textContent=x.asaGiven?`Aspirin 324 mg chewed at ${clockStr(x.asaT)}`:x.asaDec==='good'&&cpReason()?(cpReason()==='allergy'?'No aspirin: allergic':'Aspirin held — ask the medic'):'';}
+function M_CP(){const p=HP(),vf=!!V.vf;const Ms=[
+ {title:'Patient contact',sub:V.fem?'She says it isn\'t her heart.':'It could be his heart until proven otherwise.',
+  brief:V.fem?'9:14 a.m. A 64-year-old woman on her couch, pale and sweaty. She feels sick, worn out and short of breath, and says she has no chest pain. She\'s diabetic. Her husband called. Medic 1 is ten minutes out.':'9:14 a.m. A 58-year-old man at his kitchen table, pale and sweating, a fist pressed against his chest. His wife called. Medic 1 is ten minutes out.',
+  skills:['acs','o2acs'],
+  steps:[{t:'Primary: ABCs, how '+p.he+' looks',f:()=>S.h.abc},{t:'OPQRST: '+(V.fem?'the symptoms':'the pain'),f:()=>S.h.opq},{t:'SAMPLE: medications and history',f:()=>S.h.sample},{t:'Vitals and pulse ox',f:()=>S.h.vit},
+   {t:'Decision: what is this?',dec:'cpWhat',f:()=>S.h.opq&&S.h.sample}]},
+ {title:'Aspirin',sub:'Four checks before you help.',
+  brief:'Bay County MFRs may assist a patient in taking aspirin (MCA review pending): 324 mg, four 81 mg chewables, chewed. Four checks first: allergy, recent bleeding, blood thinners, any aspirin already today. The MFR never assists with nitroglycerin.',
+  skills:['asa','nitro'],
+  steps:[{t:'Ask: allergic to aspirin?',f:()=>S.h.qall},{t:'Ask: any bleeding lately?',f:()=>S.h.qbleed},{t:'Ask: any blood thinners?',f:()=>S.h.qthin},{t:'Ask: any aspirin already today?',f:()=>S.h.qtoday},
+   {t:'Decision: the aspirin',dec:'cpAsa',f:()=>S.h.qall&&S.h.qbleed&&S.h.qthin&&S.h.qtoday},
+   {t:'If the checks are clear: four 81 mg, chewed',f:()=>!!cpReason()||S.h.asaDec!=='good'||S.h.asaGiven}].concat(V.nitro?[
+   {t:'Nitro cautions: ask about erection drugs',f:()=>S.h.qed},{t:'Decision: '+p.his+' nitro',dec:'cpNitro',f:()=>S.h.qed}]:[])}];
+ if(vf)Ms.push({title:'Waiting for Medic 1',sub:'Keep him resting. Watch him.',vf:true,
+  brief:'Medic 1 is a few minutes out. He\'s resting on the couch, still gray and sweaty. You have the AED in your kit. Stay with him.',
+  skills:['cprhq','aed','pause'],
+  steps:[{t:'Check him: responsive, breathing, pulse',f:()=>S.h.arrChecked},{t:'Compressions now',rt:true,f:()=>S.h.cprStartRt!==null},{t:'AED: pads, analyze, clear, shock',rt:true,f:()=>S.h.shocks>=1},
+   {t:'Signs of life: check for a pulse',rt:true,f:()=>S.h.rosc}]});
+ Ms.push({title:'Medic 1',sub:'Hand off, then help with the 12-lead.',
+  brief:vf?'Medic 1 is coming in. He has a pulse. Give the handoff, then help place the 12-lead: a heart that just stopped is often a blocked artery.':'Medic 1 is coming in. Give the handoff, aspirin given or held and when, then help place the 12-lead. Nobody walks to the ambulance.',
+  skills:['handoff','ecg12','asa'],
+  steps:[{t:'Medic 1 arrives',wait:true,f:()=>S.h.alsArr},{t:'Decision: handoff to Medic 1',dec:'cpHand',f:()=>S.h.alsArr},
+   {t:'Help Medic 1: 4-lead and 12-lead',gate:monGate,f:()=>S.mon.twelve}].concat(vf?[]:[{t:'Decision: "I\'ll walk to the ambulance"',dec:'cpWalk',f:()=>S.mon.twelve}]).concat([
+   {t:vf?'Onto the cot, pads on':'Stair chair to the cot',gate:()=>S.mon.twelve,f:()=>S.h.moved},{t:'Power load',gate:()=>S.h.moved,f:()=>S.h.loaded}])});
+ Ms.push({title:'The ride in',sub:'Cath lab, East Side Hospital.',
+  brief:'East Side Hospital is about nine minutes away, across the river, and the cath lab is waiting. Reassess on the way.',
+  skills:['stemi12','o2acs'],
+  steps:[{t:'Reassess on the way (twice)',wait:true,act:true,f:()=>S.h.tx.reass>=2},{t:'Arrive at East Side Hospital',wait:true,f:()=>S.h.tx.arrived}]});
+ return Ms;}
+Object.assign(DEC,{
+ cpWhat:{tag:'Heart attack until proven otherwise',q:()=>V.fem?'Nausea, fatigue, short of breath, sweaty, diabetic — and no chest pain. What is this most likely?':'Pressure into his left arm and jaw, sweating, a stent four years ago. What is this most likely?',
+  optsFn:()=>V.fem?[
+    {t:'Her heart, even with no pain: treat it as a heart attack',r:'good',why:'Women, diabetics and older patients often have a heart attack with no chest pain: nausea, fatigue, short of breath, sweating.'},
+    {t:'The flu: fluids, rest, and her own doctor later',r:'bad',why:'Nausea and fatigue in a sweaty diabetic can be her heart. Treat it as a heart attack until it\'s ruled out.'},
+    {t:'Her sugar: check it, and if it\'s normal she\'s probably fine',r:'partial',why:'Checking the sugar in a diabetic is smart, but a normal sugar doesn\'t make this nothing. It may be her heart.'}]:[
+    {t:'His heart: treat it as a heart attack until it\'s ruled out',r:'good',why:'Pressure spreading to the arm and jaw, sweating, cardiac history: a heart attack until proven otherwise.'},
+    {t:'Heartburn: an antacid, then see if it settles down on its own',r:'bad',why:'Heartburn is a diagnosis for the hospital to make after the heart is ruled out, not for you.'},
+    {t:'A pulled muscle: rest, ice, and see how it feels later',r:'partial',why:'Muscle pain doesn\'t sweat and spread to the jaw. Treat it as his heart.'}],
+  why:'Chest pressure, pain to the arm or jaw, sweating, nausea and shortness of breath are a heart attack until proven otherwise, and women, diabetics and older patients may have no chest pain at all.',g:'acs',after:()=>{S.h.what=S.lastChoice;}},
+ cpAsa:{tag:'Aspirin: the four checks',q:()=>{const r=cpReason();return r==='allergy'?'Allergic to aspirin: hives and a tight throat last time. No bleeding, no blood thinners, none today. The aspirin?':r==='thinner'?'No allergy, no bleeding, none today — but Eliquis for A-fib. The aspirin?':r==='today'?(V.today==='pain'?'No allergy, no bleeding, no blood thinners — but four baby aspirin twenty minutes ago. The aspirin?':'No allergy, no bleeding, no blood thinners — but his usual baby aspirin at seven this morning. The aspirin?'):`No allergy, no bleeding, no blood thinners, nothing today. The aspirin?`;},
+  optsFn:()=>{const r=cpReason();return r==='allergy'?[
+    {t:'No aspirin with that allergy: tell the medic about it',r:'good',why:'An aspirin allergy rules it out. Tell the medic, who has other options.'},
+    {t:'Give the four chewables anyway; his heart needs it more',r:'bad',why:'Hives and a tight throat last time can be anaphylaxis this time. Not with that allergy.'},
+    {t:'Give one chewable and watch closely for any reaction',r:'partial',why:'A smaller dose is still a dose of something he reacts to. No aspirin; tell the medic.'}]:r?[
+    {t:`Hold it: ${r==='thinner'?'he\'s on a blood thinner':'he\'s had aspirin today'}. Ask the medic`,r:'good',why:r==='thinner'?'With a blood thinner on board, Bay County\'s rule is hold the aspirin and ask the medic, who decides per protocol.':'Any aspirin already today means you ask the medic before helping with more.'},
+    {t:'Give the four chewables anyway; aspirin is what he needs',r:'bad',why:r==='thinner'?'Aspirin on top of a blood thinner raises the bleeding risk. Hold it and ask the medic.':'He may already have his dose. Ask the medic before helping with more.'},
+    {t:'Give one chewable instead of four',r:'partial',why:'Half-measures aren\'t the rule: hold it and ask the medic.'}]:[
+    {t:'Four 81 mg chewables, chewed; tell the medic the time',r:'good',why:'All four checks clear: 324 mg, four 81 mg chewables, chewed so it works faster. Note the time for the medic.'},
+    {t:'One adult aspirin, swallowed whole with a big glass of water',r:'bad',why:'Chewed, not swallowed whole: chewing gets it working faster. And nothing more than a sip by mouth.'},
+    {t:'Hold it until the medic gets here, to be safe',r:'partial',why:'The checks are clear and it\'s in your scope to assist. Aspirin early helps.'}];},
+  why:'Bay County MFRs may assist a patient in taking aspirin (MCA review pending): 324 mg, four 81 mg chewables, chewed, not swallowed whole. First: allergy, recent bleeding, blood thinners, any aspirin today. An allergy: no aspirin. A blood thinner or aspirin already today: hold it and ask the medic. Tell the medic what was given and when.',g:'asa',
+  after:()=>{const x=S.h,r=cpReason();x.asaDec=S.lastChoice;if(S.lastChoice==='bad'){x.asaWrong=true;if(r){x.asaGiven=true;x.asaT=S.t;radio('You','Four 81 milligram chewables.','bad');}else{x.asaGiven=true;x.asaT=S.t;radio('You','One adult aspirin, swallowed whole.','bad');}}
+    if(S.lastChoice==='partial'&&r){x.asaWrong=true;x.asaGiven=true;x.asaT=S.t;radio('You','One 81 milligram chewable.','bad');}}},
+ cpNitro:{tag:'Never his nitro',q:()=>`He pulls a small brown bottle from his shirt pocket: "My nitro — help me take one."${V.ed?' He took a Viagra last night.':''}`,
+  opts:[{t:'Not ours to give: ask about erection drugs and tell the medic',r:'good',why:'The MFR never assists with nitroglycerin. Your job is the cautions and the medic, who decides per protocol.'},
+        {t:'Help him put one under his tongue, then let him lie back a bit',r:'bad',why:'Assisting with nitro is outside the MFR\'s scope. With an erection drug on board it can drop his pressure dangerously.'},
+        {t:'Let him take it himself while you watch his blood pressure',r:'partial',why:'Watching is good, but he shouldn\'t take it now: tell the medic about the nitro and any erection drug first.'}],
+  why:'The MFR never assists with nitroglycerin (Bay County). The cautions: erection drugs (sildenafil, tadalafil, vardenafil) in the last day or two, a low pressure, a very fast or slow heart rate. Find them out and tell the medic, who decides per protocol.',g:'nitro',
+  after:()=>{const x=S.h;x.nitroDec=S.lastChoice;if(S.lastChoice!=='good'){x.nitroTaken=true;if(V.ed){x.sbp=82;x.dbp=50;x.hr=114;x.dropT=S.t;radio('Patient','…I feel like I\'m going to pass out…','bad');if(!detOpen('drop'))detFire('drop');}else{x.sbp-=14;x.dbp-=8;radio('Partner','He took it. Pressure\'s dropped a little.','bad');}}}},
+ cpWalk:{tag:'No walking',q:()=>V.fem?'She stands up: "I can walk out to the ambulance, it\'s just down the steps."':'He stands up: "I\'m fine to walk out to the ambulance."',
+  opts:[{t:'No walking: the stair chair, and we carry you to the cot',r:'good',why:'Every step makes a sick heart work harder. Carry the patient.'},
+        {t:'Sure, slowly, with one of us holding each of your arms',r:'bad',why:'Walking puts more strain on a heart that\'s already starving for oxygen.'},
+        {t:'Walk as far as the front door, then we\'ll get you on the cot',r:'partial',why:'Fewer steps is better than many, but none is the rule.'}],
+  why:'A patient with a suspected heart attack doesn\'t walk: stair chair or cot, every time.',g:'acs',after:()=>{S.h.walk=S.lastChoice;}},
+ cpHand:{tag:'Chest pain handoff',q:'Medic 1: "What have we got?"',
+  optsFn:()=>[
+    {t:`Onset and symptoms, aspirin ${S.h.asaGiven?'given and when':'held and why'}, any nitro, vitals`,r:'good',why:'What it is, when it started, what was given or held and why, the nitro and erection-drug answers, and the vitals. The medic acts on all of it.'},
+    {t:'Probably heartburn; he\'s feeling a little better',r:'bad',why:'Better doesn\'t rule out a heart attack. Give the facts and let the 12-lead decide.'},
+    {t:'His medication list; the rest is written down on our run sheet',r:'partial',why:'The list helps, but the medic needs the aspirin time and the nitro answers out loud, now.'}],
+  why:'Chest pain handoff: onset and symptoms, aspirin given (and the time) or held (and why), the nitro and erection-drug answers, vitals and any change.',g:'handoff',
+  after:()=>{const x=S.h,r=cpReason();x.handed=true;if(x.toldT===null)x.toldT=S.t;if(S.lastChoice!=='good')return;
+    radio('Medic 1',x.asaWrong&&r?'Aspirin despite that? Noted — I\'ll watch for it.':r==='allergy'?'No aspirin with that allergy — good catch.':r==='thinner'?'Eliquis — I\'ll decide on aspirin with medical control, per Medstar/MMR protocol. Thanks for holding it.':r==='today'?(V.today==='pain'?'Four baby aspirin twenty minutes ago — that\'s his dose. No more.':'His morning 81 — I\'ll decide on the rest, per Medstar/MMR protocol.'):x.asaGiven?`324 chewed at ${clockStr(x.asaT)} — got it.`:'No aspirin yet? I\'ll give it, per protocol.','good');
+    if(V.ed)radio('Medic 1','And no nitro with the Viagra — good.','good');}},
+ fam_cp:{tag:'Family wants to drive',q:()=>`${HP().Fam}, keys in hand: "Just let me drive ${HP().him} — the hospital's ten minutes away!"`,
+  opts:[{t:'The ambulance: a medic, a defibrillator, the cath lab',r:'good',why:'If the heart stops in the car there is no AED and no one to help. The cath lab is waiting for the ambulance.'},
+        {t:'Go ahead and drive; it may be faster than waiting for us',r:'bad',why:'A heart attack can turn into cardiac arrest at any moment. The car has nothing for that.'},
+        {t:'Let the patient decide; it\'s their call',r:'partial',why:'It is the patient\'s call, so explain why the ambulance is the safer choice.'}],
+  why:'A heart attack can turn into cardiac arrest without warning. The ambulance carries the monitor, the defibrillator and a medic, and calls the cath lab ahead.',g:'acs'}
+});
+Object.assign(GUIDE,{
+ acs:{name:'Heart attack (acute coronary syndrome)',what:'A coronary artery narrows or blocks and the heart muscle starves. Pressure or squeezing in the chest, pain spreading to the arm, jaw, neck or back, sweating, nausea, short of breath. Women, diabetics and older patients often have no chest pain at all: just nausea, fatigue or breathlessness.',when:'Any of those signs, especially with cardiac risk factors or history.',wrong:'Calling it heartburn or the flu, letting the patient walk, and forgetting it can turn into cardiac arrest.',tip:'Rest, aspirin if the checks are clear, oxygen only if the SpO₂ is low (per protocol), the AED close by, and a 12-lead early.',rel:['asa','nitro','o2acs','stemi12']},
+ asa:{name:'Assisting with aspirin (Bay County)',what:'Bay County MFRs may assist a patient in taking aspirin: 324 mg, four 81 mg chewables, chewed, not swallowed whole.',when:'A suspected heart attack, after four checks: allergy, recent bleeding, blood thinners, any aspirin already today.',wrong:'Skipping the checks, letting the patient swallow it whole, or forgetting to tell the medic when it was given.',tip:'Aspirin allergy: no aspirin. A blood thinner, or any aspirin already today (a daily dose or for this pain): hold it and ask the medic. Note the time and tell the medic.',mca:'Bay County scope (Max, October 7, 2026): MFRs may assist with aspirin, 324 mg chewed; any aspirin already today and any blood thinner go to the medic first. Pending MCA review.',rel:['acs','nitro']},
+ nitro:{name:'Nitroglycerin: cautions only',what:'Nitroglycerin widens blood vessels. It can drop the blood pressure hard, especially with an erection drug on board (sildenafil, tadalafil, vardenafil).',when:'The MFR never assists with nitroglycerin in Bay County.',wrong:'Helping a patient take their own nitro, or not asking about erection drugs.',tip:'Ask about erection drugs in the last day or two, note the blood pressure and heart rate, and tell the medic. The medic decides, per protocol.',mca:'Bay County scope (Max, October 7, 2026): the MFR never assists with nitroglycerin. Pending MCA review.',rel:['acs','asa']},
+ o2acs:{name:'Oxygen in a heart attack',what:'Oxygen helps a heart attack patient only when the blood oxygen is low. With a normal SpO₂, extra oxygen doesn\'t help and may do harm.',when:`Give oxygen when the SpO₂ is below the protocol threshold. Protocols use 90 or 94; this app uses ${COUNTY.o2Min} as one setting until the MCA review sets Bay County's number.`,wrong:'Putting every chest pain patient on a non-rebreather out of habit.',tip:'Check the SpO₂ first. Low: oxygen by cannula or mask per protocol. Normal: no oxygen, recheck.',mca:'The SpO₂ threshold is "per protocol" and pending MCA review (90 or 94).',rel:['acs']},
+ stemi12:{name:'STEMI on the 12-lead',what:'ST elevation on the 12-lead means a coronary artery is likely blocked. The medic calls a cath lab alert so the team is ready at the doors.',when:'A 12-lead early in every suspected heart attack, including one with no chest pain.',wrong:'Waiting for chest pain to get a 12-lead, or placing the chest leads in the wrong spaces.',tip:'Your job is fast, accurate lead placement: V1 and V2 in the 4th intercostal space beside the sternum, V4 in the 5th at the midclavicular line.',rel:['ecg12','acs']},
+ cprhq:{name:'Witnessed arrest: CPR now, shock early',what:'When a patient collapses in front of you: check responsiveness, breathing and pulse for no more than 10 seconds, start compressions, and get the AED on and analyzing as fast as you can.',when:'Any patient who goes unresponsive with no normal breathing and no pulse.',wrong:'Waiting to be sure, long pauses around the AED, and slow restarts after the shock.',tip:'Check, compress, pads, analyze, clear, shock, and right back on the chest. Stop to check only for signs of life or when the AED tells you to.',rel:['cpr','aed','pause']}
+});
+DELAY_TAIL.cp='The AED is open beside you.';
+COUNTY.o2Min=94;
+VARIANTS.cp=()=>{const v=Object.assign({sub:[]},pickW([
+  {w:20,key:'classic',nitro:true,label:'Classic: pressure into his left arm and jaw, sweating · inferior STEMI'},
+  {w:16,key:'atypical',fem:true,label:'Atypical: a diabetic woman, nausea and fatigue, no chest pain · STEMI'},
+  {w:7,key:'today',today:'pain',nitro:true,label:'Four baby aspirin from his wife twenty minutes ago — ask the medic'},
+  {w:7,key:'today',today:'daily',nitro:true,label:'His daily baby aspirin this morning — ask the medic'},
+  {w:12,key:'thin',thin:true,nitro:true,label:'On a blood thinner (Eliquis) — hold the aspirin, ask the medic'},
+  {w:12,key:'ed',ed:true,nitro:true,label:'Wants his nitro; took Viagra last night — no nitro, tell the medic'},
+  {w:14,key:'vf',vf:true,nitro:true,label:'VF arrest in front of the crew — CPR, AED, shock, pulse back'},
+  {w:8,key:'allergy',allergy:true,nitro:true,label:'Allergic to aspirin — no aspirin, tell the medic'}]));delete v.w;return v;};
+FFC.cp={sig:()=>{const x=S.h,v=cpV();return [v.sbp<90,v.spo2<COUNTY.o2Min,x.arr,x.rosc,x.alsArr,x.stemi,x.painT!==null].join();},block:()=>S.h.arr&&!S.h.rosc,
+ due:()=>{const x=S.h;return S.mission===M.length-1&&!x.act&&S.t-Math.max(x.tx.lastReass,S.t-x.tx.t)>=180;}};
+DET.push(
+ {call:'cp',id:'vf',src:['natural','inject:vf'],name:'VF arrest in front of the crew',find:/in arrest!/,
+  acts:[['k-chk','scored'],['k-cpr','patient'],['k-pads','patient'],['k-analyze','patient'],['k-shock','patient'],['k-tell','scored']],
+  done:()=>S.h.rosc,noAct:20,noActWhy:'He arrested and nothing changed in his care — check him, compressions, pads, analyze, shock',
+  tell:60,tellIf:()=>S.h.alsArr,tellWhy:'Didn\'t tell the medic about the arrest'},
+ {call:'cp',id:'drop',src:['natural','inject:worse'],name:'The pressure drops',find:/pressure has dropped/,
+  acts:[['k-reass','scored'],['k-vit','scored'],['k-flat','patient'],['k-o2','patient'],['k-tell','scored']],
+  done:()=>S.h.flat&&S.h.sbp>=90,noAct:60,noActWhy:'The pressure dropped and nothing changed in the care — reassess, lay the patient flat, tell the medic',
+  tell:120,tellIf:()=>S.h.alsArr,tellWhy:'Didn\'t tell the medic the pressure dropped'},
+ {call:'cp',id:'pain',src:['natural'],name:'The pain comes back in the ambulance',find:/back up to \d+ out of 10/,
+  acts:[['k-reass','scored'],['k-vit','scored'],['k-o2','patient'],['k-tell','scored']],
+  done:()=>S.h.o2,noAct:60,noActWhy:'The pain came back with a low SpO₂ and nothing changed — reassess, oxygen per protocol, tell the medic',
+  tell:90,tellIf:()=>S.h.alsArr,tellWhy:'Didn\'t tell the medic the pain came back'},
+ {call:'cp',id:'delay',src:['inject:delay','chaos'],name:'Medic 1 delayed',dec:'medDelay'},
+ {call:'cp',id:'family',src:['inject:family'],name:'Family wants to drive',dec:'fam_cp'},
+ {call:'cp',id:'bridge',src:['inject:bridge'],name:'Stuck at the drawbridge',dec:'bridgeUp'});
+function cpDebrief(){const x=S.h,r=cpReason();const rows=[['Recognized it',x.what==='good'?(V.fem?'yes, with no chest pain':'yes'):'no'],
+  ['Aspirin',x.asaWrong?(r==='allergy'?'given despite the allergy':r?'given despite the checks':'swallowed whole'):x.asaGiven?`324 mg chewed at ${clockStr(x.asaT)}`:r==='allergy'?'withheld: allergy':r?`held for the medic (${r==='thinner'?'blood thinner':'aspirin already today'})`:'not given']];
+  if(V.nitro)rows.push(['Nitroglycerin',x.nitroTaken?'taken with your help':'not assisted; the medic told'],['Erection drugs asked',x.qed?'yes':'no']);
+  rows.push(['Oxygen',x.o2?'given per protocol (SpO₂ low)':'not needed (SpO₂ normal)'],['Walked to the ambulance',x.walk==='good'||V.vf?'no':'yes'],['12-lead',S.mon.twelve?'placed; STEMI found':'not done']);
+  if(x.arr)rows.push(['Collapse to compressions',x.cprStartRt!==null?Math.round(x.cprStartRt-x.arrRt)+' s':'—'],['Collapse to first shock',x.firstShockRt!==null?Math.round(x.firstShockRt-x.arrRt)+' s':'—'],['Longest hands-off pause',Math.round(x.longest)+' s']);
+  const msg=x.asaWrong?'The four checks decide the aspirin: an allergy rules it out, and a blood thinner or aspirin already today goes to the medic first.':x.nitroTaken?'The MFR never assists with nitroglycerin. Ask about erection drugs and tell the medic.':x.arr&&x.cprStartRt!==null&&x.cprStartRt-x.arrRt>15?'In a witnessed arrest, seconds count: check, compress, shock.':V.fem&&x.what==='good'?'No chest pain, and it was a heart attack. You treated her as one from the start.':'You treated it as a heart attack from the start, made the aspirin call the right way, and got the 12-lead to the medic.';
+  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:15px;color:var(--soft);margin-top:10px">${msg}</p>`;}
 const OPT_TEXT={
  agonal:["Start compressions now — gasping like that is not breathing","Roll him into the recovery position and watch his breathing closely","Put him on a non-rebreather at 15 and recheck in one minute"],
  pads:["Below the right collarbone, and on the left side below the armpit","One centered on the front of his chest, one between his shoulder blades","Both side by side in the middle of his chest, over the sternum"],
@@ -2646,7 +2900,7 @@ for(const k in OPT_TEXT){if(DEC[k]&&DEC[k].opts)DEC[k].opts.forEach((o,i)=>{if(O
 (()=>{const a=DEC.lkw.after;DEC.lkw.after=()=>{a();if(S.lastChoice==='good'&&!V.wake)radio('Husband','…Now that you ask — she was on the phone with our daughter at 9:40. She sounded totally fine.','good');};})();
 
 /* ================= Cardiac monitor · lead placement · 12-lead · sound · timeline · progress ================= */
-const CALLNAME={arrest:'Cardiac arrest',mva:'Car versus tree',od:'Overdose',ep:'Anaphylaxis',st:'Stroke',fl:'Elderly fall',cb:'Childbirth',dm:'Diabetic emergency',pd:'Pediatric breathing'};
+const CALLNAME={arrest:'Cardiac arrest',mva:'Car versus tree',od:'Overdose',ep:'Anaphylaxis',st:'Stroke',fl:'Elderly fall',cb:'Childbirth',dm:'Diabetic emergency',pd:'Pediatric breathing',cp:'Chest pain'};
 const MONCFG={
  arrest:{twelve:true,only12:true,need:()=>S.rosc,read12:'Inferior STEMI — ST elevation in II, III, and aVF, with reciprocal depression in I and aVL. I\'m activating the cath lab at East Side.',stemi:true},
  mva:{need:()=>S.m&&S.m.moved,rhythm:()=>({r:'sinus',hr:mvaV().hr}),read:()=>`Sinus tach at ${mvaV().hr}. No ectopy. Trauma alert going out.`},
@@ -2656,12 +2910,15 @@ const MONCFG={
  fl:{need:()=>S.f&&S.f.alsArr,twelve:true,rhythm:()=>({r:'sinus',hr:98}),read:()=>'Sinus at 98.',read12:'Sinus rhythm, 98, no acute changes. A normal 12-lead doesn\'t rule out a cardiac cause for her lightheadedness — the ER will keep looking.'},
  dm:{need:()=>S.d&&S.d.alsArr,rhythm:()=>({r:'sinus',hr:dmV().hr}),read:()=>`Sinus tach, ${dmV().hr} — adrenaline from the low. Should settle as his sugar comes up.`}
 };
+MONCFG.cp={need:()=>S.h&&S.h.alsArr&&S.h.handed&&(!S.h.arr||S.h.rosc),twelve:true,rhythm:()=>({r:'sinus',hr:cpV().hr,stemi:true}),read:()=>`Sinus at ${cpV().hr}. Let's get a 12-lead.`,
+ read12:'Inferior STEMI: ST elevation in II, III and aVF, with reciprocal depression in I and aVL. Cath lab alert to East Side Hospital.',stemi:true};
 function monCfg(){return MONCFG[CALL]||null;}
 function monState(){
   if(CALL==='arrest'){if(!S.aed.pads||S.terminated||S.noRes)return {kind:'none'};if(S.rosc)return {kind:'ecg',r:'sinus',hr:96,stemi:true,lead:S.mon.twelve?'II':'pads'};return {kind:'ecg',r:S.cpr.on?'cpr':'vf',hr:S.cpr.on?S.cpr.rate:0,lead:S.als.zoll?'pads':'AED'};}
+  if(CALL==='cp'&&S.h&&S.h.arr&&!S.h.rosc)return S.h.pads?{kind:'ecg',r:S.h.cpr?'cpr':'vf',hr:S.h.cpr?110:0,lead:'AED'}:{kind:'none'};
   if(CALL==='cb'){const x=S.c;return x&&x.born&&x.hrKnown?{kind:'ecg',r:'sinus',hr:Math.max(40,x.hr),lead:'HR (counted)'}:{kind:'none'};}
   const c=monCfg();if(c&&S.mon.four&&c.rhythm)return Object.assign({kind:'ecg',lead:'II'},c.rhythm());
-  const ox={od:()=>S.o&&S.o.ox&&S.o.pulse&&{hr:S.o.hr},ep:()=>S.e&&S.e.ox&&{hr:epV().hr},st:()=>S.s&&S.s.ox&&{hr:88,irr:true},fl:()=>S.f&&S.f.vitCount&&{hr:98},dm:()=>S.d&&S.d.vit&&{hr:dmV().hr},pd:()=>S.p&&S.p.ox&&{hr:pdV().hr}}[CALL];
+  const ox={od:()=>S.o&&S.o.ox&&S.o.pulse&&{hr:S.o.hr},ep:()=>S.e&&S.e.ox&&{hr:epV().hr},st:()=>S.s&&S.s.ox&&{hr:88,irr:true},fl:()=>S.f&&S.f.vitCount&&{hr:98},dm:()=>S.d&&S.d.vit&&{hr:dmV().hr},pd:()=>S.p&&S.p.ox&&{hr:pdV().hr},cp:()=>S.h&&S.h.ox&&{hr:cpV().hr}}[CALL];
   const o=ox&&ox();return o?{kind:'pleth',hr:o.hr,irr:o.irr,lead:'SpO₂ pleth'}:{kind:'none'};}
 /* --- waveform math --- */
 const g=(t,c,w)=>Math.exp(-((t-c)*(t-c))/(2*w*w));const sm=(a,b,t)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
@@ -2738,7 +2995,7 @@ function twelveShow(){const c=monCfg();S.mon.wasRun=S.running;S.running=false;co
   grid.forEach((row,r)=>row.forEach((ld,cI)=>draw(ld,cI*85,r*62,85,62)));draw('II',0,186,W,62);x.fillText('II (rhythm)',3,196);}
 $('tw-close').onclick=()=>{$('twelveov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing)S.running=true;};
 /* --- per-tick upkeep, UI sync --- */
-function monTick(dtReal){if(S.mon&&S.mon.acqT>0&&!DEC_OPEN){S.mon.acqT-=dtReal*3;if(S.mon.acqT<=0){S.mon.acqT=0;S.mon.twelve=true;if(!S.mon.four)S.mon.four=true;radio('Medic 1','12-lead acquired.','good');if(CALL==='arrest')radio('Medic 1','Inferior STEMI. Dispatch, Medic 1 — cath lab alert to East Side Hospital: post-arrest, ROSC on scene, inferior STEMI.','good');twelveShow();}}}
+function monTick(dtReal){if(S.mon&&S.mon.acqT>0&&!DEC_OPEN){S.mon.acqT-=dtReal*3;if(S.mon.acqT<=0){S.mon.acqT=0;S.mon.twelve=true;if(!S.mon.four)S.mon.four=true;radio('Medic 1','12-lead acquired.','good');if(CALL==='cp')cpStemi();if(CALL==='arrest')radio('Medic 1','Inferior STEMI. Dispatch, Medic 1 — cath lab alert to East Side Hospital: post-arrest, ROSC on scene, inferior STEMI.','good');twelveShow();}}}
 function monSync(){const c=monCfg();const vis=(id,on)=>$(id).classList.toggle('hidden',!on);
   const need=!!(c&&S.active&&c.need()),show4=need&&!c.only12&&!S.mon.four,show12=need&&c.twelve&&(S.mon.four||c.only12)&&!S.mon.twelve&&!(S.mon.acqT>0);
   vis('g-monitor',(show4||show12||S.mon.acqT>0)&&(S.mission<=3||CALL==='arrest'));vis('mon-4',show4);vis('mon-12',show12);
@@ -2883,7 +3140,7 @@ $('b-drills').onclick=()=>drillMenu();
 
 /* ================= Instructor mode ================= */
 let INST=false;
-function etaRef(){return CALL==='arrest'?(S.als&&!S.als.arrived?{o:S.als,k:'eta'}:null):({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p}[CALL]&&(()=>{const o={mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p}[CALL];return o&&!o.alsArr?{o,k:'eta'}:null;})());}
+function etaRef(){return CALL==='arrest'?(S.als&&!S.als.arrived?{o:S.als,k:'eta'}:null):({mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p,cp:S.h}[CALL]&&(()=>{const o={mva:S.m,od:S.o,ep:S.e,st:S.s,fl:S.f,cb:S.c,dm:S.d,pd:S.p,cp:S.h}[CALL];return o&&!o.alsArr?{o,k:'eta'}:null;})());}
 function instLog(t){if(S.log)S.log.push({c:clockStr(),who:'Instructor',msg:t});}
 const INJECTS=[
  {id:'delay',label:'Medic 1 delayed (+2 min)',ok:()=>!!etaRef(),run:()=>{const r=etaRef();r.o[r.k]+=120;radio('Dispatch','Medic 1 is delayed — plus two minutes.','bad');if(CALL==='mva'){detFire('delay');decLater('mvaDelay');}else medDelayFire();}},
@@ -2892,7 +3149,7 @@ const INJECTS=[
  {id:'lucas',label:'LUCAS battery dies',ok:()=>CALL==='arrest'&&S.arrest&&S.als.lucas===2,run:()=>{S.als.lucas=0;S.cpr.on=false;S.cpr.who='You';S.fat.You=.2;startPause();radio('Medic 1','The LUCAS just died — battery! Manual compressions, now!','bad');detFire('lucas');}},
  {id:'rearrest',label:'Re-arrest after ROSC (in transport)',ok:()=>CALL==='arrest'&&S.rosc&&S.arrest===false&&aPh()==='tx',run:()=>{S.rosc=false;S.arrest=true;S.Q=0;S.cpr.on=false;if(S.als.lucas===3)S.als.lucas=2;S.cpr.who=S.als.lucas===2?'You':'You';startPause();radio('Medic 1','I\'ve lost the pulse — he\'s re-arrested! Compressions!','bad');detFire('rearrest');S.als.rcNext=S.t+120;}},
  {id:'o2',label:'O₂ cylinder runs out',ok:()=>CALL==='arrest'&&S.air.o2&&!S.als.arrived&&S.o2psi>220,run:()=>{S.o2psi=190;S.o2ok=false;radio('Partner','The D cylinder just hit empty!','bad');detFire('o2');}},
- {id:'worse',label:'Patient deteriorates',ok:()=>({arrest:()=>false,mva:()=>S.m.moved&&!detOpen('shock'),od:()=>S.o.checked&&S.o.pulse&&!detOpen('renarc'),ep:()=>S.e.assessed&&!detOpen('worse'),st:()=>S.mission===3&&!detOpen('worse'),fl:()=>S.mission===3&&!detOpen('decline'),cb:()=>S.c.born&&!detOpen('mom')&&!detOpen('baby'),dm:()=>S.d.abc&&!detOpen('falling'),pd:()=>S.p.listen&&!detOpen('tiring')&&!detOpen('upset')&&!(V.kind!=='croup'&&S.p.tired)}[CALL]||(()=>false))(),
+ {id:'worse',label:'Patient deteriorates',ok:()=>({arrest:()=>false,mva:()=>S.m.moved&&!detOpen('shock'),od:()=>S.o.checked&&S.o.pulse&&!detOpen('renarc'),ep:()=>S.e.assessed&&!detOpen('worse'),st:()=>S.mission===3&&!detOpen('worse'),fl:()=>S.mission===3&&!detOpen('decline'),cb:()=>S.c.born&&!detOpen('mom')&&!detOpen('baby'),dm:()=>S.d.abc&&!detOpen('falling'),pd:()=>S.p.listen&&!detOpen('tiring')&&!detOpen('upset')&&!(V.kind!=='croup'&&S.p.tired),cp:()=>S.h.abc&&!(S.h.arr&&!S.h.rosc)&&!detOpen('drop')&&S.h.sbp>=90}[CALL]||(()=>false))(),
   run:()=>{({mva:()=>{S.m.lost+=600;detFire('shock');radio(S.mon.four?'Monitor':'Partner',S.mon.four?`Blood pressure alarm: ${mvaV().sbp}/${mvaV().dbp}. Heart rate ${mvaV().hr}.`:'She\'s getting paler and more confused.','bad');},
     od:()=>{odResedate(.35);radio('Partner','He\'s nodding off again — breathing\'s slowing down.','bad');},
     ep:()=>{S.e.sev=Math.min(1,S.e.sev+.3);radio('Patient','My throat… it\'s closing again…','bad');if(S.e.doses.length&&!detOpen('worse'))detFire('worse');},
@@ -2900,9 +3157,11 @@ const INJECTS=[
     fl:()=>{const x=S.f;x.tx.decline=true;x.declineT=x.declineT||S.t;x.gcs=Math.max(12,x.gcs-1);radio('Patient','…What happened? Where am I?','bad');if(!detOpen('decline'))detFire('decline');},
     cb:()=>{const x=S.c;if(S.mission>=3&&!x.momHit&&!detOpen('mom')){x.momHit=true;x.loss+=400;x.massage=false;radio('Partner','Mom\'s bleeding picked up — the pads are soaking through!','bad');detFire('mom');}else if(!x.vigorous){x.hr=Math.max(45,x.hr-20);radio('You','Her heart rate is dropping!','bad');}else{radio('Partner','Baby\'s getting a little dusky — is she staying warm?','bad');cbDusky();}},
     pd:()=>{const x=S.p;if(V.kind==='croup'){x.crSev=Math.min(.9,x.crSev+.1);pdUpset(.6,'He\'s panicking — listen to that noise!');}else{x.forceTire=true;x.fat=Math.max(x.fat,.4);pdTire();}},
+    cp:()=>{const x=S.h;x.sbp=82;x.dbp=50;x.hr=114;x.dropT=S.t;x.flat=false;detFire('drop');radio('Patient','…I feel like I\'m going to pass out…','bad');},
     dm:()=>{S.d.gl=Math.max(22,S.d.gl-12);radio('Partner','He\'s less responsive than he was.','bad');if(S.d.og!==null&&!S.d.d10&&!detOpen('falling'))detFire('falling');}})[CALL]();}},
- {id:'bridge',label:'Drawbridge goes up',ok:()=>(CALL==='arrest'&&aPh()==='tx'&&!S.tx.arrived)||S.mission===3&&((CALL==='st'&&!V.lvo&&!S.s.tx.arrived)||(CALL==='od'&&!S.o.tx.arrived)||(CALL==='ep'&&!S.e.tx.arrived)||(CALL==='pd'&&!S.p.tx.arrived)),run:()=>{const t=CALL==='arrest'?S.tx:CALL==='st'?S.s.tx:CALL==='od'?S.o.tx:CALL==='pd'?S.p.tx:S.e.tx;t.total+=180;radio('EMT','The bridge is going up in front of us — freighter. We\'re stuck about three minutes.','bad');detFire('bridge');decLater('bridgeUp');}},
- {id:'family',label:'Family member gets in the way',ok:()=>S.active&&(CALL==='arrest'?S.arrest&&['contact','als','work','ext','tor','look'].includes(aPh()):S.mission<=1),run:()=>{const line={arrest:['Son','Why aren\'t you shocking him?! Do something!'],mva:['Bystander','I\'m a nurse — let me in there with her!'],od:['Roommate','Is he going to jail? Don\'t tell the cops!'],ep:['Wife','He hates hospitals — just give him Benadryl!'],st:['Husband','Can\'t you just give her an aspirin?'],fl:['Daughter (phone)','Just put her in bed, she\'ll be fine!'],cb:['Husband','Should I drive her? I can drive her!'],dm:['Officer','He\'s faking it. I\'m taking him in.'],pd:['Dad','I\'ll just drive him in myself — it\'s faster!']}[CALL]||['Bystander','What\'s happening?!'];radio(line[0],line[1],'bad');detFire('family');decLater(CALL==='mva'?'mvaNurse':'fam_'+CALL);}}
+ {id:'vf',label:'Patient goes into VF arrest',ok:()=>CALL==='cp'&&S.h.abc&&!S.h.arr&&!S.h.loaded&&!DEC_OPEN,run:()=>cpArrest()},
+ {id:'bridge',label:'Drawbridge goes up',ok:()=>(CALL==='arrest'&&aPh()==='tx'&&!S.tx.arrived)||S.mission===3&&((CALL==='st'&&!V.lvo&&!S.s.tx.arrived)||(CALL==='od'&&!S.o.tx.arrived)||(CALL==='ep'&&!S.e.tx.arrived)||(CALL==='pd'&&!S.p.tx.arrived))||(CALL==='cp'&&S.mission===M.length-1&&!S.h.tx.arrived),run:()=>{const t=CALL==='arrest'?S.tx:CALL==='st'?S.s.tx:CALL==='od'?S.o.tx:CALL==='pd'?S.p.tx:CALL==='cp'?S.h.tx:S.e.tx;t.total+=180;radio('EMT','The bridge is going up in front of us — freighter. We\'re stuck about three minutes.','bad');detFire('bridge');decLater('bridgeUp');}},
+ {id:'family',label:'Family member gets in the way',ok:()=>S.active&&(CALL==='arrest'?S.arrest&&['contact','als','work','ext','tor','look'].includes(aPh()):S.mission<=1),run:()=>{const line={arrest:['Son','Why aren\'t you shocking him?! Do something!'],mva:['Bystander','I\'m a nurse — let me in there with her!'],od:['Roommate','Is he going to jail? Don\'t tell the cops!'],ep:['Wife','He hates hospitals — just give him Benadryl!'],st:['Husband','Can\'t you just give her an aspirin?'],fl:['Daughter (phone)','Just put her in bed, she\'ll be fine!'],cb:['Husband','Should I drive her? I can drive her!'],dm:['Officer','He\'s faking it. I\'m taking him in.'],pd:['Dad','I\'ll just drive him in myself — it\'s faster!'],cp:[V.fem?'Husband':'Wife','Just let me drive — the hospital\'s ten minutes away!']}[CALL]||['Bystander','What\'s happening?!'];radio(line[0],line[1],'bad');detFire('family');decLater(CALL==='mva'?'mvaNurse':'fam_'+CALL);}}
 ];
 function instOpen(){if(!S.active)return;S.instWasRunning=S.running;S.running=false;instRender();$('instov').classList.remove('hidden');}
 function instClose(){$('instov').classList.add('hidden');if(S.active&&!DEC_OPEN&&!S.briefing&&$('discov').classList.contains('hidden')&&S.instWasRunning!==false)S.running=true;}
@@ -2981,10 +3240,11 @@ $('lesson-box').onclick=e=>{const b=e.target.closest&&e.target.closest('[data-l]
 $('b-lesson').onclick=lessonStart;$('ld-again').onclick=()=>{$('ldone').classList.add('hidden');lessonStart();};$('ld-menu').onclick=()=>{$('ldone').classList.add('hidden');showMenu();};
 function showMenu(){keepAwake(false);S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');homeRender();$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
-$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-call7').onclick=()=>loadCall('cb');$('b-call8').onclick=()=>loadCall('dm');$('b-call9').onclick=()=>loadCall('pd');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
+$('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-call7').onclick=()=>loadCall('cb');$('b-call8').onclick=()=>loadCall('dm');$('b-call9').onclick=()=>loadCall('pd');$('b-call10').onclick=()=>loadCall('cp');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
 $('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
 $('b-start').onclick=()=>{$('intro').classList.add('hidden');const p=load();p.seen=true;save(p);showMenu();};
-function snapshot(){if(CALL==='pd'){const x=S.p,v=pdV();return [`Patient Contact report — v${APP_VERSION}`,`Call: pediatric breathing (${V.kind}) · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${v.rr} SpO2 ${v.spo2} HR ${v.hr} · agitation ${x.agit.toFixed(2)} · fatigue ${x.fat.toFixed(2)} · inhaler ${x.inhDec||'—'} puffs ${x.puffs} · bag ${x.good}/${x.hyper}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+function snapshot(){if(CALL==='cp'){const x=S.h,v=cpV();return [`Patient Contact report — v${APP_VERSION}`,`Call: chest pain (${V.key}) · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · BP ${v.sbp}/${v.dbp} HR ${v.hr} SpO2 ${v.spo2} pain ${x.pain} · aspirin ${x.asaGiven?'given':x.asaDec||'—'} · arrest ${x.arr?(x.rosc?'ROSC':'yes'):'no'} shocks ${x.shocks}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
+  if(CALL==='pd'){const x=S.p,v=pdV();return [`Patient Contact report — v${APP_VERSION}`,`Call: pediatric breathing (${V.kind}) · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${v.rr} SpO2 ${v.spo2} HR ${v.hr} · agitation ${x.agit.toFixed(2)} · fatigue ${x.fat.toFixed(2)} · inhaler ${x.inhDec||'—'} puffs ${x.puffs} · bag ${x.good}/${x.hyper}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='dm'){const x=S.d;return [`Patient Contact report — v${APP_VERSION}`,`Call: diabetic · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · glucose ${Math.round(x.gl)} · GCS ${dmV().gcs} · tubes ${x.tubes} · swallow ${x.sw}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='cb'){const x=S.c;return [`Patient Contact report — v${APP_VERSION}`,`Call: childbirth · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · born ${x.born} · baby HR ${Math.round(x.hr)} ${x.breath} · good breaths ${x.good} · mom loss ${Math.round(x.loss)} mL`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='fl'){const x=S.f;return [`Patient Contact report — v${APP_VERSION}`,`Call: fall · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · found: head ${x.head} meds ${x.meds} why ${x.why} · GCS ${x.gcs} · lifted ${x.lifted}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}

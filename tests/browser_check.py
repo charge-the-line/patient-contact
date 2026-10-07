@@ -11,7 +11,7 @@ errs, rows = [], []
 with sync_playwright() as p:
     b = p.chromium.launch()
     for w in (320, 390):
-        for n in range(1, 10):
+        for n in range(1, 11):
             pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True)
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click(f'#b-call{n}'); pg.wait_for_timeout(200)
@@ -212,6 +212,46 @@ with sync_playwright() as p:
             pg.wait_for_timeout(300)
         ok = pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and want in pg.inner_html('#done-b')
         if not ok: print('   detail:', label, pg.evaluate('S.incidents'), pg.evaluate('S.mission'), pg.evaluate("S.p.tireFired"))
+        rows.append((w, label + ' (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if ok else 99))); pg.close()
+    # chest pain, played from the start with slow real taps on buttons found by their visible text; the VF arrest runs on the real clock
+    CP_NEXT = """(()=>{const x=S.h;if(!x||!S.running)return '';const dd=detOpen('drop'),dp=detOpen('pain'),dv=detOpen('vf');
+      if(x.arr&&!x.rosc){if(x.act)return '';if(!x.arrChecked||x.roscSign)return 'Check: responsive';if(x.aed==='ready')return x.clear?'Shock':'Call "Clear!"';
+        if(!x.cpr&&x.aed!=='analyzing')return 'Start CPR';if(!x.pads)return 'AED pads on';if(x.shocks===0&&x.aed==='idle')return 'AED: analyze';if(x.alsArr&&dv&&!dv.told)return 'Tell the medic';return '';}
+      if(x.act)return '';if(dv&&x.alsArr&&!dv.told)return 'Tell the medic what changed';
+      if(dd||dp){const d=dd||dp;if(!d.found)return 'Reassess';if(dd&&!x.flat)return 'Lay flat';if(dp&&!x.o2)return 'O₂ only if';if(x.alsArr&&!d.told)return 'Tell the medic what changed';return '';}
+      if(!x.abc)return 'Primary: ABCs';if(!x.opq)return 'OPQRST';if(!x.sample)return 'SAMPLE';if(!x.vit)return 'Vitals and pulse ox';
+      if(S.mission===1){if(!x.qall)return 'Allergic to aspirin';if(!x.qbleed)return 'Any bleeding';if(!x.qthin)return 'Any blood thinners';if(!x.qtoday)return 'Any aspirin already today';if(x.asaDec==='good'&&!x.asaGiven&&!cpReason())return 'Help with aspirin';if(V.nitro&&!x.qed)return 'Erection drugs';}
+      if(x.alsArr&&S.mon.twelve&&!x.moved)return 'Stair chair';if(x.moved&&!x.loaded)return 'Power load';
+      if(S.mission===M.length-1&&ffWhy()==='due')return 'Reassess';return '';})()"""
+    for w, force, label, want in ((390, "{key:'classic'}", 'chest pain, classic', '324 mg chewed'), (320, "{key:'vf'}", 'chest pain, VF arrest', 'Collapse to first shock')):
+        pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={cp:%s}" % force); pg.click('#b-call10'); pg.wait_for_timeout(200); pg.click('#brief-go'); pg.wait_for_timeout(500)
+        shots = set()
+        for _ in range(700):
+            if pg.is_visible('#leadov'):
+                p_ = pg.evaluate("LG&&LG.seq[LG.i].p")
+                if p_: pg.locator('#lead-board [data-p="%s"]' % p_).first.click(delay=150); pg.wait_for_timeout(200)
+                continue
+            if pg.is_visible('#twelveov'):
+                if '12-lead' not in shots: shots.add('12-lead'); rows.append((w, label + ': 12-lead', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+                pg.click('#tw-close', delay=200); pg.wait_for_timeout(300); continue
+            if pg.is_visible('#decov'): answer(pg); continue
+            if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(300); continue
+            if pg.is_visible('#done'):
+                if pg.evaluate("S.mission<M.length-1"): pg.click('#b-next', delay=200); pg.wait_for_timeout(400); continue
+                break
+            if pg.is_visible('#g-monitor'):
+                if pg.is_visible('#mon-4'): pg.click('#mon-4', delay=200); pg.wait_for_timeout(300); continue
+                if pg.is_visible('#mon-12'): pg.click('#mon-12', delay=200); pg.wait_for_timeout(300); continue
+            nxt = pg.evaluate(CP_NEXT)
+            if nxt:
+                if pg.evaluate("S.mission")==1 and 'aspirin' not in shots: shots.add('aspirin'); rows.append((w, label + ': aspirin checks', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+                if pg.evaluate("S.h.arr&&!S.h.rosc") and 'arrest' not in shots: shots.add('arrest'); rows.append((w, label + ': arrest on screen', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+                tap(pg, nxt); continue
+            if pg.is_visible('#b-ff') and not pg.evaluate("S.h.arr&&!S.h.rosc"): try_ff(pg)
+            pg.wait_for_timeout(250)
+        ok = pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and want in pg.inner_html('#done-b') and pg.evaluate("S.h.stemi")
+        if not ok: print('   detail:', label, pg.evaluate('S.incidents'), pg.evaluate('S.mission'), pg.evaluate("JSON.stringify({rosc:S.h.rosc,longest:S.h.longest,stemi:S.h.stemi})"))
         rows.append((w, label + ' (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if ok else 99))); pg.close()
     # the Start CPR or not? drill, answered by visible text
     pg = b.new_page(viewport={'width': 390, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
