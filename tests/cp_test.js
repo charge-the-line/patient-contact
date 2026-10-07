@@ -8,7 +8,7 @@ const F=f=>{global.window.FORCE_V=f?{cp:f}:null;};
 const answer=(api,pick='good')=>{const D=api.DECO();if(!D)return null;let i=D.opts.findIndex(o=>o.r===pick);if(i<0)i=0;api.$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});api.$('dec-go').onclick();return D.key;};
 const logText=api=>api.S().log.map(e=>e.who+': '+e.msg).join(' | ');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const block=html.slice(html.indexOf('/* ================= Chest pain'),html.indexOf('const OPT_TEXT={'));
+const block=html.slice(html.indexOf('/* ================= Chest pain'),html.indexOf('/* ================= Fire victim'));
 const VS=[['classic',{key:'classic'}],['no chest pain',{key:'atypical'}],['aspirin from his wife',{today:'pain'}],['his daily aspirin',{today:'daily'}],['a blood thinner',{key:'thin'}],['an erection drug',{key:'ed'}],['VF arrest',{key:'vf'}],['an aspirin allergy',{key:'allergy'}]];
 module.exports=function(report){
   // every patient, played well on every tier, scores 100

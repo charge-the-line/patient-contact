@@ -14,9 +14,10 @@ module.exports=function(report){
       if(call==='arrest'&&S.arrest&&S.checked&&!S.terminated&&!S.noRes)offeredBad.push('arrest: CPR running');
       if(call==='od'&&S.o.checked&&(!S.o.pulse||S.o.rr<10||S.o.gurgle))offeredBad.push('od: not breathing adequately');
       if(call==='pd'&&S.p.tired)offeredBad.push('pd: tiring child needs breaths');
-      if(call==='cp'&&S.h.arr&&!S.h.rosc)offeredBad.push('cp: cardiac arrest');}
+      if(call==='cp'&&S.h.arr&&!S.h.rosc)offeredBad.push('cp: cardiac arrest');
+      if(call==='fr'&&(S.b.apnea||S.b.seizing))offeredBad.push('fr: barely breathing or seizing');}
     return false;};
-  const calls=[['mva'],['od'],['ep'],['st'],['fl'],['dm'],['pd',{kind:'croup'}],['pd',{kind:'asthma',inh:'own',tire:true}],['cp',{key:'classic'}],['cp',{key:'vf'}],['cp',{key:'atypical'}],['arrest',{open:'cpr',outcome:'rosc',shock:true}],['arrest',{look:'obvious'}],['arrest',{dnr:'valid'}],['arrest',{look:'cold'}]];
+  const calls=[['mva'],['od'],['ep'],['st'],['fl'],['dm'],['pd',{kind:'croup'}],['pd',{kind:'asthma',inh:'own',tire:true}],['cp',{key:'classic'}],['cp',{key:'vf'}],['cp',{key:'atypical'}],['fr',{key:'trap'}],['fr',{key:'gasp'}],['arrest',{open:'cpr',outcome:'rosc',shock:true}],['arrest',{look:'obvious'}],['arrest',{dnr:'valid'}],['arrest',{look:'cold'}]];
   for(const [call,force] of calls)for(const tier of [0,2]){F(force?{[call]:force}:null);const o={ff:true,stopAt:watch(call)};const r=quiet(()=>human.play(call,tier,o));F(null);
     (o.ffLog||[]).forEach(w=>{reasons.push(w);if(w==='cap')cap++;});
     const skipped=r.S.ff?r.S.ff.t:0;
@@ -53,7 +54,7 @@ module.exports=function(report){
     report('ff','a decision or the end of a part stops a skip',reasons.includes('event'),`${reasons.filter(w=>w==='event').length} event stops`);
     report('ff','a change in the patient stops a skip',reasons.includes('patient'),`${reasons.filter(w=>w==='patient').length} patient stops`);
     let silent=[],tried=0;
-    for(const call of ['arrest','mva','od','ep','st','fl','cb','dm','pd','cp']){const {api}=boot();api.setTier(0);api.loadCall(call);api.$('brief-go').onclick();
+    for(const call of ['arrest','mva','od','ep','st','fl','cb','dm','pd','cp','fr']){const {api}=boot();api.setTier(0);api.loadCall(call);api.$('brief-go').onclick();
       for(let i=0;i<4000;i++){const S=api.S();if(api.DECO()){const D=api.DECO();const k=D.opts.findIndex(x=>x.r==='good');api.$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(k)}})}});api.$('dec-go').onclick();continue;}
         if(!S.running)break;
         for(const x of api.INJECTS){let ok=false;try{ok=x.ok();}catch(e){}if(ok&&!x._seen){x._seen=1;tried++;const n0=api.RN();x.run();if(api.RN()===n0)silent.push(call+':'+x.id);}}

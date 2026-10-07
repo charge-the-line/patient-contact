@@ -21,5 +21,5 @@ for(const call in setups)for(const [label,fn] of setups[call]){const {api,els}=b
  let csv='';global.URL={createObjectURL:b=>{csv=b.parts.join('');return 'x';}};global.Blob=function(parts){this.parts=parts;};const orig=global.document.createElement;global.document.createElement=()=>({click(){}});api.$('prog-csv').onclick();global.document.createElement=orig;
  const lines=csv.split('\n');out.push(['CSV header',lines[0]]);out.push(['CSV rows for one drill-night call',lines.length-1+' (one per crew member)']);out.push(['  example',lines[1]]);}
 // 5) a full call at human pace with an instructor injecting chaos along the way still completes
-{let ok=0,n=0;for(const call of ['arrest','mva','od','ep','st','fl','dm','pd','cp']){n++;const r=play(call,0,{instChaos:true});if(r.finished)ok++;else out.push(['  incomplete with injects',call+' '+JSON.stringify(r.stuckAt)]);}out.push(['Full calls with random injects',`${ok}/${n} completed`]);}
+{let ok=0,n=0;for(const call of ['arrest','mva','od','ep','st','fl','dm','pd','cp','fr']){n++;const r=play(call,0,{instChaos:true});if(r.finished)ok++;else out.push(['  incomplete with injects',call+' '+JSON.stringify(r.stuckAt)]);}out.push(['Full calls with random injects',`${ok}/${n} completed`]);}
 out.forEach(([a,b])=>console.log(String(a).padEnd(34),b));

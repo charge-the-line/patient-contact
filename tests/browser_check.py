@@ -11,7 +11,7 @@ errs, rows = [], []
 with sync_playwright() as p:
     b = p.chromium.launch()
     for w in (320, 390):
-        for n in range(1, 11):
+        for n in range(1, 12):
             pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True)
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click(f'#b-call{n}'); pg.wait_for_timeout(200)
@@ -252,6 +252,55 @@ with sync_playwright() as p:
             pg.wait_for_timeout(250)
         ok = pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and want in pg.inner_html('#done-b') and pg.evaluate("S.h.stemi")
         if not ok: print('   detail:', label, pg.evaluate('S.incidents'), pg.evaluate('S.mission'), pg.evaluate("JSON.stringify({rosc:S.h.rosc,longest:S.h.longest,stemi:S.h.stemi})"))
+        rows.append((w, label + ' (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if ok else 99))); pg.close()
+    # the fire victim, played from the start with slow real taps on buttons found by their visible text; the rule of nines
+    # is mapped by tapping the body outline itself, front and back; the gasping patient is bagged every 6 real seconds
+    FR_NEXT = """(()=>{const x=S.b;if(!x||!S.running)return '';const ds=detOpen('swell'),da=detOpen('apnea'),dt=detOpen('tox'),dc=detOpen('cold');
+      if(x.bvm&&x.apnea){if(S.rt-x.lastBreathRt>=6)return 'BREATH';return x.alsArr&&da&&!da.told&&!x.act?'Tell the medic what changed':'';}
+      if(x.act)return '';if(da&&!x.bvm)return 'Bag-mask, O₂ 15';
+      if(dt){if(x.seizing)return x.protect?'':'Seizure: protect';if(x.secr)return 'Roll him';if(x.alsArr&&!dt.told)return 'Tell the medic what changed';}
+      if(ds){if(!ds.found)return 'Reassess';if(!ds.told)return x.alsArr?'Tell the medic what changed':'Radio Medic 1';if(V.key==='hoarse'&&!x.sit)return 'Sit him up';if(V.key!=='hoarse'&&!x.jaw)return 'Jaw thrust';}
+      if(dc){if(!dc.found)return 'Reassess';if(x.cooling)return 'Stop cooling';if(!x.sheet||x.wet)return 'Dry, clean burn sheet';if(!x.warm)return 'Blankets over the sheet';}
+      if(x.cooling&&x.coolT>=25)return x.towels?'Wet towels off':'Stop cooling';
+      if(!x.gloves)return 'Gloves on';if(!x.strip)return 'Stop the burning';if(!x.jewel)return 'Rings and watch';if(!x.abc)return 'Primary: ABCs';
+      if(!x.apnea&&x.o2!=='nrb')return 'Non-rebreather';if(!x.ox)return 'Pulse oximeter';
+      if(S.mission>=2&&!x.airway)return 'Look for airway burn';if(S.mission>=2&&!x.ready)return 'Suction and bag-mask ready';
+      if(S.mission>=3&&x.coolT===0&&!x.cooling)return 'Cool briefly';if(S.mission>=3&&x.coolT>=20&&!x.sheet&&!x.cooling)return 'Dry, clean burn sheet';if(S.mission>=3&&x.sheet&&!x.warm)return 'Blankets over the sheet';if(S.mission>=3&&x.warm&&x.est===null)return 'Map the burns';
+      if(x.alsArr&&S.mon.four&&!x.loaded)return 'Onto the cot, oxygen on';if(x.loaded&&!x.heat)return 'Heat on in the back';
+      if(S.mission===M.length-1&&ffWhy()==='due')return 'Reassess';return '';})()"""
+    for w, force, label, want in ((390, "{key:'trap'}", 'fire victim, the 98% trap', 'Some monitors can measure carbon monoxide directly; ask your medics if theirs does.'), (320, "{key:'gasp'}", 'fire victim, gasping', 'Bag-mask breaths')):
+        pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={fr:%s}" % force); pg.click('#b-call11'); pg.wait_for_timeout(200); pg.click('#brief-go'); pg.wait_for_timeout(500)
+        shots = set()
+        for _ in range(900):
+            if pg.is_visible('#ninesov'):
+                if 'nines' not in shots: shots.add('nines'); rows.append((w, label + ': rule of nines', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+                r_ = pg.evaluate("(()=>{const want=FR_BURNS[V.key].filter(b=>b[1]!=='superficial').map(b=>b[0]);return want.find(r=>!NN.mark[r])||''})()")
+                if not r_: pg.click('#nn-done', delay=200); pg.wait_for_timeout(300); continue
+                side = 'f' if r_[0] == 'f' else 'b'
+                if pg.evaluate("NN.side") != side: pg.click('#nn-front' if side == 'f' else '#nn-back', delay=200); pg.wait_for_timeout(250)
+                pg.locator('#nn-board [data-r="%s"]' % r_).first.click(delay=200); pg.wait_for_timeout(300); continue
+            if pg.is_visible('#leadov'):
+                p_ = pg.evaluate("LG&&LG.seq[LG.i].p")
+                if p_: pg.locator('#lead-board [data-p="%s"]' % p_).first.click(delay=150); pg.wait_for_timeout(200)
+                continue
+            if pg.is_visible('#decov'): answer(pg); continue
+            if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(300); continue
+            if pg.is_visible('#done'):
+                if pg.evaluate("S.mission<M.length-1"): pg.click('#b-next', delay=200); pg.wait_for_timeout(400); continue
+                break
+            if pg.is_visible('#g-monitor') and pg.is_visible('#mon-4'): pg.click('#mon-4', delay=200); pg.wait_for_timeout(300); continue
+            nxt = pg.evaluate(FR_NEXT)
+            if nxt == 'BREATH':
+                if 'bagging' not in shots: shots.add('bagging'); rows.append((w, label + ': bagging on screen', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+                pg.locator('button:visible', has_text='Breath (1 every 6 s)').first.click(delay=200); continue
+            if nxt:
+                if pg.evaluate("S.mission")==3 and 'burns' not in shots: shots.add('burns'); rows.append((w, label + ': burn care on screen', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL)))
+                tap(pg, nxt); continue
+            if pg.is_visible('#b-ff') and not pg.evaluate("S.b.apnea||S.b.seizing"): try_ff(pg)
+            pg.wait_for_timeout(250)
+        ok = pg.is_visible('#done') and pg.get_attribute('#done-s', 'data-final') == '100' and want in pg.inner_html('#done-b') and pg.evaluate("S.b.estOK")
+        if not ok: print('   detail:', label, pg.evaluate('S.incidents'), pg.evaluate('S.mission'), pg.evaluate("JSON.stringify({est:S.b.est,apnea:S.b.apnea,cn:S.b.cn})"))
         rows.append((w, label + ' (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if ok else 99))); pg.close()
     # the Start CPR or not? drill, answered by visible text
     pg = b.new_page(viewport={'width': 390, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
