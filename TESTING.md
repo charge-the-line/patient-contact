@@ -192,3 +192,6 @@ The `fire` section (`tests/fr_test.js`, 32 checks):
 
 ## 0.30.1 check (October 8, 2026)
 - `drill`: `?call=fl` opens the elderly fall on load with the intro and menu hidden; an unknown id changes nothing.
+
+## Fast-forward and deteriorations (October 8, 2026)
+- `ff`: every deterioration with actions (24 across 10 calls) hides fast-forward the moment it fires and holds it until it is handled. Proved to fail with the hold removed from `ffDue`. Asked by Max after Bleed Control's skip-ahead learned to stop on events; Patient Contact already stopped on any radio line, patient change, step or decision.

@@ -60,6 +60,11 @@ module.exports=function(report){
         for(const x of api.INJECTS){let ok=false;try{ok=x.ok();}catch(e){}if(ok&&!x._seen){x._seen=1;tried++;const n0=api.RN();x.run();if(api.RN()===n0)silent.push(call+':'+x.id);}}
         api.tick(.25);}}
     report('ff','every instructor inject announces itself on the radio, so a skip always stops for it',silent.length===0&&tried>=6,silent.join(', ')||`${tried} injects`);}
+  // 4b (October 8, 2026, matching Bleed Control's skip-ahead): every deterioration with actions, in every call, holds fast-forward the moment it fires, until it is handled
+  {const {api:a0}=boot();const calls=[...new Set(a0.DET().filter(d=>d.acts).map(d=>d.call))];const leaks=[],reached=[];
+   for(const call of calls){const r=quiet(()=>human.play(call,0,{stopAt:(S,api)=>!api.ffWhy()}));if(!r||!r.stopped)continue;reached.push(call);const api=r.api,S=api.S();
+     for(const d of api.DET().filter(d=>d.call===call&&d.acts)){const x=api.detFire(d.id);if(!api.ffWhy())leaks.push(call+':'+d.id);x.closed=true;}}
+   report('ff','every deterioration, in every call, hides fast-forward the moment it fires and holds it until it is handled',leaks.length===0&&reached.length>=8,leaks.join(', ')||`${reached.length} calls, ${a0.DET().filter(d=>d.acts).length} deteriorations`);}
   // 5. the button: hidden unless available, and a tap skips
   {F({fl:{}});const o={stopAt:(S,api)=>S.mission===3&&!api.ffWhy()};const r=quiet(()=>human.play('fl',0,o));F(null);const api=r.api,S=api.S();const b=api.$('b-ff');
     api.ffSync();const shown=!b._cls.has('ffoff');const t0=S.t;b.onclick();const moved=S.t>t0;
