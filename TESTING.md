@@ -189,3 +189,6 @@ The `fire` section (`tests/fr_test.js`, 32 checks):
 - The wife (family inject): oxygen for her and a second unit. Answer length on every fire card for every patient: the right answer is neither longest nor shortest. Scope words. Fast-forward never while he is barely breathing or seizing. Every call opens with exactly one dispatch line.
 - `deter`: `fr.swell` (on its own; inject on the unresponsive patient), `fr.apnea` (on its own; inject), `fr.tox` (oxygen turned down; inject), `fr.cold` (cooling left running, `coolLong` bot option) each proved by a do-nothing and a respond run; the delay and family cards.
 - `human`, `variants`, `instructor`, `ff`, `home` (20 activities), `fuzz` include the call. Proven to fail: a wrong chest value, Max's line removed, and the mask button refusing were each caught.
+
+## 0.30.1 check (October 8, 2026)
+- `drill`: `?call=fl` opens the elderly fall on load with the intro and menu hidden; an unknown id changes nothing.

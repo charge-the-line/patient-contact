@@ -174,6 +174,8 @@ if(want.includes('home')){const {boot}=require('./pc_mock.js');
 
 if(want.includes('drill')){const {boot}=require('./pc_mock.js');global.__loc={search:'?drill=apgar'};const {api,els}=boot();global.__loc={search:'?drill=nope'};const b=boot();global.__loc=undefined;
   report('drill','daily-drill deep link: ?drill=apgar opens the APGAR drill on load with the intro hidden; an unknown id is ignored',!!api.DR()&&api.DR().id==='apgar'&&els.intro.classList.contains('hidden')&&!els.drillov.classList.contains('hidden')&&!b.api.DR(),`drill ${api.DR()&&api.DR().id}`);}
+if(want.includes('drill')){const {boot}=require('./pc_mock.js');global.__loc={search:'?call=fl'};const a=boot();global.__loc={search:'?call=nope'};const b=boot();global.__loc=undefined;const c=boot();
+  report('drill','call deep link (0.30.1, for Bleed Control): ?call=fl opens the elderly fall with the intro and menu hidden; an unknown id or no link opens nothing',a.api.CALL()==='fl'&&a.els.intro.classList.contains('hidden')&&a.els.menu.classList.contains('hidden')&&b.api.CALL()===c.api.CALL()&&b.els.intro.classList.contains('hidden')===c.els.intro.classList.contains('hidden'),`call ${a.api.CALL()} / unknown ${b.api.CALL()}`);}
 
 if(want.includes('ff'))require('./ff_test.js')(report);
 if(want.includes('deter'))require('./det_test.js')(report);
