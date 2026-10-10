@@ -257,4 +257,8 @@ if(want.includes('syntax')){// rule 15 (final sweep M2): the timed drills' real 
   report('voice','one name store: the report fields read the hub profile and write it back; the CSV is the practice record',pre[0]==='Jo Lee'&&pre[1]==='Station 4'&&hub.name==='Pat Q'&&hub.org==='Station 9'&&/patient-contact-practice-record\.csv/.test(html)&&/if\(pcProfile\(\)\.name\)p\.name=pcProfile\(\)\.name/.test(html),`pre ${pre} hub ${hub.name}/${hub.org}`);}
  report('voice','home chips use the shared chip class',(html.match(/class="chip dim" id="chip-/g)||[]).length===12&&!/bchip/.test(html));
 }
+
+{// Continue opens the activity itself (milestone 8): ?call= a call, ?lesson=1 the lesson
+ const {boot}=require('./pc_mock.js');global.__loc={search:'?call=st'};const a=boot();global.__loc={search:'?lesson=1'};const b=boot();global.__loc=undefined;
+ report('voice','deep links open the activity itself: a call and the lesson',a.api.CALL()==='st'&&a.api.S().active===true&&b.api.LS()!==null,`call ${a.api.CALL()} lesson ${b.api.LS()!==null}`);}
 console.log(`\n${results.length-failed}/${results.length} checks passed · ${Math.round((Date.now()-T0)/1000)} s`);process.exit(failed?1:0);
