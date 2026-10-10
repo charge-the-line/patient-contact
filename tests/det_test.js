@@ -220,4 +220,17 @@ module.exports=function(report){
     api.INJECTS.find(x=>x.id==='family').run();api.INJECTS.find(x=>x.id==='delay').ok()&&api.INJECTS.find(x=>x.id==='delay').run();const keys=[];let g=0;
     while(keys.length<2&&g++<400){if(api.DECO())keys.push(answer(api));else api.tick(.25);}
     report('deter','two cards raised at once both get answered, one after the other',keys.includes('mvaNurse')&&(keys.includes('mvaDelay')||!api.S().m||api.S().m.alsArr),keys.join(', '));}
+  // epinephrine repeat window (Max, October 10, 2026; MCA review pending): sooner than 5 game minutes after the last dose costs 3,
+  // exactly 5 minutes is fine; no improvement and no second dose by 15 game minutes plus the 3-minute grace costs 5
+  {const inj=(gap)=>{F({ep:{rebound:false}});const r=quiet(()=>human.play('ep',0,{noDet:true,stopAt:S=>S.mission===1&&S.running&&!S.briefing}));F(null);const api=r.api,S=api.S();
+      S.e.doses=[{t:S.t+.75-gap,mg:.3,site:'thigh'}];S.e.vol=.3;S.e.site='thigh2';S.e.act={k:'inject',t:.01};const s0=S.score;api.tick(.25);
+      return {cost:s0-S.score,soon:S.incidents.some(w=>/too soon — wait at least 5 minutes/.test(w)),n:S.e.doses.length};};
+    const a=inj(299.5),b=inj(300),c=inj(240);
+    report('deter','epinephrine repeated 4 min 59.5 s after the first dose costs 3 and says "wait at least 5 minutes"; the dose still goes in',a.cost===3&&a.soon&&a.n===2,`−${a.cost}`);
+    report('deter','epinephrine repeated at exactly 5 minutes costs nothing (4 minutes used to be allowed)',b.cost===0&&!b.soon&&b.n===2&&c.cost===3&&c.soon,`5:00 −${b.cost}, 4:00 −${c.cost}`);}
+  {F({ep:{rebound:false}});const r=quiet(()=>human.play('ep',0,{noDet:true,stopAt:S=>S.mission===1&&S.running&&!S.briefing}));F(null);const api=r.api,S=api.S();
+    S.e.assessed=true;const t1=S.t-10;S.e.doses=[{t:t1,mg:.3,site:'thigh'}];api.INJECTS.find(x=>x.id==='worse').run();const late=w=>/No improvement after 15 minutes and no second dose — a repeat is indicated per protocol/.test(w);
+    let g=0,early=false,at=null;while(S.t<t1+1200&&g++<4000){if(api.DECO()){answer(api);continue;}if(!S.running)break;api.tick(.25);if(S.incidents.some(late)){at=S.t-t1;break;}}
+    const x=(S.dets||[]).find(d=>d.id==='worse');
+    report('deter','no second dose while he is not improving: the 5-point line lands after 15 game minutes plus the 3-minute grace, not before',at!==null&&at>1080&&at<1090&&x&&x.lateDing,at===null?'never fired':`fired ${Math.round(at)} s after the first dose`);}
 };

@@ -302,7 +302,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:15px;color:var(--soft)">Version 0.30.5 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
+  <p style="font-size:15px;color:var(--soft)">Version 0.30.6 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -436,7 +436,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.30.5';
+const APP_VERSION='0.30.6';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -881,7 +881,7 @@ const FFC={
   due:()=>{const m=S.m,d=detOpen('shock');return !!d||(S.mission===0&&m.extr.stage>=1&&!m.inside)||(S.mission===1&&m.vitExtr<1&&!m.act)||(S.mission===1&&m.extr.done&&!m.moved);}},
  od:{tx:3,re:200,sig:()=>{const o=S.o;return [o.pulse,o.rr>=10,o.withdrawal,o.gurgle,o.spo2>=90,o.gcs>=13,o.alsArr].join();},
   block:()=>{const o=S.o;return o.checked&&(!o.pulse||o.rr<10||o.gurgle);}},
- ep:{tx:3,re:200,sig:()=>{const e=S.e,v=epV();return [v.sev<.2?0:v.sev<.45?1:v.sev<.7?2:3,e.overdose&&S.t-e.odT<600,e.alsArr,S.t>=epLast()+300,e.doses.length].join();},
+ ep:{tx:3,re:200,sig:()=>{const e=S.e,v=epV();return [v.sev<.2?0:v.sev<.45?1:v.sev<.7?2:3,e.overdose&&S.t-e.odT<600,e.alsArr,S.t>=epLast()+EPI_REPEAT_MIN,e.doses.length].join();},
   due:()=>{const e=S.e;return S.mission===2&&e.injected&&e.reassAfter<2&&S.t-Math.max(e.lastReass,e.injT)>=120;}},
  st:{tx:3,re:200,sig:()=>{const x=S.s;return [x.sev>.5,x.vomit,x.alsArr,x.tx.bridge,x.secr,x.tx.diverted].join();}},
  fl:{tx:3,re:200,sig:()=>{const x=S.f;return [x.gcs,x.alsArr,!!x.vomit,x.tx.diverted].join();}},
@@ -1016,8 +1016,8 @@ const DET=[
   acts:[['e-reass','scored'],['e-vitals','scored'],['e-o2','patient'],['e-pos','patient'],['e-second','patient'],['e-inject','patient'],['e-tell','scored']],
   done:x=>S.e.doses.some(d=>d.t>=x.t0),noAct:90,noActWhy:'His reaction came back and nothing changed in his care — reassess, oxygen, position, a second dose',
   tell:150,tellIf:()=>S.e.alsArr,tellWhy:'Didn\'t tell the medic his reaction was coming back',
-  late:x=>Math.max(x.t0,(S.e.doses.filter(d=>d.t<x.t0).pop()||{t:-1e9}).t+300)+180,lateWhy:'His reaction came back and no second dose was given — epinephrine may be repeated after 5 to 15 minutes if no improvement, per protocol (MCA review pending)',
-  ffOK:x=>x.found&&(x.told||!S.e.alsArr)&&S.t<epLast()+300&&!(S.e.d2&&!S.e.injected)},
+  late:x=>Math.max(x.t0,(S.e.doses.filter(d=>d.t<x.t0).pop()||{t:-1e9}).t+EPI_REPEAT_MAX)+EPI_GRACE,lateWhy:'No improvement after 15 minutes and no second dose — a repeat is indicated per protocol; epinephrine may be repeated after 5 to 15 minutes if no improvement, per protocol (MCA review pending)',
+  ffOK:x=>x.found&&(x.told||!S.e.alsArr)&&S.t<epLast()+EPI_REPEAT_MIN&&!(S.e.d2&&!S.e.injected)},
  {call:'st',id:'worse',src:['natural','inject:worse'],name:'Worse in the back: large-vessel signs',find:/pooling in her mouth/,
   acts:[['s-reass','scored'],['s-glu2','scored'],['s-suct','patient'],['s-side','patient'],['s-o2','patient'],['s-tell','scored']],
   done:()=>!S.s.secr&&!S.s.divertAt,noAct:90,noActWhy:'She got worse and nothing changed in her care — recheck BE-FAST, her airway, tell the medic',
@@ -1595,6 +1595,9 @@ EX('e-ox').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.ox)retu
 EX('e-vitals').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.act)return;e.act={k:'vitals',t:18};radio('Partner','Getting a BP.');};
 function epFound(){decLater('epPosW');}
 function epFindMsg(){const e=S.e,v=epV(),last=e.doses.length?e.doses[e.doses.length-1].t:null;return `Hoarse voice is back, wheezing, SpO₂ ${v.spo2}%, BP ${v.sbp}/${v.dbp}, hives spreading. The epi was ${last===null?'—':mmss(S.t-last)} ago.`;}
+// Epinephrine repeat window (Max, October 10, 2026; MCA review pending): sooner than 5 game minutes after the last dose costs 3;
+// no improvement and no second dose by 15 game minutes plus 3 minutes of grace costs 5. The medic's own second dose waits for the 5-minute mark.
+const EPI_REPEAT_MIN=300,EPI_REPEAT_MAX=900,EPI_GRACE=180;
 const epLast=()=>S.e.doses.length?S.e.doses[S.e.doses.length-1].t:-1e9;
 /* a second dose: you draw it up and give it if Medic 1 isn't here yet; once the medic is on scene, the medic gives it or tells you to (Max, October 6, 2026) */
 EX('e-second').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.doses.length||(e.d2&&!e.injected))return;if(e.alsArr&&!e.medSaysDraw){radio('Medic 1','Hold on — tell me what you\'re seeing first.');return;}
@@ -1603,7 +1606,7 @@ EX('e-second').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.doses.length
 EX('e-calm').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.overdose||e.calm)return;e.calm=true;radio('You','Sitting him partly up, keeping him still. Slow breaths with me — this will pass.');detAct('e-calm');};
 EX('e-tell').onclick=()=>{if(CALL!=='ep')return;const e=S.e,d=detOpen('worse'),od=detOpen('overdose');if(od&&e.alsArr&&!od.told){radio('You',`I gave ${e.doses.length?e.doses[e.doses.length-1].mg.toFixed(2):'—'} mg at ${clockStr(e.injT)} — too much. Pulse ${epV().hr}.`);radio('Medic 1','Thanks for telling me straight. Monitor on, we watch his rhythm.','good');od.told=true;detAct('e-tell');if(!d)return;}if(!e.alsArr){radio('You','Medic 1 isn\'t here yet. The second dose is on us.');return;}if(!d){radio('Medic 1','Thanks. Keep watching his airway.');return;}if(d.told)return;
   radio('You',`It's coming back: hoarse, wheezing, SpO₂ ${epV().spo2}%. Epi 0.3 was ${mmss(S.t-epLast())} ago.`);d.told=true;detAct('e-tell');
-  if(S.mission===3)e.medDoseAt=S.t+Math.max(30,epLast()+300-S.t);else{e.medSaysDraw=true;radio('Medic 1','Draw up a second 0.3 for me — I\'ll check it with you.','good');}};
+  if(S.mission===3)e.medDoseAt=S.t+Math.max(30,epLast()+EPI_REPEAT_MIN-S.t);else{e.medSaysDraw=true;radio('Medic 1','Draw up a second 0.3 for me — I\'ll check it with you.','good');}};
 EX('e-check').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(epNeed()||e.ampOK||e.act)return;e.act={k:'check',t:6};};
 EX('e-another').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(!e.ampBad)return;e.ampBad=false;e.ampChecked=false;radio('Partner','Here\'s a fresh ampule from the spare kit.');};
 EX('e-syr').onclick=()=>{if(CALL!=='ep')return;const e=S.e;if(e.syr)return;if(!e.ampOK){if(e.ampChecked&&e.ampBad){radio('Partner','That ampule is expired and discolored — get another.','bad');return;}e.ampChecked=true;if(e.ampBad){ding(10,'Opened an ampule you never checked — this one was expired and discolored; check drug, concentration, expiration and clarity first');radio('You','…It\'s brownish. Expired 03/2026. We can\'t use this one.','bad');return;}ding(5,'Opened the ampule without checking it — drug, concentration, expiration and clarity, every time');e.ampOK=true;}e.syr=true;radio('You','Filter needle on the 1 mL syringe. Snapping the ampule neck away from me.');};
@@ -1624,7 +1627,7 @@ function tickEP(dtReal){const e=S.e;const F=S.mission===3?4:3;const dt=dtReal*F;
     if(k==='assess'){e.assessed=true;radio('You','Hives across his chest and neck, face swelling, hoarse voice, wheezing. He\'s pale and dizzy. Stung on the neck about ten minutes ago. Allergic to bees — no auto-injector at home.','bad');}
     if(k==='vitals'){e.vitT=S.t;e.vitCount++;if(detFind('worse',epFindMsg()))detAct('e-vitals');{const v=epV();if(detFind('overdose',`Pulse ${v.hr}, BP ${v.sbp}/${v.dbp}, shaking, heart pounding — that's too much epinephrine.`))detAct('e-vitals');}const v=epV();radio('Partner',`Pulse ${v.hr}, BP ${v.sbp}/${v.dbp}, resp ${v.rr}, SpO₂ ${v.spo2}%.`);}
     if(k==='check'){e.ampChecked=true;if(e.ampBad){radio('You','Label: Epinephrine 1 mg/mL — expired 03/2026, and the solution is brownish. We can\'t use this one.','bad');}else{e.ampOK=true;radio('You','Epinephrine 1 mg/mL — 1:1,000. Expires 08/2027. Clear and colorless. Right drug, right concentration.','good');}}
-    if(k==='inject'){const mg=e.vol,prev=e.doses.length?e.doses[e.doses.length-1].t:null;if(prev!==null&&S.t-prev<240)ding(3,'Repeated epinephrine too soon — it may be repeated after 5 to 15 minutes if no improvement, per protocol');e.doses.push({t:S.t,mg,site:e.site});detAct('e-inject');e.injected=true;e.injT=S.t;radio('You','Needle straight into the sharps container — no recapping.');
+    if(k==='inject'){const mg=e.vol,prev=e.doses.length?e.doses[e.doses.length-1].t:null;if(prev!==null&&S.t-prev<EPI_REPEAT_MIN)ding(3,'Repeated epinephrine too soon — wait at least 5 minutes; it may be repeated after 5 to 15 minutes if no improvement, per protocol');e.doses.push({t:S.t,mg,site:e.site});detAct('e-inject');e.injected=true;e.injT=S.t;radio('You','Needle straight into the sharps container — no recapping.');
       if(mg>.5){e.overdose=true;e.odT=S.t;detFire('overdose');ding(25,`Epinephrine overdose: ${mg.toFixed(2)} mg IM`);radio('You','His heart is pounding — he\'s grabbing his chest, 160s and his BP is through the roof!','bad');}
       else if(mg<.2)ding(10,`Underdosed: ${mg.toFixed(2)} mg — the adult dose is 0.3 mg`);}}}
   if(e.assessed){e.sev=Math.min(1,e.sev+(e.doses.length?.00025:.0011)*dt);
@@ -1650,7 +1653,7 @@ function renderEP(){if(FF_ON)return;const e=S.e;if(!e)return;const v=epV();$('cl
   $('ev-air').textContent=!e.assessed?'Not assessed':v.sev>.75?'Stridor — voice muffled, can\'t finish sentences':v.sev>.55?'Hoarse voice, wheezing, face swelling':v.sev>.35?'Wheezing, hives spreading':'Hives fading, breathing easier';
   $('ev-age').textContent=e.injT!==null?`epi ${mmss(S.t-e.injT)} ago`:'';$('who').textContent='';$('pause').textContent='';
   for(const [id,on] of [['e-assess',e.assessed],['e-sting',e.sting],['e-pos',e.pos],['e-o2',e.o2],['e-ox',e.ox],['e-check',e.ampOK],['e-syr',e.syr],['e-drawn',e.drawn],['e-xcheck',e.xcheck],['e-swap',e.swapped],['e-inject',e.injected],['e-time',e.timeNoted]])$(id).classList.toggle('on',on);
-  $('e-another').classList.toggle('hidden',!(e.ampChecked&&e.ampBad));$('e-reass').classList.toggle('hidden',!e.doses.length);$('e-calm').classList.toggle('hidden',!(e.overdose&&S.t-e.odT<600));$('e-calm').classList.toggle('on',!!e.calm);{const d=detOpen('worse'),ready=S.t>=epLast()+300;$('e-second').classList.toggle('hidden',!e.doses.length);$('e-second').classList.toggle('on',!!e.d2&&!e.injected);$('e-second').classList.toggle('hot',!!(d&&d.found&&ready&&!(e.d2&&!e.injected)&&(!e.alsArr||e.medSaysDraw)));$('e-reass').classList.toggle('hot',!!(d&&!d.found));$('e-tell').classList.toggle('hot',!!(d&&d.found&&!d.told&&e.alsArr));$('e-tell').classList.toggle('on',!!(d&&d.told));$('e-second').textContent=e.d2&&!e.injected?'Second dose: drawing up…':'Draw up a second dose';}$('e-time').classList.toggle('hot',e.injected&&!e.timeNoted);
+  $('e-another').classList.toggle('hidden',!(e.ampChecked&&e.ampBad));$('e-reass').classList.toggle('hidden',!e.doses.length);$('e-calm').classList.toggle('hidden',!(e.overdose&&S.t-e.odT<600));$('e-calm').classList.toggle('on',!!e.calm);{const d=detOpen('worse'),ready=S.t>=epLast()+EPI_REPEAT_MIN;$('e-second').classList.toggle('hidden',!e.doses.length);$('e-second').classList.toggle('on',!!e.d2&&!e.injected);$('e-second').classList.toggle('hot',!!(d&&d.found&&ready&&!(e.d2&&!e.injected)&&(!e.alsArr||e.medSaysDraw)));$('e-reass').classList.toggle('hot',!!(d&&!d.found));$('e-tell').classList.toggle('hot',!!(d&&d.found&&!d.told&&e.alsArr));$('e-tell').classList.toggle('on',!!(d&&d.told));$('e-second').textContent=e.d2&&!e.injected?'Second dose: drawing up…':'Draw up a second dose';}$('e-time').classList.toggle('hot',e.injected&&!e.timeNoted);
   $('e-check').textContent=e.act&&e.act.k==='check'?'Checking…':'Check the ampule';
   const mg=e.vol;$('e-drawtxt').innerHTML=!e.syr?'':`<b style="color:${Math.abs(mg-.3)<.001?'#7fe3a4':'#ffc23d'}">${mg.toFixed(2)} mL</b> = ${mg.toFixed(2)} mg at 1 mg/mL${e.drawn?' · drawn':''}`;
   ['e-m10','e-m05','e-p05','e-p10','e-drawn'].forEach(i=>$(i).disabled=!e.syr||e.drawn);epSyr();}
