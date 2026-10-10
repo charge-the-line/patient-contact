@@ -302,7 +302,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.30.3 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.30.4 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -436,7 +436,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.30.3';
+const APP_VERSION='0.30.4';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -861,7 +861,7 @@ function showBrief(){const m=M[S.mission];S.briefing=true;S.running=false;$('bri
   $('brief-chips').innerHTML=m.skills.map(k=>`<button class="chip" data-k="${k}">${esc(GUIDE[k].name)}</button>`).join('');$('briefov').classList.remove('hidden');}
 $('brief-chips').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
 $('brief-menu').onclick=()=>showMenu();
-$('brief-go').onclick=()=>{keepAwake(true);$('briefov').classList.add('hidden');S.briefing=false;S.running=true;};
+$('brief-go').onclick=()=>{keepAwake(true);$('briefov').classList.add('hidden');S.briefing=false;S.running=true;if(!MV.raf){MV.raf=true;requestAnimationFrame(drawWave);}};
 function checkMission(dt){const m=M[S.mission];let all=true,done=0;if(S.dets)detTick();if(S.decQ&&S.decQ.length&&!DEC_OPEN&&S.running){openDecision(S.decQ.shift(),-1);return;}
   m.steps.forEach((s,j)=>{if(stepsDone[j]){done++;return;}const prev=j===0||stepsDone[j-1];
     if(s.dec){if(!DEC_OPEN&&(prev||s.any)&&s.f())openDecision(s.dec,j);all=false;return;}
@@ -3281,7 +3281,7 @@ function monSample(st,t){if(st.kind==='pleth'){const ph=t-MV.beat;return .9*g(ph
   if(st.r==='asys')return .02*Math.sin(t*3)+(Math.random()-.5)*.02;
   const ph=t-MV.beat;const L=LEADS.II;let v=beatVal(ph,L,{noP:st.r==='afib',wide:st.r==='pea',st:st.stemi?STEMI_INF.II:0});if(st.r==='afib')v+=.045*Math.sin(2*Math.PI*6.3*t)+.03*Math.sin(2*Math.PI*9.1*t+.5);return v;}
 function monSetup(){const c=$('ecgc');if(!c||!c.getContext)return false;const r=c.getBoundingClientRect?c.getBoundingClientRect():{width:300,height:96};MV.dpr=window.devicePixelRatio||1;MV.w=Math.max(200,Math.round(r.width||300));MV.h=Math.round(r.height||96);c.width=MV.w*MV.dpr;c.height=MV.h*MV.dpr;MV.ctx=c.getContext('2d');if(!MV.ctx)return false;MV.ctx.setTransform(MV.dpr,0,0,MV.dpr,0,0);MV.ctx.clearRect(0,0,MV.w,MV.h);MV.x=0;MV.py=null;return true;}
-function drawWave(now){requestAnimationFrame(drawWave);if(!S.active)return;const st=monState();
+function drawWave(now){if(!S.active){MV.raf=false;return;}requestAnimationFrame(drawWave);/* the ECG only animates while a call is live; brief-go restarts it */const st=monState();
   if(!MV.lastFrame)MV.lastFrame=now||0;const dt=Math.min(.1,((now||0)-MV.lastFrame)/1000);MV.lastFrame=now||0;
   if(st.kind!==MV.kind){MV.kind=st.kind;if(!monSetup())return;}
   if(!MV.ctx||st.kind==='none')return;
@@ -3434,7 +3434,7 @@ function drawStrip(cv,r){if(!cv||!cv.getContext)return;const W=320,H=96,d=window
     else{if(t>=next){beat=t;const rr=60/r.hr;next=t+(r.k==='afib'?rr*(.55+Math.random()*.9):rr);}v=beat<0?0:beatVal(t-beat,LEADS.II,{noP:r.k==='afib'});if(r.k==='afib')v+=.05*Math.sin(2*Math.PI*6.3*t+seed)+.03*Math.sin(2*Math.PI*9.1*t);}
     const y=H*.6-v*H*.42;px?x.lineTo(px,y):x.moveTo(px,y);}x.stroke();}
 /* --- runner --- */
-function drillStart(id){pca('begin','pc','drill-'+id,()=>DR&&DR.qs?`question-${DR.i+1}`:'');const d=DRILLS.find(x=>x.id===id);DR={id,d,i:0,right:0,qs:[],t0:performance.now(),errs:0,taps:[]};$('dr-title').textContent=d.name;
+function drillStart(id){keepAwake(true);pca('begin','pc','drill-'+id,()=>DR&&DR.qs?`question-${DR.i+1}`:'');const d=DRILLS.find(x=>x.id===id);DR={id,d,i:0,right:0,qs:[],t0:performance.now(),errs:0,taps:[]};$('dr-title').textContent=d.name;
   if(id==='med')DR.qs=Array.from({length:8},genMed);if(id==='o2')DR.qs=Array.from({length:8},genO2);if(id==='apgar')DR.qs=Array.from({length:8},genApgar);if(id==='lkw')DR.qs=shuf(LKWQ);if(id==='startcpr')DR.qs=shuf(STARTQ).map(x=>Object.assign({},x,{d:x.d.slice()}));
   if(id==='rhythm')DR.qs=Array.from({length:8},()=>{const r=pick(RHY);return {rhy:r,q:'What rhythm is this?',a:r.n,d:shuf(RHY.filter(x=>x.k!==r.k).map(x=>x.n)).slice(0,3),why:r.why};});
   if(id==='cpr')return cprDrill();if(id==='leads')return leadDrill();drillQ();}
@@ -3446,7 +3446,7 @@ function drillAns(i){const q=DR.qs[DR.i];if(q.done)return;q.done=true;const ok=q
   $('dr-fb').innerHTML=`<b style="color:${ok?'#7fe3a4':'#ff8f8a'}">${ok?'Right.':'Not quite — '+esc(q.a)+'.'}</b> ${esc(q.why)}`;
   $('dr-foot').innerHTML=`<button data-a="next" class="go" style="width:100%">${DR.i+1<DR.qs.length?'Next':'See results'}</button>`;}
 function drillNext(){DR.i++;if(DR.i<DR.qs.length)drillQ();else drillDone(Math.round(DR.right/DR.qs.length*100),`${DR.right} of ${DR.qs.length} right`);}
-function drillDone(score,detail){pca('end',pca('bkt',score));const p=load();p.drills=p.drills||{};const prev=p.drills[DR.id]?p.drills[DR.id].best:null;p.drills[DR.id]={best:Math.max(prev||0,score),runs:((p.drills[DR.id]||{}).runs||0)+1,last:new Date().toISOString()};
+function drillDone(score,detail){keepAwake(false);pca('end',pca('bkt',score));const p=load();p.drills=p.drills||{};const prev=p.drills[DR.id]?p.drills[DR.id].best:null;p.drills[DR.id]={best:Math.max(prev||0,score),runs:((p.drills[DR.id]||{}).runs||0)+1,last:new Date().toISOString()};
   p.drillRuns=(p.drillRuns||[]).concat([pcDrillStamp({drill:DR.id,d:new Date().toISOString(),score})]).slice(-200);save(p);const best=prev!==null&&score>prev;
   $('dr-meta').textContent='';$('dr-body').innerHTML=`<div class="big">${score}</div><p style="margin:4px 0 8px">${esc(detail)}${best?' · <b style="color:var(--orange)">New personal best!</b>':prev!==null?` · best ${Math.max(prev,score)}`:''}</p><div class="chips"><button class="chip" data-a="learn" data-k="${DR.d.g}">Learn more: ${esc(GUIDE[DR.d.g].name)}</button></div>`;
   $('dr-foot').innerHTML='<div style="display:flex;gap:8px"><button data-a="menu" style="flex:1">All drills</button><button data-a="again" class="go" style="flex:1">Again</button></div>';}
@@ -3477,7 +3477,7 @@ function torsoSVG(dots,prefix){return `<svg viewBox="0 0 200 250" style="width:1
 function drillClick(e){const b=e.target.closest&&e.target.closest('[data-a],[data-p]');if(!b)return;const ds=b.dataset||{};
   if(ds.p&&DR&&DR.id==='leads'){leadDrillTap(ds.p);return;}
   const a=ds.a;if(a==='go')drillStart(ds.d);else if(a==='ans')drillAns(+ds.i);else if(a==='next')drillNext();else if(a==='tap')cprTap();
-  else if(a==='again'){const id=DR.id;drillStart(id);}else if(a==='menu'||a==='quit'){if(DR&&DR.timer)clearInterval(DR.timer);drillMenu();}
+  else if(a==='again'){const id=DR.id;drillStart(id);}else if(a==='menu'||a==='quit'){if(DR&&DR.timer)clearInterval(DR.timer);keepAwake(false);drillMenu();}
   else if(a==='close'){if(DR&&DR.timer)clearInterval(DR.timer);DR=null;$('drillov').classList.add('hidden');}
   else if(a==='learn')openCard(ds.k,true);}
 $('dr-body').onclick=drillClick;$('dr-foot').onclick=drillClick;
@@ -3589,7 +3589,7 @@ $('b-lesson').onclick=lessonStart;$('ld-again').onclick=()=>{$('ldone').classLis
 function showMenu(){keepAwake(false);S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');homeRender();$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
 $('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-call7').onclick=()=>loadCall('cb');$('b-call8').onclick=()=>loadCall('dm');$('b-call9').onclick=()=>loadCall('pd');$('b-call10').onclick=()=>loadCall('cp');$('b-call11').onclick=()=>loadCall('fr');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
-$('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
+$('b-resume').onclick=()=>{$('menu').classList.add('hidden');if(S.active)keepAwake(true);if(S.briefing)$('briefov').classList.remove('hidden');else if(DEC_OPEN)$('decov').classList.remove('hidden');else S.running=true;};
 $('b-start').onclick=()=>{$('intro').classList.add('hidden');const p=load();p.seen=true;save(p);showMenu();};
 function snapshot(){if(CALL==='fr'){const x=S.b,v=frV();return [`Patient Contact report — v${APP_VERSION}`,`Call: fire victim (${V.key}) · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · BP ${v.sbp}/${v.dbp} HR ${v.hr} RR ${v.rr} SpO2 ${v.spo2} · O2 ${x.o2||'none'} · temp ${x.temp.toFixed(1)} · burns marked ${x.est===null?'—':x.est+'%'} · apnea ${x.apnea} · seizure ${x.toxT!==null}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='cp'){const x=S.h,v=cpV();return [`Patient Contact report — v${APP_VERSION}`,`Call: chest pain (${V.key}) · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · BP ${v.sbp}/${v.dbp} HR ${v.hr} SpO2 ${v.spo2} pain ${x.pain} · aspirin ${x.asaGiven?'given':x.asaDec||'—'} · arrest ${x.arr?(x.rosc?'ROSC':'yes'):'no'} shocks ${x.shocks}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
@@ -3618,8 +3618,10 @@ if(load().seen){$('intro').classList.add('hidden');showMenu();}
 {const q=new URLSearchParams((typeof location!=='undefined'&&location.search)||'').get('drill');if(q&&DRILLS.find(x=>x.id===q)){$('intro').classList.add('hidden');$('menu').classList.add('hidden');drillMenu();drillStart(q);}}
 /* other modules deep-link to a call: patient-contact/?call=fl opens the elderly fall (Bleed Control's blood-thinner debrief, 0.30.1); unknown ids are ignored */
 {const P=new URLSearchParams((typeof location!=='undefined'&&location.search)||'');const c=P.get('call');if(c&&!P.get('drill')&&Object.prototype.hasOwnProperty.call(CALLNAME,c))loadCall(c);}
-let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else render();if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();ffSync();},250);
-requestAnimationFrame(drawWave);
+let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else if(S.active)render();/* nothing to redraw on the home list */if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();ffSync();},250);
+MV.raf=true;requestAnimationFrame(drawWave);
+/* rule 15: the two timed drills (CPR tempo, lead placement) run on the real clock; it stops while the screen is off */
+pcOnPause(null,away=>{if(DR&&DR.t0){DR.t0+=away*1000;if(DR.taps)DR.taps=DR.taps.map(x=>x+away*1000);}});
 </script>
 </body>
 </html>
