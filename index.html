@@ -42,6 +42,7 @@
 @font-face{font-family:"Saira Condensed";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/saira-condensed-latin-700-normal.woff2) format("woff2")}
 /* Milestone 1: every button is at least 48 px tall (finger-sized, gloves on). */
 button{min-height:48px}
+#rdy-s{font-size:15px;line-height:1.4}
 </style>
 <style>
 :root{--navy:#0a0c0f;--bg:#0a0c0f;--deck:#14171c;--deck2:#1c2026;--line:#2a2f37;--ink:#f6f7f9;--soft:#aab2bd;--orange:#ff7a1a;--acc:#ff7a1a;--acc-ink:#0a0c0f;--red:#e5383b;--green:#39e36f;--amber:#ffc23d;--mon:#050708}
@@ -70,14 +71,14 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .etaw{display:flex;flex-direction:column;min-width:0;line-height:1.15}.ffbtn{flex:none;margin-left:10px;padding:0 14px;font-size:16px}.ffoff{visibility:hidden}
 /* the monitor: the one bold element */
 .mon{background:var(--mon);border-radius:16px;border:3px solid #2a3340;padding:10px 12px 12px;margin-bottom:10px;box-shadow:inset 0 0 0 1px #000}
-.mon .hdr{display:flex;justify-content:space-between;font-size:14px;color:#7d8a99;margin-bottom:4px}
+.mon .hdr{display:flex;justify-content:space-between;gap:8px;font-size:15px;color:#7d8a99;margin-bottom:4px}
 .mon .hdr span:last-child{color:var(--green)}
 .trace{width:100%;height:84px;display:block}
 .vitals{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
 .v{text-align:left}.v .l{font-size:13px;color:#7d8a99}.v .n{font-family:"Saira Condensed";font-weight:600;font-size:30px;line-height:1}
 .v.g .n{color:var(--green)}.v.y .n{color:var(--amber)}.v.w .n{color:#e9eef5}.v.c .n{color:#6fd3ff}
 .aedmsg{font-family:"Saira Condensed";font-size:26px;font-weight:600;color:var(--amber);min-height:34px;margin-top:4px}
-.cprbar{display:flex;gap:10px;align-items:center;margin-top:8px;font-size:14px;color:#9fb0c3}
+.cprbar{display:flex;gap:10px;align-items:center;margin-top:8px;font-size:15px;color:#9fb0c3}
 .track{flex:1;height:10px;border-radius:5px;background:#1a2028;overflow:hidden}.track div{height:100%;background:var(--green);width:0}
 /* action deck */
 .deck{background:var(--deck);border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:10px}
@@ -85,12 +86,12 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .grp h3{margin:0 0 6px;font-size:17px;font-weight:600;color:var(--soft)}
 .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .row.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-.stat{font-size:14px;color:var(--soft);margin-top:6px;line-height:1.35}
-.o2{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:14px;color:var(--soft)}
+.stat{font-size:15px;color:var(--soft);margin-top:6px;line-height:1.4}
+.o2{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:15px;color:var(--soft)}
 /* call card */
 .card{background:var(--deck);border:1px solid var(--line);border-radius:6px;padding:12px;margin-bottom:10px}
 .card h2{margin:0 0 4px;font-size:22px;font-weight:600}
-.card .sub{font-size:14px;color:var(--soft);margin:0 0 8px}
+.card .sub{font-size:15px;color:var(--soft);margin:0 0 8px;line-height:1.4}
 .steps{list-style:none;padding:0;margin:0}.steps li{display:flex;gap:10px;padding:6px 0;font-size:15px;border-top:1px solid #2a3d5e}.steps li:first-child{border-top:0}
 .steps .box{width:18px;height:18px;border:2px solid var(--soft);border-radius:5px;flex:0 0 auto;margin-top:1px}
 .steps li.done{color:#7f8fa6;text-decoration:line-through}.steps li.done .box{background:#2f9e66;border-color:#2f9e66}
@@ -103,7 +104,7 @@ button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .overlay .box{background:var(--deck);border:1px solid var(--line);border-radius:8px;padding:18px;max-width:460px;width:100%;margin:auto}
 .overlay h2{font-size:28px;margin:0 0 8px;font-weight:600;line-height:1.1}
 .overlay p{font-size:16px;line-height:1.5;color:#d6deea;margin:0 0 12px}
-.tag{display:inline-block;font-family:"Saira Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:.5px;border-radius:4px;padding:2px 8px;margin-bottom:8px;background:var(--acc);color:var(--acc-ink)}
+.tag{display:inline-block;font-family:"Saira Condensed",sans-serif;font-size:15px;font-weight:600;letter-spacing:.5px;border-radius:4px;padding:2px 8px;margin-bottom:8px;background:var(--acc);color:var(--acc-ink)}
 .opt{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px;font-size:16px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
 .chip{padding:7px 11px;font-size:15px;border-radius:6px;background:#14324d;border-color:#2b6a99;color:#cfe6ff;font-family:inherit;font-weight:400;letter-spacing:0;text-transform:none;line-height:1.2;white-space:normal}
@@ -302,7 +303,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:15px;color:var(--soft)">Version 0.30.6 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
+  <p style="font-size:15px;color:var(--soft)">Version 0.30.7 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -315,7 +316,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 </div></div>
 
 <div class="overlay hidden" id="menu"><div class="box">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-block;font-size:14px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="font-size:14px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a><button class="gear" id="h-set" style="margin-left:12px">Settings</button></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-flex;align-items:center;min-height:44px;font-size:15px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-size:15px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a><button class="gear" id="h-set" style="margin-left:12px">Settings</button></div>
   <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door.</h1></div>
   <div class="card rdy" id="rdy"><div class="flex"><div style="min-width:0"><div class="small">Your readiness</div><b id="rdy-t" style="display:block;font-family:'Saira Condensed';font-size:22px;line-height:1.05"></b><div class="small" id="rdy-s"></div></div><div class="sp"></div><div class="num" id="rdy-n"></div></div></div>
   <button id="b-resume" class="go hidden" style="width:100%;margin-bottom:8px">Resume call</button>
@@ -436,7 +437,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.30.6';
+const APP_VERSION='0.30.7';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -3351,7 +3352,7 @@ function monSync(){const c=monCfg();const vis=(id,on)=>$(id).classList.toggle('h
   const st=monState();$('trace').classList.toggle('hidden',st.kind==='none');if(st.kind==='ecg'&&st.lead==='II'&&CALL!=='arrest')$('mon-name').textContent='Cardiac monitor';else if(st.kind==='pleth')$('mon-name').textContent='Pulse oximeter';$('ecg-lead').textContent=st.lead||'';$('ecg-hr').textContent=st.kind==='ecg'&&['vf','cpr'].includes(st.r)?'':st.hr?`${st.kind==='pleth'?'PR':'HR'} ${Math.round(st.hr)}`:'';}
 $('mon-4').onclick=()=>{if(!S.active)return;leadStart('4');};$('mon-12').onclick=()=>{if(!S.active)return;leadStart('12');};
 /* --- timeline + progress --- */
-function timelineHTML(){const L=(S.log||[]).filter(e=>e.who!=='Guide');if(!L.length)return'';return `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--orange);font-family:'Saira Condensed';font-size:18px">Call timeline · ${L.length} events</summary><div style="max-height:260px;overflow:auto;font-size:14px;line-height:1.45;margin-top:6px">${L.map(e=>`<div style="padding:3px 0;border-top:1px dashed #2a3d5e"><b style="color:var(--soft)">${e.c}</b> <span style="color:var(--orange)">${esc(e.who)}:</span> ${esc(e.msg)}</div>`).join('')}</div></details>`;}
+function timelineHTML(){const L=(S.log||[]).filter(e=>e.who!=='Guide');if(!L.length)return'';return `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--orange);font-family:'Saira Condensed';font-size:18px">Call timeline · ${L.length} events</summary><div style="max-height:260px;overflow:auto;font-size:15px;line-height:1.45;margin-top:6px">${L.map(e=>`<div style="padding:3px 0;border-top:1px dashed #2a3d5e"><b style="color:var(--soft)">${e.c}</b> <span style="color:var(--orange)">${esc(e.who)}:</span> ${esc(e.msg)}</div>`).join('')}</div></details>`;}
 function progressShow(){const p=load();const runs=p.runs||[];$('prog-body').innerHTML=Object.keys(CALLNAME).map(k=>{const r=runs.filter(x=>(x.call||'arrest')===k);if(!r.length)return `<div class="mrow"><span>${CALLNAME[k]}</span><b style="color:var(--soft)">not run yet</b></div>`;const best=Math.max(...r.map(x=>x.score)),last=r[r.length-1];const tiers=[...new Set(r.map(x=>['Guided','Recall','Chaos'][x.tier]))].join(', ');return `<div class="mrow"><span>${CALLNAME[k]}<br><small style="color:var(--soft)">${r.length} run${r.length>1?'s':''} · ${tiers} · last ${last.d.slice(0,10)}</small></span><b>${best}</b></div>`;}).join('')+`<h3 style="margin:12px 0 4px;font-family:'Saira Condensed';color:var(--orange)">Quick drills</h3>`+DRILLS.map(d=>{const x=(p.drills||{})[d.id];return `<div class="mrow"><span>${d.name}${x?`<br><small style="color:var(--soft)">${x.runs} run${x.runs>1?'s':''} · last ${x.last.slice(0,10)}</small>`:''}</span><b${x?'':' style="color:var(--soft)"'}>${x?x.best:'not run yet'}</b></div>`;}).join('');$('progov').classList.remove('hidden');}
 $('b-prog').onclick=progressShow;$('prog-close').onclick=()=>$('progov').classList.add('hidden');
 $('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Patient','Date','Tier','Score','Instructor']].concat((p.runs||[]).flatMap(r=>(r.who&&r.who.length?r.who:[p.name||'']).map(n=>[n,p.dept||'',CALLNAME[r.call||'arrest'],r.variant||'',r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score,r.inst||'']))).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),'',r.d.slice(0,16).replace('T',' '),'Drill',r.score,'']));const csv=pcCsv(rows);/* the core quotes every cell and defuses =, +, -, @ formulas */
@@ -3455,7 +3456,7 @@ function drillDone(score,detail){keepAwake(false);pca('end',pca('bkt',score));co
   $('dr-foot').innerHTML='<div style="display:flex;gap:8px"><button data-a="menu" style="flex:1">All drills</button><button data-a="again" class="go" style="flex:1">Again</button></div>';}
 /* CPR tempo */
 function cprDrill(){DR.dur=20;$('dr-meta').textContent='Tap the pad in time — 100 to 120 a minute';
-  $('dr-body').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;color:var(--soft)">Your rate</span><span id="dr-left" style="font-family:'Saira Condensed';font-size:20px">20 s</span></div><div id="dr-rate" class="big" style="text-align:center">—</div><div class="track" style="height:14px;margin:6px 0 10px"><div id="dr-zone" style="width:0%;background:var(--green)"></div></div><button id="dr-pad" data-a="tap" style="width:100%;height:200px;font-size:26px;font-family:'Saira Condensed';background:#2a1310;border-color:var(--red)">TAP — PUSH HARD AND FAST</button><p style="font-size:14px;color:var(--soft);margin:8px 0 0">Starts on your first tap. No metronome — that's the point.</p>`;
+  $('dr-body').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;color:var(--soft)">Your rate</span><span id="dr-left" style="font-family:'Saira Condensed';font-size:20px">20 s</span></div><div id="dr-rate" class="big" style="text-align:center">—</div><div class="track" style="height:14px;margin:6px 0 10px"><div id="dr-zone" style="width:0%;background:var(--green)"></div></div><button id="dr-pad" data-a="tap" style="width:100%;height:200px;font-size:26px;font-family:'Saira Condensed';background:#2a1310;border-color:var(--red)">TAP — PUSH HARD AND FAST</button><p style="font-size:15px;color:var(--soft);margin:8px 0 0">Starts on your first tap. No metronome — that's the point.</p>`;
   $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Quit drill</button>';}
 function cprTap(){const now=performance.now();if(!DR.taps.length){DR.t0=now;DR.timer=setInterval(cprTick,200);}DR.taps.push(now);cprTick();}
 function cprTick(){if(!DR||DR.id!=='cpr')return;const now=performance.now(),el=(now-DR.t0)/1000;const iv=[];for(let i=1;i<DR.taps.length;i++)iv.push((DR.taps[i]-DR.taps[i-1])/1000);
