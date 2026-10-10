@@ -34,6 +34,7 @@ python3 tests/browser_check.py
 | `drills` | Every quiz scores 100 when right and 0 when wrong; **answer keys are recalculated independently from the question text**; CPR tempo separates 110/min from 135 and 90 |
 | `instructor` | Every injectable complication fires in every call; re-arrest restarts the LUCAS |
 | `fuzz` | Random tapping (including menu, instructor, and drill buttons) never crashes or produces NaN |
+| `voice` | One voice (milestone 5): the button standard on the briefing, panel, lesson, call and quick-drill results, the links under every result, `esct` rendering the MCA notes as the tag chip, tier help from the core, About and version in How to play, the hub name store, the shared chip class |
 
 The suite has been verified to **catch planted bugs**: late breaths not counting, a wrong APGAR answer key, and a forgotten cache bump all fail loudly.
 

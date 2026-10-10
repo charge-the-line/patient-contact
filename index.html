@@ -125,7 +125,7 @@ body.tv .radio{max-height:320px}body.tv .ecgwrap,body.tv .ecgwrap canvas{height:
 @media (min-width:1100px){body.tv{zoom:1.18}}
 .syr{width:100%;height:58px;display:block;margin:4px 0}
 .scen{display:block;width:100%;text-align:left;padding:12px 70px 12px 14px;margin-bottom:8px;position:relative;background:var(--deck);border:0;border-left:4px solid var(--acc);border-radius:6px}
-.scen .bchip{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:"Saira Condensed";font-weight:600;font-size:14px;letter-spacing:.5px;padding:2px 8px;border-radius:4px;background:var(--acc);color:var(--acc-ink,#0a0c0f);white-space:nowrap;line-height:1.5}.bchip.dim{background:var(--deck2);color:var(--soft)}.bchip.due{background:#ffc23d;color:#0a0c0f}
+.scen .chip{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:"Saira Condensed";font-weight:600;font-size:14px;letter-spacing:.5px;padding:2px 8px;border-radius:4px;background:var(--acc);color:var(--acc-ink,#0a0c0f);white-space:nowrap;line-height:1.5}.scen .chip.dim{background:var(--deck2);color:var(--soft)}.scen .chip.due{background:#ffc23d;color:#0a0c0f}
 .card.rdy{background:linear-gradient(135deg,rgba(255,122,26,.22),var(--deck) 70%);border-left:4px solid var(--acc)}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .slide h2{font-size:30px}.slide ul{margin:0 0 12px;padding-left:20px;font-size:16px;line-height:1.5}.slide li{margin-bottom:4px}.dots{display:flex;gap:4px;justify-content:center;margin:8px 0}.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.dots i.on2{background:var(--acc)}.scen b{display:block;font-family:"Saira Condensed";font-size:21px;font-weight:600}.scen span{font-size:15px;color:var(--soft)}
 textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0f1a2e;color:var(--ink);width:100%}
@@ -139,7 +139,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="meta"><button id="b-guide" class="guidebtn">Protocol guide</button><div style="margin-top:4px">Score <b id="score">100</b></div><div id="clock">14:41</div></div>
 </div>
 
-<div class="eta" id="etabar"><div class="etaw"><span id="eta-l">Medic 1</span><b id="eta-v">9:00 out</b></div><button id="b-ff" class="go ffbtn ffoff">Fast-forward ▸▸</button></div>
+<div class="eta" id="etabar"><div class="etaw"><span id="eta-l">Medic 1</span><b id="eta-v">9:00 out</b></div><button id="b-ff" class="go ffbtn ffoff pc-ff">Fast-forward ▸▸</button></div>
 
 <div class="mon" id="monitor">
   <div class="hdr"><span id="mon-name">AED</span><span id="mon-mode"></span></div>
@@ -291,7 +291,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <h2 id="m-title">Call</h2>
   <p class="sub" id="m-sub"></p>
   <ul class="steps" id="steps"></ul>
-  <div class="actions"><button id="b-restart">Restart</button><button id="b-menu">Menu</button></div>
+  <div class="actions"><button id="b-restart">Restart</button><button id="b-menu">Stop and go back</button><button class="gear" data-pc-set>Settings</button></div>
   <button id="b-report" style="width:100%;margin-top:8px">Report an issue or idea</button>
 </div>
 <div class="card" id="radiocard"><h2>Radio</h2><div class="radio" id="radio"></div></div>
@@ -303,7 +303,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:15px;color:var(--soft)">Version 0.31.0 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
+  <p style="font-size:15px;color:var(--soft)">Version 0.32.0 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -312,16 +312,19 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>Everything runs on a clock: the ALS ETA, your compressor's arms, your oxygen, the drive to the hospital, and the bridges in between.</p>
   <p><b>Guided</b> lists every step. <b>Recall</b> hides the list. <b>Chaos</b> adds things going wrong.</p>
   <p>When the medic arrives, you'll help put the patient on the cardiac monitor — and turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
+  <div class="pc-sec">About</div>
+  <p>Patient Contact is a free practice tool for medical first responders, in the same family as Charge the Line, Bleed Control, BLS Ready and Upwind. It follows current guidelines; protocols vary, so follow your medical control. Agency and hospital names are generic until the Bay County MCA review.</p>
+  <div id="how-about"></div>
   <button class="go" id="how-close" style="width:100%;font-size:18px">Close</button>
 </div></div>
 
 <div class="overlay hidden" id="menu"><div class="box">
   <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-flex;align-items:center;min-height:44px;font-size:15px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-size:15px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a><button class="gear" id="h-set" style="margin-left:12px">Settings</button></div>
-  <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door. <span class="ver" style="font-size:15px;color:var(--soft)">v0.31.0</span></h1></div>
+  <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door. <span class="ver" style="font-size:15px;color:var(--soft)">v0.32.0</span></h1></div>
   <div class="card rdy" id="rdy"><div class="flex"><div style="min-width:0"><div class="small">Your readiness</div><b id="rdy-t" style="display:block;font-family:'Saira Condensed';font-size:22px;line-height:1.05"></b><div class="small" id="rdy-s"></div></div><div class="sp"></div><div class="num" id="rdy-n"></div></div></div>
   <button id="b-resume" class="go hidden" style="width:100%;margin-bottom:8px">Resume call</button>
   <div class="card"><div class="small">What this is</div><p style="margin:4px 0 0;font-size:15px;line-height:1.45">Medical first response for the firefighter who gets there before the ambulance: eleven calls with a working cardiac monitor, patients that change every run, quick drills and a lesson. You are the medical first responder; the EMT drives and the medic works the patient. <b>Protocols vary. On a real call, follow your medical control.</b></p></div>
-  <button class="scen" id="b-lesson"><span class="bchip dim" id="chip-lesson">—</span><b>The lesson</b><span>Medical first response in 12 slides, each with a check · about 10 minutes</span></button>
+  <button class="scen" id="b-lesson"><span class="chip dim" id="chip-lesson">—</span><b>The lesson</b><span>Medical first response in 12 slides, each with a check · about 10 minutes</span></button>
   <div class="row2" style="margin:10px 0 12px"><button id="b-drills">Quick drills</button><button id="b-prog">My progress</button><button id="b-gindex">Protocol guide</button><button id="b-howto">How to play</button></div>
   <div class="sec">Difficulty</div>
   <div class="tiers"><button data-tier="0">Guided</button><button data-tier="1">Recall</button><button data-tier="2">Chaos</button></div>
@@ -330,17 +333,17 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <div class="row2"><button id="b-rand">Patients: varied</button><button id="b-inst">Instructor mode: off</button></div>
   <p class="stat" style="margin:8px 0 6px">Standard patients give everyone the same case. Instructor mode adds live injects and a freeze. Start a full Drill Night from the home page.</p>
   <div class="sec">Calls</div>
-  <button class="scen" id="b-call1"><span class="bchip dim" id="chip-arrest">—</span><b>62-year-old man down</b><span>Witnessed collapse at home. His wife is doing CPR. Medic 1 is nine minutes out.</span></button>
-  <button class="scen" id="b-call2"><span class="bchip dim" id="chip-mva">—</span><b>Car versus tree, driver pinned</b><span>Single-vehicle crash on a county road, early morning, 41°F. Driver trapped, bleeding. Your engine crew is cutting. Medic 1 is seven minutes out.</span></button>
-  <button class="scen" id="b-call3"><span class="bchip dim" id="chip-od">—</span><b>Unresponsive in the bathroom</b><span>11:47 p.m. A roommate found him on the bathroom floor, barely breathing. Suspected fentanyl. Medic 1 is eight minutes out.</span></button>
-  <button class="scen" id="b-call4"><span class="bchip dim" id="chip-ep">—</span><b>Stung in the orchard</b><span>A yellow jacket sting, and now he can't catch his breath. No auto-injectors in Bay County — you draw up the epi. Medic 1 is eight minutes out.</span></button>
-  <button class="scen" id="b-call5"><span class="bchip dim" id="chip-st">—</span><b>Something's wrong with Mom</b><span>10:07 a.m. Her husband found her slumped at the kitchen table, slurring and weak on one side. Medic 1 is six minutes out — and East Side Hospital is across the river.</span></button>
-  <button class="scen" id="b-call6"><span class="bchip dim" id="chip-fl">—</span><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
-  <button class="scen" id="b-call7"><span class="bchip dim" id="chip-cb">—</span><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
-  <button class="scen" id="b-call8"><span class="bchip dim" id="chip-dm">—</span><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
-  <button class="scen" id="b-call9"><span class="bchip dim" id="chip-pd">—</span><b>"My son can't breathe"</b><span>2:04 a.m. A 4-year-old on his mother's lap, working hard to breathe. Medic 1 is nine minutes out.</span></button>
-  <button class="scen" id="b-call10"><span class="bchip dim" id="chip-cp">—</span><b>"It feels like an elephant on my chest"</b><span>9:14 a.m. Chest pressure — or is it? Medic 1 is ten minutes out.</span></button>
-  <button class="scen" id="b-call11"><span class="bchip dim" id="chip-fr">—</span><b>"We pulled him out of the back bedroom"</b><span>4:12 a.m., a house fire. Your crew carries a man out and lays him at the curb. Medic 1 is eight minutes out.</span></button>
+  <button class="scen" id="b-call1"><span class="chip dim" id="chip-arrest">—</span><b>62-year-old man down</b><span>Witnessed collapse at home. His wife is doing CPR. Medic 1 is nine minutes out.</span></button>
+  <button class="scen" id="b-call2"><span class="chip dim" id="chip-mva">—</span><b>Car versus tree, driver pinned</b><span>Single-vehicle crash on a county road, early morning, 41°F. Driver trapped, bleeding. Your engine crew is cutting. Medic 1 is seven minutes out.</span></button>
+  <button class="scen" id="b-call3"><span class="chip dim" id="chip-od">—</span><b>Unresponsive in the bathroom</b><span>11:47 p.m. A roommate found him on the bathroom floor, barely breathing. Suspected fentanyl. Medic 1 is eight minutes out.</span></button>
+  <button class="scen" id="b-call4"><span class="chip dim" id="chip-ep">—</span><b>Stung in the orchard</b><span>A yellow jacket sting, and now he can't catch his breath. No auto-injectors in Bay County — you draw up the epi. Medic 1 is eight minutes out.</span></button>
+  <button class="scen" id="b-call5"><span class="chip dim" id="chip-st">—</span><b>Something's wrong with Mom</b><span>10:07 a.m. Her husband found her slumped at the kitchen table, slurring and weak on one side. Medic 1 is six minutes out — and East Side Hospital is across the river.</span></button>
+  <button class="scen" id="b-call6"><span class="chip dim" id="chip-fl">—</span><b>"I just need help up"</b><span>7:34 a.m. An 82-year-old woman on her bedroom floor. Her daughter called from out of state when she didn't answer the phone. She's alert, apologetic, and wants to get back in bed.</span></button>
+  <button class="scen" id="b-call7"><span class="chip dim" id="chip-cb">—</span><b>"The baby's coming!"</b><span>2:18 a.m., January. Her third baby, and her last labor was fast. Medic 1 is ten minutes out on icy roads. This one's yours.</span></button>
+  <button class="scen" id="b-call8"><span class="chip dim" id="chip-dm">—</span><b>"He's drunk — he swung at me"</b><span>3:40 p.m. A driver slumped in a running car in a grocery store parking lot. Police are on scene and think he's intoxicated. Medic 1 is nine minutes out.</span></button>
+  <button class="scen" id="b-call9"><span class="chip dim" id="chip-pd">—</span><b>"My son can't breathe"</b><span>2:04 a.m. A 4-year-old on his mother's lap, working hard to breathe. Medic 1 is nine minutes out.</span></button>
+  <button class="scen" id="b-call10"><span class="chip dim" id="chip-cp">—</span><b>"It feels like an elephant on my chest"</b><span>9:14 a.m. Chest pressure — or is it? Medic 1 is ten minutes out.</span></button>
+  <button class="scen" id="b-call11"><span class="chip dim" id="chip-fr">—</span><b>"We pulled him out of the back bedroom"</b><span>4:12 a.m., a house fire. Your crew carries a man out and lays him at the curb. Medic 1 is eight minutes out.</span></button>
 </div></div>
 
 <div class="overlay hidden" id="briefov"><div class="box">
@@ -348,7 +351,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <h2 id="brief-t"></h2><p id="brief-x"></p>
   <div style="font-family:'Saira Condensed';font-size:17px;color:var(--orange)">Skills on this part of the call — tap to review</div>
   <div class="chips" id="brief-chips"></div>
-  <div style="display:flex;gap:8px"><button id="brief-menu" style="flex:0 0 auto">Back to menu</button><button class="go" id="brief-go" style="flex:1;font-size:18px">Start</button></div>
+  <div style="display:flex;gap:8px"><button id="brief-menu" style="flex:0 0 auto">Back</button><button class="go" id="brief-go" style="flex:1;font-size:18px">Start</button></div>
 </div></div>
 
 <div class="overlay hidden" id="decov"><div class="box">
@@ -387,7 +390,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <button id="inst-fab" class="fab hidden">Instructor</button>
 <div class="overlay hidden" id="pc-drillov" style="z-index:25"><div class="box" id="pc-drillbox"></div></div>
 <div class="overlay hidden" id="lessonov" style="z-index:12"><div class="box slide" id="lesson-box"></div></div>
-<div class="overlay hidden" id="ldone" style="z-index:13"><div class="box"><h2>Lesson complete</h2><div class="big" id="ld-score"></div><div id="ld-body"></div><div class="row2" style="margin-top:10px"><button id="ld-again">Again</button><button class="go" id="ld-menu">Menu</button></div></div></div>
+<div class="overlay hidden" id="ldone" style="z-index:13"><div class="box"><h2>Lesson complete</h2><div class="big" id="ld-score"></div><div id="ld-body"></div><div class="pc-row3"><button id="ld-again">Again</button><button id="ld-menu">Home</button><button class="go" id="ld-next">Next</button></div><p class="pc-links"><a href="../">◂ Preconnect</a><a href="../feedback.html?from=pc">Feedback</a></p></div></div>
 <div class="overlay hidden" id="instov" style="z-index:22"><div class="box">
   <div style="display:flex;justify-content:space-between;align-items:center"><span class="tag" style="background:#7a5cff;color:#fff;margin:0">Instructor</span><button id="inst-close" class="go">Close — resume</button></div>
   <div id="inst-body" style="margin-top:10px"></div>
@@ -409,7 +412,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 </div></div>
 <div class="overlay hidden" id="done"><div class="box">
   <h2 id="done-t"></h2><div class="big" id="done-s"></div><div id="done-b"></div>
-  <button class="go" id="b-next" style="width:100%;font-size:18px;margin-top:10px">Next</button>
+  <div class="pc-row3" id="done-row"><button id="b-again">Again</button><button id="b-home">Home</button><button class="go" id="b-next">Next</button></div><p class="pc-links"><a href="../">◂ Preconnect</a><a href="../feedback.html?from=pc">Feedback</a></p>
 </div></div>
 
 <div class="overlay hidden" id="repov"><div class="box">
@@ -428,7 +431,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
  <div class="set"><div class="k">Motion<small>Auto follows your phone's Reduce Motion setting.</small></div><div class="seg2" data-set="motion"><button data-val="auto">Auto</button><button data-val="off">Off</button></div></div>
  <div class="sec">Feedback</div>
  <div class="set"><div class="k">Sound<small>A metronome for compressions, a tone for right and wrong, a chime when you finish, and Patient Contact's monitor.</small></div><div class="seg2" data-set="sound"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
- <div class="set"><div class="k">Haptics<small>A tap you can feel on compressions and mistakes.</small></div><div class="seg2" data-set="haptics"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
+ <div class="set"><div class="k">Vibration<small>A tap you can feel on compressions and mistakes.</small></div><div class="seg2" data-set="haptics"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
  <div class="sec">Privacy</div>
  <div class="set"><div class="k">Anonymous statistics<small>Counts like "someone finished the infant station." Never names. <a href="../privacy.html" style="color:var(--acc)">Details</a></small></div><div class="seg2" data-set="stats"><button data-val="off">Off</button><button data-val="on">On</button></div></div>
  <p class="stat" style="margin-top:10px">Settings apply to every Preconnect module on this phone.</p>
@@ -436,7 +439,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.31.0';
+const APP_VERSION='0.32.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -459,7 +462,9 @@ function fresh(){S={mon:{four:false,twelve:false,placing:null,err4:0,err12:0,acq
   ride:0,cot:false,straps:false,loaded:false,act:null,actT:0,
   tx:{t:0,total:600,bridge:0,arrived:false,reassess:0,lastReass:-999},
   etco2:0,chaos:{vomitDone:false,etaHit:false},rateSum:0,rateN:0,Qm:0,manT:0};}
-function radio(who,msg,cls=''){RADIO_N++;msg=vt(msg);const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">${esc(who)}:</span> <span class="${cls}">${esc(msg)}</span>`;r.prepend(d);while(r.children.length>18)r.lastChild.remove();if(typeof radioHook==='function')radioHook(who,msg);}
+/* One voice (milestone 5): the MCA review notes are written into the content once and shown as the shared tag chip wherever they render. esct escapes like esc, then swaps the note for the chip. */
+function esct(t){return esc(t).replace(/\s*\((?:Pending MCA review\.|MCA review pending)\)\.?/g,' '+pcTag('mca')).replace(/\s*\(Bay County practice, pending MCA review\.\)/g,' (Bay County practice.) '+pcTag('mca')).replace(/\s*Pending MCA review\.(?=\s|$)/g,' '+pcTag('mca'));}
+function radio(who,msg,cls=''){RADIO_N++;msg=vt(msg);const r=$('radio');const d=document.createElement('div');d.innerHTML=`<span class="who">${esc(who)}:</span> <span class="${cls}">${esct(msg)}</span>`;r.prepend(d);while(r.children.length>18)r.lastChild.remove();if(typeof radioHook==='function')radioHook(who,msg);}
 function ding(p,why){S.score=Math.max(0,S.score-p);S.incidents.push(why);radio('Feedback',`${why} (−${p})`,'bad');pcFx('bad');if(TIER===0){const k=incidentKey(why);if(k)radio('Guide',`Why it matters: Protocol guide → ${GUIDE[k].name}`);}}
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
 let CALL0=14*3600+41*60;
@@ -857,7 +862,7 @@ function loadMission(i){S.mission=i;S.mStart=S.t;stepsDone=M[i].steps.map(()=>fa
   $('m-title').textContent=`${i+1}/${M.length} · ${vtf(m.title)}`;$('m-sub').textContent=vtf(m.sub);
   $('steps').innerHTML=TIER===0?m.steps.map((s,j)=>`<li id="st-${j}"><span class="box"></span><span>${esc(vtf(s.t))}</span></li>`).join(''):`<li id="rc"><span class="box"></span><span>Checklist hidden — ${m.steps.length} steps. <span id="rcn"></span></span></li>`;
   if(TIER<2)showBrief();}
-function showBrief(){const m=M[S.mission];S.briefing=true;S.running=false;$('brief-t').textContent=`${S.mission+1}/${M.length} · ${vtf(m.title)}`;$('brief-x').textContent=vtf(m.brief);
+function showBrief(){const m=M[S.mission];S.briefing=true;S.running=false;$('brief-t').textContent=`${S.mission+1}/${M.length} · ${vtf(m.title)}`;$('brief-x').innerHTML=esct(vtf(m.brief));
   $('brief-chips').innerHTML=m.skills.map(k=>`<button class="chip" data-k="${k}">${esc(GUIDE[k].name)}</button>`).join('');$('briefov').classList.remove('hidden');}
 $('brief-chips').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
 $('brief-menu').onclick=()=>showMenu();
@@ -1073,13 +1078,13 @@ function openDecision(key,j){const d=DEC[key];const opts=typeof d.optsFn==='func
   $('dec-opts').classList.remove('hidden');$('dec-fb').classList.add('hidden');$('decov').classList.remove('hidden');$('decov').scrollTop=0;}
 $('dec-opts').onclick=e=>{const b=e.target.closest('[data-i]');if(!b||!DEC_OPEN)return;const d=DEC[DEC_OPEN.key],o=DEC_OPEN.opts[+b.dataset.i];
   const col={good:'#7fe3a4',partial:'#ffc23d',bad:'#ff8f8a'}[o.r],lab={good:'Right call.',partial:'Workable — not the best call.',bad:'That would hurt your patient.'}[o.r];
-  $('dec-res').innerHTML=`<b style="color:${col}">${lab}</b> ${esc(o.why)}`;$('dec-why').textContent=vtf(d.why);
+  $('dec-res').innerHTML=`<b style="color:${col}">${lab}</b> ${esct(o.why)}`;$('dec-why').innerHTML=esct(vtf(d.why));
   $('dec-chips').innerHTML=d.g?`<button class="chip" data-k="${d.g}">Learn more: ${esc(GUIDE[d.g].name)}</button>`:'';
   if(o.r==='bad')ding(10,'Decision — '+d.tag);else if(o.r==='partial')ding(5,'Decision — '+d.tag);S.decisions.push({tag:d.tag,r:o.r});S.lastChoice=o.r;S.lastOpt=o;
   $('dec-opts').classList.add('hidden');$('dec-fb').classList.remove('hidden');};
 $('dec-chips').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
 $('dec-go').onclick=()=>{if(!DEC_OPEN)return;const d=DEC[DEC_OPEN.key];$('decov').classList.add('hidden');if(DEC_OPEN.j>=0)stepsDone[DEC_OPEN.j]=true;const el=$('st-'+DEC_OPEN.j);if(el)el.classList.add('done');if(d.after)d.after();DEC_OPEN=null;S.running=true;};
-function finish(){keepAwake(false);pcFx('done');if(M[S.mission]&&M[S.mission].next&&!M[S.mission].branched){M[S.mission].branched=true;M=M.slice(0,S.mission+1).concat(M[S.mission].next());}const last=S.mission===M.length-1;$('done-t').textContent=vtf(M[S.mission].title)+(last?' — call complete':' — complete');countUp($('done-s'),S.score,600);
+function finish(){keepAwake(false);pcFx('done');if(M[S.mission]&&M[S.mission].next&&!M[S.mission].branched){M[S.mission].branched=true;M=M.slice(0,S.mission+1).concat(M[S.mission].next());}const last=S.mission===M.length-1;$('done-t').textContent=vtf(M[S.mission].title)+(last?' — call complete':' — complete');pcBand($('done-s'),S.score);countUp($('done-s'),S.score,600);
   const keys=[...new Set(S.incidents.map(incidentKey).filter(Boolean))];
   const compare=last?pcBestPrev((load().runs||[]).filter(r=>r.call===CALL).map(r=>({d:r.d,score:r.score}))):null;
   let h=pcDebriefBody({score:S.score,compare,feedback:S.incidents,lessons:keys.map(k=>({k,name:GUIDE[k].name})),steps:M[S.mission].steps.map((st,j)=>({name:st.t,ok:!!stepsDone[j],missed:!stepsDone[j]}))});
@@ -1096,9 +1101,10 @@ function finish(){keepAwake(false);pcFx('done');if(M[S.mission]&&M[S.mission].ne
   else if(last){h+=arrestDebrief();record();}
   if(last&&V.label)h=`<p style="font-size:15px;margin:4px 0 8px"><b>This patient:</b> ${esc(V.label)}</p>`+h;
   if(last)h+=timelineHTML();
-  $('done-b').innerHTML=vt(h);$('b-next').textContent=last?'Back to calls':'Next';$('done').classList.remove('hidden');}
+  $('done-b').innerHTML=vt(h);/* one voice: Again · Home · Next. Between parts of the call: Home pauses (Resume on the home list) and Next is the next part; after the last part Again restarts the call and Next opens the next call on the list. */const ks=Object.keys(CALLNAME),endOfList=last&&ks.indexOf(CALL)>=ks.length-1;$('b-again').classList.toggle('hidden',!last);$('b-next').classList.toggle('hidden',endOfList);$('done-row').classList.toggle('two',!last||endOfList);$('b-home').classList.toggle('go',endOfList);$('done').classList.remove('hidden');}
 $('done-b').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,true);};
-$('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length-1){loadMission(S.mission+1);if(!S.briefing)S.running=true;}else{S.active=false;showMenu();}};
+$('b-next').onclick=()=>{$('done').classList.add('hidden');if(S.mission<M.length-1){loadMission(S.mission+1);if(!S.briefing)S.running=true;}else{S.active=false;const ks=Object.keys(CALLNAME),n=ks.indexOf(CALL)+1;if(n<ks.length)loadCall(ks[n]);else showMenu();}};
+$('b-home').onclick=()=>{$('done').classList.add('hidden');if(S.mission>=M.length-1)S.active=false;showMenu();};$('b-again').onclick=()=>{$('done').classList.add('hidden');S.active=false;loadCall(CALL);};
 
 function arrestOutcome(){if(S.noRes)return S.dnr.produced?'No resuscitation — a valid DNR was produced right away':'No resuscitation — definite signs of death';
   if(S.terminated&&S.dnr.stop)return 'Efforts stopped on a valid DNR at '+clockStr(S.torT);
@@ -1175,7 +1181,7 @@ function incidentKey(w){const R=[[/without gloves|Smoldering clothing/,'offgas']
 let GFREE=false,peeked={};
 function openCard(k,free){const g=GUIDE[k];if(!g)return;if(TIER===1&&S.active&&!free&&!peeked[k]){peeked[k]=true;S.score=Math.max(0,S.score-2);S.incidents.push('Guide lookup: '+g.name);}
   GFREE=!!free;const L=['What it is','When','What goes wrong','Pro tip'];
-  $('g-body').innerHTML=`<h2>${esc(g.name)}</h2>`+[g.what,g.when,g.wrong,g.tip].map((t,i)=>`<div class="gsec"><b>${L[i]}</b><p>${esc(t)}</p></div>`).join('')+(g.mca?`<div class="gsec mca"><b>Check your protocol</b><p>${esc(g.mca)}</p></div>`:'')+(g.rel?`<div class="chips">${g.rel.map(r=>`<button class="chip" data-k="${r}">${esc(GUIDE[r].name)}</button>`).join('')}</div>`:'');
+  $('g-body').innerHTML=`<h2>${esc(g.name)}</h2>`+[g.what,g.when,g.wrong,g.tip].map((t,i)=>`<div class="gsec"><b>${L[i]}</b><p>${esct(t)}</p></div>`).join('')+(g.mca?`<div class="gsec mca"><b>Check your protocol</b><p>${esct(g.mca)}</p></div>`:'')+(g.rel?`<div class="chips">${g.rel.map(r=>`<button class="chip" data-k="${r}">${esc(GUIDE[r].name)}</button>`).join('')}</div>`:'');
   $('guideov').classList.remove('hidden');$('guideov').scrollTop=0;}
 function openIndex(){$('g-body').innerHTML=`<h2>Protocol guide</h2><p style="font-size:15px;color:var(--soft)">Every skill on this call. Built on current adult BLS guidelines — your MCA protocol is what you follow on a real call.</p><div class="chips">${Object.keys(GUIDE).map(k=>`<button class="chip" data-k="${k}">${esc(GUIDE[k].name)}</button>`).join('')}</div>`;$('guideov').classList.remove('hidden');}
 $('g-body').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openCard(b.dataset.k,GFREE);};
@@ -3354,8 +3360,8 @@ $('mon-4').onclick=()=>{if(!S.active)return;leadStart('4');};$('mon-12').onclick
 function timelineHTML(){const L=(S.log||[]).filter(e=>e.who!=='Guide');if(!L.length)return'';return `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--orange);font-family:'Saira Condensed';font-size:18px">Call timeline · ${L.length} events</summary><div style="max-height:260px;overflow:auto;font-size:15px;line-height:1.45;margin-top:6px">${L.map(e=>`<div style="padding:3px 0;border-top:1px dashed #2a3d5e"><b style="color:var(--soft)">${e.c}</b> <span style="color:var(--orange)">${esc(e.who)}:</span> ${esc(e.msg)}</div>`).join('')}</div></details>`;}
 function progressShow(){const p=load();const runs=p.runs||[];$('prog-body').innerHTML=Object.keys(CALLNAME).map(k=>{const r=runs.filter(x=>(x.call||'arrest')===k);if(!r.length)return `<div class="mrow"><span>${CALLNAME[k]}</span><b style="color:var(--soft)">not run yet</b></div>`;const best=Math.max(...r.map(x=>x.score)),last=r[r.length-1];const tiers=[...new Set(r.map(x=>['Guided','Recall','Chaos'][x.tier]))].join(', ');return `<div class="mrow"><span>${CALLNAME[k]}<br><small style="color:var(--soft)">${r.length} run${r.length>1?'s':''} · ${tiers} · last ${last.d.slice(0,10)}</small></span><b>${best}</b></div>`;}).join('')+`<h3 style="margin:12px 0 4px;font-family:'Saira Condensed';color:var(--orange)">Quick drills</h3>`+DRILLS.map(d=>{const x=(p.drills||{})[d.id];return `<div class="mrow"><span>${d.name}${x?`<br><small style="color:var(--soft)">${x.runs} run${x.runs>1?'s':''} · last ${x.last.slice(0,10)}</small>`:''}</span><b${x?'':' style="color:var(--soft)"'}>${x?x.best:'not run yet'}</b></div>`;}).join('');$('progov').classList.remove('hidden');}
 $('b-prog').onclick=progressShow;$('prog-close').onclick=()=>$('progov').classList.add('hidden');
-$('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Patient','Date','Tier','Score','Instructor']].concat((p.runs||[]).flatMap(r=>(r.who&&r.who.length?r.who:[p.name||'']).map(n=>[n,p.dept||'',CALLNAME[r.call||'arrest'],r.variant||'',r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score,r.inst||'']))).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),'',r.d.slice(0,16).replace('T',' '),'Drill',r.score,'']));const csv=pcCsv(rows);/* the core quotes every cell and defuses =, +, -, @ formulas */
-  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='patient-contact-training-record.csv';a.click();}catch(e){}};
+$('prog-csv').onclick=()=>{const p=load();if(pcProfile().name)p.name=pcProfile().name;if(pcProfile().org)p.dept=pcProfile().org;const rows=[['Name','Department','Call','Patient','Date','Tier','Score','Instructor']].concat((p.runs||[]).flatMap(r=>(r.who&&r.who.length?r.who:[p.name||'']).map(n=>[n,p.dept||'',CALLNAME[r.call||'arrest'],r.variant||'',r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score,r.inst||'']))).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),'',r.d.slice(0,16).replace('T',' '),'Drill',r.score,'']));const csv=pcCsv(rows);/* the core quotes every cell and defuses =, +, -, @ formulas */
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='patient-contact-practice-record.csv';a.click();}catch(e){}};
 $('b-rand').onclick=()=>{RANDOM=!RANDOM;const p=load();p.standard=!RANDOM;save(p);$('b-rand').textContent=RANDOM?'Patients: varied':'Patients: standard';$('b-rand').classList.toggle('on',RANDOM);};
 window.addEventListener('resize',()=>{MV.kind='';});
 
@@ -3392,7 +3398,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 function drillBest(id){const p=load();return p.drills&&p.drills[id]?p.drills[id].best:null;}
 function drillMenu(){DR=null;$('dr-title').textContent='Quick drills';$('dr-meta').textContent='';
   $('dr-body').innerHTML=`<p style="font-size:15px;color:#d6deea;margin:0 0 10px">Short, focused practice for the skills that fade fastest. Personal bests are saved on this phone.</p>`+DRILLS.map(d=>{const b=drillBest(d.id);return `<button class="scen" data-a="go" data-d="${d.id}"><b>${d.name}${b!==null?` <span style="float:right;font-size:16px;color:var(--orange)">best ${b}</span>`:''}</b><span>${d.sub}</span></button>`;}).join('');
-  $('dr-foot').innerHTML='<button data-a="close" class="go" style="width:100%">Back to menu</button>';$('drillov').classList.remove('hidden');}
+  $('dr-foot').innerHTML='<button data-a="close" class="go" style="width:100%">Close</button>';$('drillov').classList.remove('hidden');}
 /* --- quiz generators --- */
 function genMed(){const T=[
   ()=>{const mg=pick([.3,.15,.5]);return {q:`Epinephrine 1 mg/mL. You need ${fmt(mg)} mg IM. How many mL do you draw?`,a:fmt(mg)+' mL',d:[fmt(mg*10)+' mL',fmt(mg/10)+' mL',fmt(1/mg)+' mL'],why:`Volume = dose ÷ concentration = ${fmt(mg)} mg ÷ 1 mg/mL = ${fmt(mg)} mL.`};},
@@ -3444,19 +3450,19 @@ function drillStart(id){keepAwake(true);pca('begin','pc','drill-'+id,()=>DR&&DR.
 function drillQ(){const q=DR.qs[DR.i];$('dr-meta').textContent=`${DR.i+1} of ${DR.qs.length} · ${DR.right} right`;
   const opts=shuf([q.a,...q.d]);q.opts=opts;
   $('dr-body').innerHTML=(q.rhy?'<canvas id="dr-strip" style="width:100%;height:96px;border-radius:8px;display:block;margin-bottom:8px"></canvas>':'')+`<p style="font-size:17px;line-height:1.45;margin:0 0 10px">${esc(q.q)}</p>`+opts.map((o,i)=>`<button class="opt" data-a="ans" data-i="${i}">${esc(o)}</button>`).join('')+'<p id="dr-fb" style="font-size:15px;margin:6px 0 0"></p>';
-  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Quit drill</button>';if(q.rhy)drawStrip($('dr-strip'),q.rhy);}
+  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Stop and go back</button>';if(q.rhy)drawStrip($('dr-strip'),q.rhy);}
 function drillAns(i){const q=DR.qs[DR.i];if(q.done)return;q.done=true;const ok=q.opts[i]===q.a;if(ok)DR.right++;
-  $('dr-fb').innerHTML=`<b style="color:${ok?'#7fe3a4':'#ff8f8a'}">${ok?'Right.':'Not quite — '+esc(q.a)+'.'}</b> ${esc(q.why)}`;
+  $('dr-fb').innerHTML=`<b style="color:${ok?'#7fe3a4':'#ff8f8a'}">${ok?'Right.':'Not quite — '+esc(q.a)+'.'}</b> ${esct(q.why)}`;
   $('dr-foot').innerHTML=`<button data-a="next" class="go" style="width:100%">${DR.i+1<DR.qs.length?'Next':'See results'}</button>`;}
 function drillNext(){DR.i++;if(DR.i<DR.qs.length)drillQ();else drillDone(Math.round(DR.right/DR.qs.length*100),`${DR.right} of ${DR.qs.length} right`);}
 function drillDone(score,detail){keepAwake(false);pca('end',pca('bkt',score));const p=load();p.drills=p.drills||{};const prev=p.drills[DR.id]?p.drills[DR.id].best:null;p.drills[DR.id]={best:Math.max(prev||0,score),runs:((p.drills[DR.id]||{}).runs||0)+1,last:new Date().toISOString()};
   p.drillRuns=(p.drillRuns||[]).concat([pcDrillStamp({drill:DR.id,d:new Date().toISOString(),score})]).slice(-200);save(p);const best=prev!==null&&score>prev;
-  $('dr-meta').textContent='';$('dr-body').innerHTML=`<div class="big">${score}</div><p style="margin:4px 0 8px">${esc(detail)}${best?' · <b style="color:var(--orange)">New personal best!</b>':prev!==null?` · best ${Math.max(prev,score)}`:''}</p><div class="chips"><button class="chip" data-a="learn" data-k="${DR.d.g}">Learn more: ${esc(GUIDE[DR.d.g].name)}</button></div>`;
-  $('dr-foot').innerHTML='<div style="display:flex;gap:8px"><button data-a="menu" style="flex:1">All drills</button><button data-a="again" class="go" style="flex:1">Again</button></div>';}
+  $('dr-meta').textContent='';const ids=DRILLS.map(d=>d.id),nxt=ids[ids.indexOf(DR.id)+1];DR.nextId=nxt||null;$('dr-body').innerHTML=`<div class="big ${pcBandClass(score)}">${score}</div><p style="margin:4px 0 8px">${esc(detail)}${best?' · <b style="color:var(--orange)">New personal best!</b>':prev!==null?` · best ${Math.max(prev,score)}`:''}</p><div class="chips"><button class="chip" data-a="learn" data-k="${DR.d.g}">Learn more: ${esc(GUIDE[DR.d.g].name)}</button></div>`;
+  $('dr-foot').innerHTML=pcResultRow({again:'again',home:'home',next:DR.nextId?'nextd':null,attr:'data-a'})+pcLinks('pc');}
 /* CPR tempo */
 function cprDrill(){DR.dur=20;$('dr-meta').textContent='Tap the pad in time — 100 to 120 a minute';
   $('dr-body').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;color:var(--soft)">Your rate</span><span id="dr-left" style="font-family:'Saira Condensed';font-size:20px">20 s</span></div><div id="dr-rate" class="big" style="text-align:center">—</div><div class="track" style="height:14px;margin:6px 0 10px"><div id="dr-zone" style="width:0%;background:var(--green)"></div></div><button id="dr-pad" data-a="tap" style="width:100%;height:200px;font-size:26px;font-family:'Saira Condensed';background:#2a1310;border-color:var(--red)">TAP — PUSH HARD AND FAST</button><p style="font-size:15px;color:var(--soft);margin:8px 0 0">Starts on your first tap. No metronome — that's the point.</p>`;
-  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Quit drill</button>';}
+  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Stop and go back</button>';}
 function cprTap(){const now=performance.now();if(!DR.taps.length){DR.t0=now;DR.timer=setInterval(cprTick,200);}DR.taps.push(now);cprTick();}
 function cprTick(){if(!DR||DR.id!=='cpr')return;const now=performance.now(),el=(now-DR.t0)/1000;const iv=[];for(let i=1;i<DR.taps.length;i++)iv.push((DR.taps[i]-DR.taps[i-1])/1000);
   const recent=iv.slice(-6);const rate=recent.length?Math.round(60/(recent.reduce((a,b)=>a+b,0)/recent.length)):0;const inz=iv.filter(x=>{const r=60/x;return r>=100&&r<=120;}).length;
@@ -3465,7 +3471,7 @@ function cprTick(){if(!DR||DR.id!=='cpr')return;const now=performance.now(),el=(
 /* lead placement */
 function leadDrill(){DR.seq=shuf(SEQ4.concat(SEQV));DR.i=0;const dots=Object.keys(LEADPOS);
   $('dr-body').innerHTML=`<p id="dr-lp" style="font-size:17px;margin:0 0 6px"></p><div id="dr-board">${torsoSVG(dots,'drl-')}</div><p id="dr-fb" style="font-size:15px;min-height:36px;margin:6px 0 0"></p>`;
-  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Quit drill</button>';DR.t0=performance.now();leadDrillPrompt();}
+  $('dr-foot').innerHTML='<button data-a="quit" style="width:100%">Stop and go back</button>';DR.t0=performance.now();leadDrillPrompt();}
 function leadDrillPrompt(){const s=DR.seq[DR.i];$('dr-lp').innerHTML=`<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${s.col};border:1px solid #fff;vertical-align:-2px"></span> Place <b>${s.name}</b> · ${DR.i+1} of ${DR.seq.length}`;$('dr-meta').textContent=`${DR.errs} error${DR.errs===1?'':'s'}`;}
 function leadDrillTap(p){const s=DR.seq[DR.i];if(!s)return;if(p===s.p){const el=$('drl-'+p);if(el&&el.setAttribute){el.setAttribute('fill',s.col);el.setAttribute('opacity','1');el.setAttribute('r','6');}DR.i++;$('dr-fb').textContent='';
     if(DR.i>=DR.seq.length){const secs=Math.round((performance.now()-DR.t0)/1000);const score=Math.max(0,100-DR.errs*8-Math.max(0,secs-30)*2);drillDone(score,`${secs} seconds · ${DR.errs} placement error${DR.errs===1?'':'s'}`);return;}leadDrillPrompt();}
@@ -3480,7 +3486,7 @@ function torsoSVG(dots,prefix){return `<svg viewBox="0 0 200 250" style="width:1
 function drillClick(e){const b=e.target.closest&&e.target.closest('[data-a],[data-p]');if(!b)return;const ds=b.dataset||{};
   if(ds.p&&DR&&DR.id==='leads'){leadDrillTap(ds.p);return;}
   const a=ds.a;if(a==='go')drillStart(ds.d);else if(a==='ans')drillAns(+ds.i);else if(a==='next')drillNext();else if(a==='tap')cprTap();
-  else if(a==='again'){const id=DR.id;drillStart(id);}else if(a==='menu'||a==='quit'){if(DR&&DR.timer)clearInterval(DR.timer);if(DR&&DR.id)pca('abandon');keepAwake(false);drillMenu();}
+  else if(a==='again'){const id=DR.id;drillStart(id);}else if(a==='nextd'){const id=DR&&DR.nextId;if(id)drillStart(id);}else if(a==='home'){if(DR&&DR.timer)clearInterval(DR.timer);keepAwake(false);DR=null;$('drillov').classList.add('hidden');showMenu();}else if(a==='menu'||a==='quit'){if(DR&&DR.timer)clearInterval(DR.timer);if(DR&&DR.id)pca('abandon');keepAwake(false);drillMenu();}
   else if(a==='close'){if(DR&&DR.timer)clearInterval(DR.timer);DR=null;$('drillov').classList.add('hidden');}
   else if(a==='learn')openCard(ds.k,true);}
 $('dr-body').onclick=drillClick;$('dr-foot').onclick=drillClick;
@@ -3547,7 +3553,7 @@ const KEY='patient-contact';
 function load(){let p=null;try{p=JSON.parse(localStorage.getItem(KEY));}catch(e){}if(!p||typeof p!=='object'||Array.isArray(p))p={runs:[],name:'',dept:''};p.runs=Array.isArray(p.runs)?p.runs.filter(r=>r&&typeof r==='object'):[];for(const f of ['drillRuns','crew'])if(p[f]!==undefined&&!Array.isArray(p[f]))delete p[f];if(typeof p.name!=='string')p.name='';if(typeof p.dept!=='string')p.dept='';return p;}/* wrong-shape data (a bad backup) never bricks the page */
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
 function record(){const p=load();pca('end',`${['guided','recall','chaos'][TIER]}/${pca('att',(p.runs||[]).filter(r=>(r.call||'arrest')===CALL).length+1)}/${pca('bkt',S.score)}`);p.runs.push(pcDrillStamp({who:INST&&p.crew&&p.crew.length?p.crew.slice():null,inst:INST?(p.instName||''):'',variant:V.label||'',call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc}));p.runs=p.runs.slice(-500);save(p);}
-const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];
+const TT=[pcTierHelp(0,'Learn the sequence and the why.'),pcTierHelp(1,'Guide lookups cost 2 points.'),pcTierHelp(2,'No guide. Delays, a vomiting patient, and more.')];
 /* =================== Home readiness and the lesson (shared lesson engine). The lesson is generic medical first response in our own words; your Medical Control Authority's protocols are what you follow on a real call. =================== */
 const PC_ACTS=[['lesson','lesson'],...Object.keys(CALLNAME).map(k=>['call',k]),...DRILLS.map(d=>['drill',d.id])];
 function readiness(){const p=load();const best={};(p.runs||[]).forEach(r=>{const k='call:'+(r.call||'arrest');best[k]=Math.max(best[k]||0,+r.score||0);});(p.drillRuns||[]).forEach(r=>{const k=(r.drill==='lesson'?'lesson:':'drill:')+r.drill;best[k]=Math.max(best[k]||0,+r.score||0);});
@@ -3586,9 +3592,9 @@ let LS=null;
 function lessonStart(){keepAwake(true);$('menu').classList.add('hidden');pca('begin','pc','lesson',()=>LS?`slide-${LS.i+1}`:'');LS=pcLessonStart({slides:LESSON,label:'MFR lesson',onDone:lessonDone,onQuit:()=>{pca('abandon');LS=null;keepAwake(false);showMenu();}});}
 function lessonAct(ds){pcLessonAct(LS,ds);}
 function lessonDone(score,right,n){keepAwake(false);pcFx('done');pca('end',pca('bkt',score));const p=load();const prev=(p.drillRuns||[]).filter(x=>x.drill==='lesson');p.drillRuns=(p.drillRuns||[]).concat([pcDrillStamp({drill:'lesson',d:new Date().toISOString(),score})]).slice(-200);save(p);LS=null;
-  $('ld-score').textContent='';countUp($('ld-score'),score,600);$('ld-body').innerHTML=pcDebriefBody({score,compare:pcBestPrev(prev),kicker:'Next: run a call and put it to work.',metrics:[['Right on the first try',`${right} of ${n}`]],clean:false});$('ldone').classList.remove('hidden');}
+  $('ld-score').textContent='';pcBand($('ld-score'),score);countUp($('ld-score'),score,600);$('ld-body').innerHTML=pcDebriefBody({score,compare:pcBestPrev(prev),kicker:'Next: run a call and put it to work.',metrics:[['Slides',`${n} of ${n}`],['Right on the first try',`${right} of ${n}`]],clean:false});$('ldone').classList.remove('hidden');}
 $('lesson-box').onclick=e=>{const b=e.target.closest&&e.target.closest('[data-l]');if(b)lessonAct(b.dataset);};
-$('b-lesson').onclick=lessonStart;$('ld-again').onclick=()=>{$('ldone').classList.add('hidden');lessonStart();};$('ld-menu').onclick=()=>{$('ldone').classList.add('hidden');showMenu();};
+$('b-lesson').onclick=lessonStart;$('ld-again').onclick=()=>{$('ldone').classList.add('hidden');lessonStart();};$('ld-menu').onclick=()=>{$('ldone').classList.add('hidden');showMenu();};$('ld-next').onclick=()=>{$('ldone').classList.add('hidden');loadCall(Object.keys(CALLNAME)[0]);};
 function showMenu(){keepAwake(false);S.running=false;$('briefov').classList.add('hidden');$('menu').classList.remove('hidden');homeRender();$('tierhelp').textContent=TT[TIER];document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('on',+b.dataset.tier===TIER));$('b-resume').classList.toggle('hidden',!S.active);}
 document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{TIER=+b.dataset.tier;showMenu();});
 $('b-call1').onclick=()=>loadCall('arrest');$('b-call2').onclick=()=>loadCall('mva');$('b-call3').onclick=()=>loadCall('od');$('b-call4').onclick=()=>loadCall('ep');$('b-call5').onclick=()=>loadCall('st');$('b-call6').onclick=()=>loadCall('fl');$('b-call7').onclick=()=>loadCall('cb');$('b-call8').onclick=()=>loadCall('dm');$('b-call9').onclick=()=>loadCall('pd');$('b-call10').onclick=()=>loadCall('cp');$('b-call11').onclick=()=>loadCall('fr');$('b-menu').onclick=showMenu;$('b-restart').onclick=()=>loadCall(CALL);
@@ -3604,12 +3610,12 @@ function snapshot(){if(CALL==='fr'){const x=S.b,v=frV();return [`Patient Contact
   if(CALL==='ep'){const e=S.e,v=epV();return [`Patient Contact report — v${APP_VERSION}`,`Call: anaphylaxis · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · sev ${v.sev.toFixed(2)} · HR ${v.hr} BP ${v.sbp} SpO2 ${v.spo2} · drawn ${e.vol.toFixed(2)} mL · doses ${e.doses.length}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='od'){const o=S.o;return [`Patient Contact report — v${APP_VERSION}`,`Call: overdose · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · RR ${Math.round(o.rr)} SpO2 ${Math.round(o.spo2)} GCS ${Math.round(o.gcs)} · doses ${o.doses} · pulse ${o.pulse}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
   if(CALL==='mva')return [`Patient Contact report — v${APP_VERSION}`,`Call: MVA · Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim ${mmss(S.t)} · blood loss ${Math.round(S.m.lost)} mL · control ${S.m.ctrl} · extrication stage ${S.m.extr.stage} · ALS ${S.m.alsArr?'on scene':'ETA '+mmss(S.m.eta)}`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');return [`Patient Contact report — v${APP_VERSION}`,`Mission ${S.mission+1}/${M.length} ${M[S.mission].title} · ${['Guided','Recall','Chaos'][TIER]} · score ${S.score}`,`Sim time ${mmss(S.t)} · arrest ${S.arrest} · ROSC ${S.rosc} · CPR ${S.cpr.on?compressorNow():'off'} · CCF ${S.arrestT?Math.round(S.compT/S.arrestT*100):0}%`,`AED ${S.aed.state} shocks ${S.aed.shocks} · ALS ${S.als.arrived?'on scene':'ETA '+mmss(S.als.eta)} · LUCAS ${S.als.lucas} · O2 ${Math.round(S.o2psi)} psi`,S.incidents.length?'Feedback: '+S.incidents.join('; '):'',`Device: ${navigator.userAgent.slice(0,120)}`].filter(Boolean).join('\n');}
-$('b-report').onclick=()=>{const p=load();$('r-name').value=p.name||'';$('r-dept').value=p.dept||'';$('r-note').value='';$('r-msg').textContent='';$('repov').classList.remove('hidden');};
+$('b-report').onclick=()=>{const p=load(),pr=pcProfile();$('r-name').value=pr.name||p.name||'';$('r-dept').value=pr.org||p.dept||'';$('r-note').value='';$('r-msg').textContent='';$('repov').classList.remove('hidden');};
 $('r-cancel').onclick=()=>$('repov').classList.add('hidden');
-$('r-send').onclick=async()=>{const p=load();p.name=$('r-name').value.trim();p.dept=$('r-dept').value.trim();save(p);const text=`From: ${p.name||'—'} (${p.dept||'—'})\nNote: ${$('r-note').value.trim()||'—'}\n\n${snapshot()}`;
+$('r-send').onclick=async()=>{const p=load();p.name=$('r-name').value.trim();p.dept=$('r-dept').value.trim();save(p);pcProfileSet(p.name,p.dept);const text=`From: ${p.name||'—'} (${p.dept||'—'})\nNote: ${$('r-note').value.trim()||'—'}\n\n${snapshot()}`;
   if(navigator.share){try{await navigator.share({title:'Patient Contact report',text});$('repov').classList.add('hidden');return;}catch(e){if(e.name==='AbortError')return;}}
   try{await navigator.clipboard.writeText(text);$('r-msg').textContent='Report copied — paste it into a text or email.';}catch(e){$('r-note').value=text;$('r-msg').textContent='Copy the text above and send it.';}};
-applySettings();settingsBind();window.onPreconnectSettings=s=>{SOUND=s.sound==='on';};
+applySettings();settingsBind();$('how-about').innerHTML=pcAboutFoot('pc',APP_VERSION);window.onPreconnectSettings=s=>{SOUND=s.sound==='on';};
 $('b-howmore').onclick=()=>$('howov').classList.remove('hidden');$('how-close').onclick=()=>$('howov').classList.add('hidden');$('b-howto').onclick=()=>$('howov').classList.remove('hidden');
 if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
