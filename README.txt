@@ -1,15 +1,11 @@
-PATIENT CONTACT — HOSTING
-Upload these files together: index.html manifest.json sw.js icon-192.png icon-512.png
+PATIENT CONTACT — a Preconnect module (https://charge-the-line.github.io/patient-contact/)
+This folder is the whole app:
+  index.html, preconnect-core.js, manifest.json, sw.js, icon-192.png, icon-512.png, fonts/
+(plus tests/, TESTING.md and CLAUDE.md, which do not affect the app).
+Every one of those files must be uploaded together: the page loads preconnect-core.js first, and the type comes from fonts/.
 
-Easiest: a second repository on the same GitHub account (charge-the-line).
- 1. github.com -> "+" -> New repository -> name it patient-contact -> Public -> Create
- 2. "uploading an existing file" -> drag in the five files -> Commit changes
- 3. Settings -> Pages -> Deploy from a branch -> main, / (root) -> Save
- 4. Live in a minute or two at https://charge-the-line.github.io/patient-contact/
-(Or create its own account "patient-contact" and a repo named patient-contact.github.io
- for https://patient-contact.github.io)
+GitHub Pages serves the main branch root of the charge-the-line/patient-contact repository. Committing to main deploys within a minute or two.
+Every release bumps APP_VERSION in index.html, the "Version x" literal on the first-run card, and CACHE in sw.js together; the "Current version" line in CLAUDE.md must match (the tests check all of them).
 
-TESTS (optional, for whoever maintains the app)
-The tests/ folder and TESTING.md can live in the same repository.
-They don't affect the app. To run them on a computer with Node.js:  node tests/run_all.js
-Upload them the same way as the app files: Add file -> Upload files, drag in the tests folder and TESTING.md.
+Install on a phone: open the link -> iPhone: Share -> Add to Home Screen; Android: menu -> Install app.
+Tests (Node.js 18 or newer): node tests/run_all.js

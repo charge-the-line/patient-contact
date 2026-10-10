@@ -207,3 +207,6 @@ The `fire` section (`tests/fr_test.js`, 32 checks):
 ## Rule 15 and the wake lock (final sweep milestone 2, October 10, 2026)
 - The real clock stops while the screen is off: tests call `pcPauseHide()`, advance the fake clock, `pcPauseShow()`, and assert no penalty and no metric change (and that an instructor freeze is left alone where there is one). Proven to fail (scratch): removing the hookup (BLS Ready) or scoring on the wall clock again (Bleed Control) fails the check.
 - The wake lock is released on every quit path added in this milestone (stubbed `navigator.wakeLock`, one request per one release).
+
+## Truth and counts (final sweep milestone 3, October 10, 2026)
+- `syntax`: the epinephrine repeat sentence appears in the scoring line, the late line and the guide card and the old three numbers are gone; stroke's 94 is labelled as the stroke guideline's number and chest pain still reads `COUNTY.o2Min`; no "high and tight"; no "prototype"; the first-run line; "non-rebreather"; a quick drill quit sends its quit event with the question number; the docs guard (CLAUDE.md "Current version" equals `APP_VERSION`; README.txt names `preconnect-core.js` and `fonts/`).
