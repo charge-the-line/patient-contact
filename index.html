@@ -303,7 +303,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:15px;color:var(--soft)">Version 0.30.7 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
+  <p style="font-size:15px;color:var(--soft)">Version 0.31.0 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -317,15 +317,19 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <div class="overlay hidden" id="menu"><div class="box">
   <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-flex;align-items:center;min-height:44px;font-size:15px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-size:15px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a><button class="gear" id="h-set" style="margin-left:12px">Settings</button></div>
-  <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door.</h1></div>
+  <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door. <span class="ver" style="font-size:15px;color:var(--soft)">v0.31.0</span></h1></div>
   <div class="card rdy" id="rdy"><div class="flex"><div style="min-width:0"><div class="small">Your readiness</div><b id="rdy-t" style="display:block;font-family:'Saira Condensed';font-size:22px;line-height:1.05"></b><div class="small" id="rdy-s"></div></div><div class="sp"></div><div class="num" id="rdy-n"></div></div></div>
   <button id="b-resume" class="go hidden" style="width:100%;margin-bottom:8px">Resume call</button>
   <div class="card"><div class="small">What this is</div><p style="margin:4px 0 0;font-size:15px;line-height:1.45">Medical first response for the firefighter who gets there before the ambulance: eleven calls with a working cardiac monitor, patients that change every run, quick drills and a lesson. You are the medical first responder; the EMT drives and the medic works the patient. <b>Protocols vary. On a real call, follow your medical control.</b></p></div>
-  <div class="sec" style="margin-top:6px">1 · Learn</div>
   <button class="scen" id="b-lesson"><span class="bchip dim" id="chip-lesson">—</span><b>The lesson</b><span>Medical first response in 12 slides, each with a check · about 10 minutes</span></button>
-  <div class="sec">2 · Calls</div>
+  <div class="row2" style="margin:10px 0 12px"><button id="b-drills">Quick drills</button><button id="b-prog">My progress</button><button id="b-gindex">Protocol guide</button><button id="b-howto">How to play</button></div>
+  <div class="sec">Difficulty</div>
   <div class="tiers"><button data-tier="0">Guided</button><button data-tier="1">Recall</button><button data-tier="2">Chaos</button></div>
   <p class="stat" id="tierhelp" style="margin:0 0 10px"></p>
+  <div class="sec">Drill night</div>
+  <div class="row2"><button id="b-rand">Patients: varied</button><button id="b-inst">Instructor mode: off</button></div>
+  <p class="stat" style="margin:8px 0 6px">Standard patients give everyone the same case. Instructor mode adds live injects and a freeze. Start a full Drill Night from the home page.</p>
+  <div class="sec">Calls</div>
   <button class="scen" id="b-call1"><span class="bchip dim" id="chip-arrest">—</span><b>62-year-old man down</b><span>Witnessed collapse at home. His wife is doing CPR. Medic 1 is nine minutes out.</span></button>
   <button class="scen" id="b-call2"><span class="bchip dim" id="chip-mva">—</span><b>Car versus tree, driver pinned</b><span>Single-vehicle crash on a county road, early morning, 41°F. Driver trapped, bleeding. Your engine crew is cutting. Medic 1 is seven minutes out.</span></button>
   <button class="scen" id="b-call3"><span class="bchip dim" id="chip-od">—</span><b>Unresponsive in the bathroom</b><span>11:47 p.m. A roommate found him on the bathroom floor, barely breathing. Suspected fentanyl. Medic 1 is eight minutes out.</span></button>
@@ -337,11 +341,6 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <button class="scen" id="b-call9"><span class="bchip dim" id="chip-pd">—</span><b>"My son can't breathe"</b><span>2:04 a.m. A 4-year-old on his mother's lap, working hard to breathe. Medic 1 is nine minutes out.</span></button>
   <button class="scen" id="b-call10"><span class="bchip dim" id="chip-cp">—</span><b>"It feels like an elephant on my chest"</b><span>9:14 a.m. Chest pressure — or is it? Medic 1 is ten minutes out.</span></button>
   <button class="scen" id="b-call11"><span class="bchip dim" id="chip-fr">—</span><b>"We pulled him out of the back bedroom"</b><span>4:12 a.m., a house fire. Your crew carries a man out and lays him at the curb. Medic 1 is eight minutes out.</span></button>
-  <div class="sec">3 · Drills and tools</div>
-  <div class="row2"><button id="b-drills" class="go">Quick drills</button><button id="b-prog">My progress</button><button id="b-gindex">Protocol guide</button><button id="b-howto">How to play</button></div>
-  <div class="sec">Drill night</div>
-  <div class="row2"><button id="b-rand">Patients: varied</button><button id="b-inst">Instructor mode: off</button></div>
-  <p class="stat" style="margin:8px 0 0">Standard patients give everyone the same case. Instructor mode adds live injects and a freeze. Start a full Drill Night from the home page.</p>
 </div></div>
 
 <div class="overlay hidden" id="briefov"><div class="box">
@@ -437,7 +436,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.30.7';
+const APP_VERSION='0.31.0';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
