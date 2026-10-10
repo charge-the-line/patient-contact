@@ -1,0 +1,103 @@
+{
+ "runs": [
+  {
+   "inst": "",
+   "variant": "",
+   "d": "2026-09-20T11:41:10.360Z",
+   "tier": 0,
+   "score": 77,
+   "ccf": 81,
+   "rosc": true
+  },
+  {
+   "who": [
+    "Jordan",
+    "Sam"
+   ],
+   "inst": "Capt. Lee",
+   "variant": "Severe, fast-moving reaction · symptoms returned in transport",
+   "call": "ep",
+   "d": "2026-10-02T11:41:10.360Z",
+   "tier": 0,
+   "score": 100,
+   "ccf": 0,
+   "rosc": false
+  },
+  {
+   "who": null,
+   "inst": "",
+   "variant": "Left-sided weakness · found down",
+   "call": "st",
+   "d": "2026-10-04T11:41:10.360Z",
+   "tier": 1,
+   "score": 84,
+   "ccf": 0,
+   "rosc": false
+  },
+  {
+   "who": [
+    "Jo"
+   ],
+   "inst": "Capt. Lee",
+   "variant": "Witnessed VF",
+   "call": "arrest",
+   "d": "2026-10-10T10:43:34.360Z",
+   "tier": 0,
+   "score": 95,
+   "ccf": 85,
+   "rosc": true,
+   "night": "2026-10-10T09:17:10.360Z"
+  }
+ ],
+ "drillRuns": [
+  {
+   "drill": "cpr",
+   "d": "2026-10-05T11:41:10.360Z",
+   "score": 90
+  },
+  {
+   "drill": "med",
+   "d": "2026-10-05T11:41:10.360Z",
+   "score": 70
+  },
+  {
+   "drill": "lesson",
+   "d": "2026-10-08T11:41:10.360Z",
+   "score": 92
+  },
+  {
+   "drill": "startcpr",
+   "d": "2026-10-10T10:29:10.360Z",
+   "score": 88,
+   "who": [
+    "Jo"
+   ],
+   "inst": "Capt. Lee",
+   "night": "2026-10-10T09:17:10.360Z"
+  }
+ ],
+ "drills": {
+  "cpr": {
+   "best": 90,
+   "runs": 1,
+   "last": "2026-10-05T11:41:10.360Z"
+  },
+  "med": {
+   "best": 70,
+   "runs": 1,
+   "last": "2026-10-05T11:41:10.360Z"
+  }
+ },
+ "name": "Max",
+ "dept": "Monitor Twp FD",
+ "crew": [
+  "Jordan",
+  "Sam"
+ ],
+ "instName": "Capt. Lee",
+ "seen": true,
+ "tv": false,
+ "standard": false,
+ "inst": false,
+ "sound": true
+}

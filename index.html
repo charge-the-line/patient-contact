@@ -302,7 +302,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:14px;color:var(--soft)">Version 0.30.2 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
+  <p style="font-size:14px;color:var(--soft)">Version 0.30.3 · prototype. Built on current adult BLS guidelines; your Medical Control Authority's protocols are what you follow on a real call.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -436,7 +436,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.30.2';
+const APP_VERSION='0.30.3';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -3351,7 +3351,7 @@ $('mon-4').onclick=()=>{if(!S.active)return;leadStart('4');};$('mon-12').onclick
 function timelineHTML(){const L=(S.log||[]).filter(e=>e.who!=='Guide');if(!L.length)return'';return `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--orange);font-family:'Saira Condensed';font-size:18px">Call timeline · ${L.length} events</summary><div style="max-height:260px;overflow:auto;font-size:14px;line-height:1.45;margin-top:6px">${L.map(e=>`<div style="padding:3px 0;border-top:1px dashed #2a3d5e"><b style="color:var(--soft)">${e.c}</b> <span style="color:var(--orange)">${esc(e.who)}:</span> ${esc(e.msg)}</div>`).join('')}</div></details>`;}
 function progressShow(){const p=load();const runs=p.runs||[];$('prog-body').innerHTML=Object.keys(CALLNAME).map(k=>{const r=runs.filter(x=>(x.call||'arrest')===k);if(!r.length)return `<div class="mrow"><span>${CALLNAME[k]}</span><b style="color:var(--soft)">not run yet</b></div>`;const best=Math.max(...r.map(x=>x.score)),last=r[r.length-1];const tiers=[...new Set(r.map(x=>['Guided','Recall','Chaos'][x.tier]))].join(', ');return `<div class="mrow"><span>${CALLNAME[k]}<br><small style="color:var(--soft)">${r.length} run${r.length>1?'s':''} · ${tiers} · last ${last.d.slice(0,10)}</small></span><b>${best}</b></div>`;}).join('')+`<h3 style="margin:12px 0 4px;font-family:'Saira Condensed';color:var(--orange)">Quick drills</h3>`+DRILLS.map(d=>{const x=(p.drills||{})[d.id];return `<div class="mrow"><span>${d.name}${x?`<br><small style="color:var(--soft)">${x.runs} run${x.runs>1?'s':''} · last ${x.last.slice(0,10)}</small>`:''}</span><b${x?'':' style="color:var(--soft)"'}>${x?x.best:'not run yet'}</b></div>`;}).join('');$('progov').classList.remove('hidden');}
 $('b-prog').onclick=progressShow;$('prog-close').onclick=()=>$('progov').classList.add('hidden');
-$('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Patient','Date','Tier','Score','Instructor']].concat((p.runs||[]).flatMap(r=>(r.who&&r.who.length?r.who:[p.name||'']).map(n=>[n,p.dept||'',CALLNAME[r.call||'arrest'],r.variant||'',r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score,r.inst||'']))).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),'',r.d.slice(0,16).replace('T',' '),'Drill',r.score,'']));const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+$('prog-csv').onclick=()=>{const p=load();const rows=[['Name','Department','Call','Patient','Date','Tier','Score','Instructor']].concat((p.runs||[]).flatMap(r=>(r.who&&r.who.length?r.who:[p.name||'']).map(n=>[n,p.dept||'',CALLNAME[r.call||'arrest'],r.variant||'',r.d.slice(0,16).replace('T',' '),['Guided','Recall','Chaos'][r.tier],r.score,r.inst||'']))).concat((p.drillRuns||[]).map(r=>[p.name||'',p.dept||'','Drill: '+((DRILLS.find(d=>d.id===r.drill)||{}).name||r.drill),'',r.d.slice(0,16).replace('T',' '),'Drill',r.score,'']));const csv=pcCsv(rows);/* the core quotes every cell and defuses =, +, -, @ formulas */
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='patient-contact-training-record.csv';a.click();}catch(e){}};
 $('b-rand').onclick=()=>{RANDOM=!RANDOM;const p=load();p.standard=!RANDOM;save(p);$('b-rand').textContent=RANDOM?'Patients: varied':'Patients: standard';$('b-rand').classList.toggle('on',RANDOM);};
 window.addEventListener('resize',()=>{MV.kind='';});
@@ -3541,7 +3541,7 @@ function instSync(){$('b-inst').textContent='Instructor mode: '+(INST?'on':pcDri
 
 /* ================= menu, progress, report ================= */
 const KEY='patient-contact';
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],name:'',dept:''};}catch(e){return {runs:[],name:'',dept:''};}}
+function load(){let p=null;try{p=JSON.parse(localStorage.getItem(KEY));}catch(e){}if(!p||typeof p!=='object'||Array.isArray(p))p={runs:[],name:'',dept:''};p.runs=Array.isArray(p.runs)?p.runs.filter(r=>r&&typeof r==='object'):[];for(const f of ['drillRuns','crew'])if(p[f]!==undefined&&!Array.isArray(p[f]))delete p[f];if(typeof p.name!=='string')p.name='';if(typeof p.dept!=='string')p.dept='';return p;}/* wrong-shape data (a bad backup) never bricks the page */
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
 function record(){const p=load();pca('end',`${['guided','recall','chaos'][TIER]}/${pca('att',(p.runs||[]).filter(r=>(r.call||'arrest')===CALL).length+1)}/${pca('bkt',S.score)}`);p.runs.push(pcDrillStamp({who:INST&&p.crew&&p.crew.length?p.crew.slice():null,inst:INST?(p.instName||''):'',variant:V.label||'',call:CALL,d:new Date().toISOString(),tier:TIER,score:S.score,ccf:S.arrestT?Math.round(S.compT/S.arrestT*100):0,rosc:S.rosc}));p.runs=p.runs.slice(-500);save(p);}
 const TT=['Every step listed. Learn the sequence and the why.','Checklist hidden. You run the call from memory. Guide lookups cost 2 points.','No checklist, no guide, and things go wrong: delays, a vomiting patient, and more.'];

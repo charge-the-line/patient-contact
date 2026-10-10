@@ -1,0 +1,52 @@
+{
+ "runs": [
+  {
+   "inst": "",
+   "variant": "",
+   "d": "2026-09-20T11:41:10.360Z",
+   "tier": 0,
+   "score": 77,
+   "ccf": 81,
+   "rosc": true
+  },
+  {
+   "who": [
+    "Jordan",
+    "Sam"
+   ],
+   "inst": "Capt. Lee",
+   "variant": "Severe, fast-moving reaction · symptoms returned in transport",
+   "call": "ep",
+   "d": "2026-10-02T11:41:10.360Z",
+   "tier": 0,
+   "score": 100,
+   "ccf": 0,
+   "rosc": false
+  },
+  {
+   "who": null,
+   "inst": "",
+   "variant": "Left-sided weakness · found down",
+   "call": "st",
+   "d": "2026-10-04T11:41:10.360Z",
+   "tier": 1,
+   "score": 84,
+   "ccf": 0,
+   "rosc": false
+  },
+  {
+   "call": "ghost",
+   "variant": "",
+   "d": "2026-10-10T04:29:10.360Z",
+   "tier": 0,
+   "score": 90
+  }
+ ],
+ "drillRuns": [
+  {
+   "drill": "ghost",
+   "d": "2026-10-10T06:53:10.360Z",
+   "score": 80
+  }
+ ]
+}
