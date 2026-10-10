@@ -195,3 +195,6 @@ The `fire` section (`tests/fr_test.js`, 32 checks):
 
 ## Fast-forward and deteriorations (October 8, 2026)
 - `ff`: every deterioration with actions (24 across 10 calls) hides fast-forward the moment it fires and holds it until it is handled. Proved to fail with the hold removed from `ffDue`. Asked by Max after Bleed Control's skip-ahead learned to stop on events; Patient Contact already stopped on any radio line, patient change, step or decision.
+
+## Offline helper (final sweep milestone 1, October 10, 2026)
+- `syntax`: the page and the shared core are network-first with a short wait (`NET_WAIT` ≤ 4 s, `Promise.race`), only 2xx answers are saved, installs use `cache:'reload'`, index.html is cached once. Proven in a browser (scratch): the first launch after a deploy runs the new page with the new core; a hanging network shows the saved page in under 4 s; a 404 serves the saved page.

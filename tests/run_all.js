@@ -44,6 +44,9 @@ if(want.includes('syntax')){try{new vm.Script(html.split('<script>')[1].split('<
 
   report('syntax','offline helper only clears its own old caches',/k\.startsWith\('patient-contact-v'\)/.test(fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8')));
   {const sw2=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');report('syntax','offline helper never caches anonymous statistics',/goatcounter\\\.com\$\|\(\^\|\\\.\)zgo\\\.at/.test(sw2)||sw2.includes('goatcounter')&&sw2.includes('zgo'));}}
+  {// Milestone B (final sweep, M1): the page and the shared core are both network-first with a short wait, bad answers are never saved, installs skip the HTTP cache, and index.html is stored once
+   const sw5=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');const coreNF=sw5.includes("netFirst(req, 'preconnect-core.js')")&&/fellBack = Date\.now\(\)/.test(sw5),navNF=/req\.mode === 'navigate'\)\s*\{\s*e\.respondWith\(netFirst/.test(sw5),wait=/const NET_WAIT = (\d+)/.test(sw5)&&+sw5.match(/const NET_WAIT = (\d+)/)[1]<=4000&&/Promise\.race\(\[net, wait\]\)/.test(sw5),okOnly=/if \(r\.ok\) \{ const copy = r\.clone\(\); caches\.open\(CACHE\)\.then\(c => c\.put\(key, copy\)\)/.test(sw5),reload=/cache: 'reload'/.test(sw5),once=!/CORE = \['\.\/'/.test(sw5)&&/'index\.html'/.test(sw5);
+   report('syntax','offline helper: page and shared core network-first with a short wait, bad answers never saved, fresh installs skip the HTTP cache, index stored once',coreNF&&navNF&&wait&&okOnly&&reload&&once,`core ${coreNF} nav ${navNF} wait ${wait} ok ${okOnly} reload ${reload} once ${once}`);}
 
 if(want.includes('balance')){const {boot}=require('./pc_mock.js');const {api}=boot();const D=api.DEC;let longest=0,total=0;
   let shortest=0;const chk=o=>{const L=o.map(x=>x.t.length),g=o.findIndex(x=>x.r==='good');if(g<0)return;total++;if(L[g]===Math.max(...L))longest++;else if(L[g]===Math.min(...L))shortest++;};
