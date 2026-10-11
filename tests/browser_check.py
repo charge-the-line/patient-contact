@@ -357,7 +357,7 @@ with sync_playwright() as p:
                     try: pg.locator(f'#lead-board [data-p="{lead}"]').first.click(delay=200, timeout=2500)
                     except Exception: pass
                     pg.wait_for_timeout(600); continue
-                if pg.is_visible('#g-monitor') and not pg.is_visible('#decov'):
+                if pg.is_visible('#g-monitor') and not pg.is_visible('#decov') and not pg.is_visible('#done') and pg.evaluate('S.running'):   # the monitor group stays in the page under a mission result; a tap there would only time out
                     if pg.is_visible('#mon-4'): real_tap(pg, 'mon-4'); continue
                     if pg.is_visible('#mon-12'): real_tap(pg, 'mon-12'); continue
                 acts = pg.evaluate("__pcPolicy()")
