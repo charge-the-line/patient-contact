@@ -2,7 +2,7 @@
 """Real-browser check (optional). Needs:  pip install playwright && playwright install chromium
 Opens every call and the drills at phone sizes; fails on any JavaScript error or anything off-screen.
 Usage:  python3 tests/browser_check.py"""
-import json, pathlib, sys
+import json, os, pathlib, re, sys, time
 from playwright.sync_api import sync_playwright
 URL = (pathlib.Path(__file__).resolve().parent.parent / 'index.html').as_uri()
 OVER = "(()=>{let m=0;const vis=e=>e.checkVisibility?e.checkVisibility({visibilityProperty:true}):e.offsetParent!==null;document.querySelectorAll('body *').forEach(e=>{if(!vis(e))return;const r=e.getBoundingClientRect();if(r.width<1||r.height<1)return;m=Math.max(m,r.right-window.innerWidth);});return Math.round(m);})()"   # fixed elements count too (the hub header slipped past offsetParent)
@@ -320,6 +320,95 @@ with sync_playwright() as p:
     pg.click('#h-set'); pg.wait_for_timeout(200)
     rows.append((844, 'settings land', (pg.evaluate(OVER)+1000*pg.evaluate(SMALL))))
     pg.close()
+    # ---- Milestone 10 (lean finish): every activity to the end with real taps at 390 px, when PC_ALL=1 ----
+    # The eleven calls are played by the suite's own human bot (tests/human_bot.js), moved into the page: it reads the live call
+    # state and names the next button; this script taps that button for real, at a finger's pace, until the last debrief.
+    if os.environ.get('PC_ALL'):
+        def pc_policy():
+            src = (pathlib.Path(__file__).resolve().parent / 'human_bot.js').read_text()
+            body = src[src.index('while(rt<1800){') + len('while(rt<1800){'):src.rindex("if(api.S().running)api.tick(.25);}")]
+            body = body.replace("$('dec-opts').onclick({target:{closest:()=>({dataset:{i:String(i)}})}});$('dec-go').onclick();", "Q.push({dec:i});Q.push('dec-go');")
+            body = body.replace("N.side=r[0];$('nn-board').onclick({target:{closest:()=>({dataset:{r}})}});", "Q.push(r[0]==='f'?'nn-front':'nn-back');Q.push({nn:r});")
+            body = body.replace("(opts.ffLog=opts.ffLog||[]).push(api.ffGo());", "Q.push('b-ff');")
+            body = re.sub(r"const e=\$\('([a-z0-9-]+)'\);e\.onclick\(\);", r"Q.push('\1');", body)
+            body = re.sub(r"\$\('([a-z0-9-]+)'\)\.onclick\(\);", r"Q.push('\1');", body)
+            body = body.replace("rt+=.25;continue;", "return Q;").replace("length-1)break;", "length-1)return 'END';") + "}"   # the loop's continue is one decision made; the closing brace is the one cut off with the tick
+            assert "onclick" not in body and "api.tick" not in body and "continue;" not in body, body
+            return ("window.__pcPolicy=(function(){const api={S:()=>S,M:()=>M,DECO:()=>DEC_OPEN,V:()=>V,NN:()=>NN,stepsDone:()=>stepsDone,ffWhy,FR_BURNS,FFC,INJECTS,pdRef:()=>pdRef(),dmV:()=>dmV(),instAct,$};"
+                    "const call=CALL,opts={ff:true};const hid=id=>{const e=document.getElementById(id);return !e||!e.getClientRects().length||!!e.closest('.hidden');};"
+                    "let rt=0,nextTap=0,lastBreath=-99,react={},missions=[],stuckAt=null,lastProgress=0,lastSig='',Q=[];const T0=performance.now();"
+                    "const tap=id=>{if(rt<nextTap)return false;const e=document.getElementById(id);if(!e||hid(id)||e.classList.contains('on')||e.disabled||e.classList.contains('cool'))return false;Q.push(id);nextTap=rt+1.2;return true;};"
+                    "const after=(key,cond,delay=2)=>{if(!cond){delete react[key];return false;}if(react[key]===undefined)react[key]=rt;return rt-react[key]>=delay;};"
+                    "return function(){Q=[];rt=(performance.now()-T0)/1000;" + body + "return Q;};})();")
+        POLICY = pc_policy()
+        def real_tap(pg, a):   # one real tap at a finger's pace; a button that hid or moved meanwhile is a missed tap, and the bot decides again
+            sel = ('#' + a) if isinstance(a, str) else (f'#dec-opts button[data-i="{a["dec"]}"]' if 'dec' in a else f'#nn-board [data-r="{a["nn"]}"]')
+            try: pg.locator(sel).first.click(delay=260, timeout=2500)
+            except Exception: pass
+        def call_full(pg, n, cid):
+            pg.goto(URL); pg.wait_for_timeout(250)
+            if pg.is_visible('#b-start'): pg.click('#b-start')
+            pg.click(f'#b-call{n}'); pg.wait_for_timeout(300); pg.evaluate(POLICY)
+            end = time.time() + 25 * 60; last = ''
+            while time.time() < end:
+                if pg.is_visible('#twelveov'): real_tap(pg, 'tw-close'); continue
+                lead = pg.evaluate("(typeof LG!=='undefined'&&LG)?LG.seq[LG.i].p:null")
+                if lead:
+                    try: pg.locator(f'#lead-board [data-p="{lead}"]').first.click(delay=200, timeout=2500)
+                    except Exception: pass
+                    pg.wait_for_timeout(600); continue
+                if pg.is_visible('#g-monitor') and not pg.is_visible('#decov'):
+                    if pg.is_visible('#mon-4'): real_tap(pg, 'mon-4'); continue
+                    if pg.is_visible('#mon-12'): real_tap(pg, 'mon-12'); continue
+                acts = pg.evaluate("__pcPolicy()")
+                if acts == 'END': break
+                for a in acts: real_tap(pg, a)
+                pg.wait_for_timeout(250)
+            done = pg.is_visible('#done') and pg.evaluate("S.mission===M.length-1")
+            score = pg.get_attribute('#done-s', 'data-final') if done else None
+            ok = done and score is not None and int(score) >= 90
+            if not ok: print('   detail:', cid, 'mission', pg.evaluate('S.mission'), 'of', pg.evaluate('M.length'), 'score', score, pg.evaluate('S.incidents.slice(-6)'), pg.evaluate("(()=>{const j=stepsDone.findIndex(x=>!x);return M[S.mission]&&M[S.mission].steps[j]&&M[S.mission].steps[j].t;})()"))
+            rows.append((390, f'ALL call {cid} (full)', 0 if ok else 99)); print(f'   {cid}: score {score}, {int((time.time()-(end-25*60))/60)} min')
+        pg = b.new_page(viewport={'width': 390, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
+        # the lesson: the right answer by its visible text, then Next
+        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.click('#b-lesson'); pg.wait_for_timeout(300)
+        for _ in range(40):
+            if not pg.evaluate("(typeof LS!=='undefined'&&!!(LS&&LS.cfg))"): break
+            good = pg.evaluate("LS.cfg.slides[LS.i].o.find(o=>o[1]==='good')[0]")
+            pg.locator('[data-l="ans"]', has_text=re.compile('^' + re.escape(good) + '$')).first.click(delay=120); pg.wait_for_timeout(150)
+            pg.click('#l-next', delay=120); pg.wait_for_timeout(250)
+        ok = pg.is_visible('#ldone') and pg.evaluate("(JSON.parse(localStorage.getItem('patient-contact')||'{}').drillRuns||[]).some(r=>r.drill==='lesson'&&r.score===100)")
+        rows.append((390, 'ALL lesson (full)', 0 if ok else 99))
+        # the eight quick drills
+        def drill_open(did):
+            pg.goto(URL); pg.wait_for_timeout(250)
+            if pg.is_visible('#b-start'): pg.click('#b-start')
+            pg.click('#b-drills'); pg.wait_for_timeout(200); pg.click(f'[data-a="go"][data-d="{did}"]', delay=200); pg.wait_for_timeout(300)
+        def drill_score(did, floor):
+            sc = pg.evaluate(f"(()=>{{const p=JSON.parse(localStorage.getItem('patient-contact')||'{{}}');const r=(p.drillRuns||[]).filter(r=>r.drill==='{did}').pop();return r?r.score:null;}})()")
+            ok = sc is not None and sc >= floor
+            if not ok: print('   detail: drill', did, 'score', sc, pg.inner_text('#dr-body')[:160])
+            rows.append((390, f'ALL drill {did} (full)', 0 if ok else 99))
+        for did in ('rhythm', 'med', 'o2', 'apgar', 'lkw', 'startcpr'):
+            drill_open(did)
+            for _ in range(10):
+                if not pg.evaluate("!!(DR&&DR.qs&&DR.i<DR.qs.length)"): break
+                i = pg.evaluate("DR.qs[DR.i].opts.indexOf(DR.qs[DR.i].a)"); pg.click(f'#dr-body button[data-i="{i}"]', delay=200); pg.wait_for_timeout(250); pg.click('#dr-foot button[data-a="next"]', delay=200); pg.wait_for_timeout(250)
+            drill_score(did, 100)
+        drill_open('cpr'); box = pg.locator('#dr-pad').bounding_box(); x, y = box['x'] + box['width'] / 2, box['y'] + box['height'] / 2   # 110 a minute on the real clock, like a thumb on the pad
+        t0 = time.perf_counter(); k = 0
+        while time.perf_counter() - t0 < 21.5:
+            pg.mouse.click(x, y); k += 1
+            while time.perf_counter() - t0 < k * 60 / 110: time.sleep(0.005)
+        pg.wait_for_timeout(600); drill_score('cpr', 90)
+        drill_open('leads')
+        for _ in range(12):
+            if not pg.evaluate("!!(DR&&DR.seq&&DR.i<DR.seq.length)"): break
+            lead = pg.evaluate("DR.seq[DR.i].p"); pg.locator(f'#dr-body [data-p="{lead}"]').first.click(delay=200); pg.wait_for_timeout(500)
+        pg.wait_for_timeout(400); drill_score('leads', 90)
+        # the eleven calls from the start, random patients, Guided
+        for n, cid in enumerate(('arrest', 'mva', 'od', 'ep', 'st', 'fl', 'cb', 'dm', 'pd', 'cp', 'fr'), 1): call_full(pg, n, cid)
+        pg.close()
     b.close()
 bad = [r for r in rows if r[2] > 1]
 for r in rows: print(f"{'PASS' if r[2] <= 1 else 'FAIL'}  {r[0]}px  {r[1]:<26} overflow {r[2]%1000}px · buttons under 44px: {(r[2]//1000)%100} · text under floor: {r[2]//100000}")
