@@ -333,6 +333,14 @@ with sync_playwright() as p:
             body = re.sub(r"const e=\$\('([a-z0-9-]+)'\);e\.onclick\(\);", r"Q.push('\1');", body)
             body = re.sub(r"\$\('([a-z0-9-]+)'\)\.onclick\(\);", r"Q.push('\1');", body)
             body = body.replace("rt+=.25;continue;", "return Q;").replace("length-1)break;", "length-1)return 'END';") + "}"   # the loop's continue is one decision made; the closing brace is the one cut off with the tick
+            # childbirth has its own human-pace bot (tests/cb_bot.js): its running branch joins the policy under call==='cb'
+            cb = (pathlib.Path(__file__).resolve().parent / 'cb_bot.js').read_text()
+            cbb = cb[cb.index("    if(S.running){") + len("    if(S.running){"):cb.index("      api.tick(.25);}")]
+            cbb = re.sub(r"\$\('([a-z0-9-]+)'\)\._cls\.has\('hot'\)", r"(document.getElementById('\1')||{classList:{contains:()=>false}}).classList.contains('hot')", cbb)
+            cbb = cbb.replace("$('b-breath').onclick();lastB=rt;", "Q.push('b-breath');lastBreath=rt;").replace("rt-lastB>=", "rt-lastBreath>=").replace("o.", "opts.")
+            assert "onclick" not in cbb and "$(" not in cbb, cbb
+            body = body.replace("{mva:'m-reass',", "{cb:'c-reass',mva:'m-reass',", 1)
+            body = body.replace("    if(S.running){", "    if(call==='cb'&&S.running){const x=S.c;" + cbb + "}\n    if(S.running){", 1)
             assert "onclick" not in body and "api.tick" not in body and "continue;" not in body, body
             return ("window.__pcPolicy=(function(){const api={S:()=>S,M:()=>M,DECO:()=>DEC_OPEN,V:()=>V,NN:()=>NN,stepsDone:()=>stepsDone,ffWhy,FR_BURNS,FFC,INJECTS,pdRef:()=>pdRef(),dmV:()=>dmV(),instAct,$};"
                     "const call=CALL,opts={ff:true};const hid=id=>{const e=document.getElementById(id);return !e||!e.getClientRects().length||!!e.closest('.hidden');};"
