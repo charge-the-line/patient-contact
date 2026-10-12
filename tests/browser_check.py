@@ -2,15 +2,24 @@
 """Real-browser check (optional). Needs:  pip install playwright && playwright install chromium
 Opens every call and the drills at phone sizes; fails on any JavaScript error or anything off-screen.
 Usage:  python3 tests/browser_check.py"""
-import json, os, pathlib, re, sys, time
+import json, os, pathlib, re, sys, time, threading, functools
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from playwright.sync_api import sync_playwright
 URL = (pathlib.Path(__file__).resolve().parent.parent / 'index.html').as_uri()
 OVER = "(()=>{let m=0;const vis=e=>e.checkVisibility?e.checkVisibility({visibilityProperty:true}):e.offsetParent!==null;document.querySelectorAll('body *').forEach(e=>{if(!vis(e))return;const r=e.getBoundingClientRect();if(r.width<1||r.height<1)return;m=Math.max(m,r.right-window.innerWidth);});return Math.round(m);})()"   # fixed elements count too (the hub header slipped past offsetParent)
 TEXT = "(()=>{let n=0;const vis=e=>e.checkVisibility?e.checkVisibility({visibilityProperty:true}):e.offsetParent!==null;document.querySelectorAll('body *').forEach(e=>{if(e.closest('svg')||!vis(e))return;const t=[...e.childNodes].filter(x=>x.nodeType===3).map(x=>x.textContent).join(' ').replace(/\\s+/g,' ').trim();if(t.length<2)return;const r=e.getBoundingClientRect();if(r.width<1||r.height<1)return;const fs=parseFloat(getComputedStyle(e).fontSize),w=t.split(' ').filter(x=>/[A-Za-z0-9]/.test(x)).length;if(fs<(w>=6?15:13)-.01)n++;});return n;})()"   # the text floor: 15 px for anything read as a sentence (six words or more), 13 px for captions; SVG numerals exempt
 SMALL = "(()=>{let n=0;const vis=e=>e.checkVisibility?e.checkVisibility({visibilityProperty:true}):e.offsetParent!==null;document.querySelectorAll('button').forEach(e=>{if(!vis(e))return;const r=e.getBoundingClientRect();if(r.width<2||r.height<2||r.bottom<0||r.top>innerHeight)return;if(r.height<44||r.width<44)n++;});return n+100*(()=>{let n=0;const vis=e=>e.checkVisibility?e.checkVisibility({visibilityProperty:true}):e.offsetParent!==null;document.querySelectorAll('body *').forEach(e=>{if(e.closest('svg')||!vis(e))return;const t=[...e.childNodes].filter(x=>x.nodeType===3).map(x=>x.textContent).join(' ').replace(/\\s+/g,' ').trim();if(t.length<2)return;const r=e.getBoundingClientRect();if(r.width<1||r.height<1)return;const fs=parseFloat(getComputedStyle(e).fontSize),w=t.split(' ').filter(x=>/[A-Za-z0-9]/.test(x)).length;if(fs<(w>=6?15:13)-.01)n++;});return n;})();})()"   # buttons under 44 px tall or wide, plus 100 per text under the floor
+EXE = '/opt/pw-browsers/chromium' if os.path.exists('/opt/pw-browsers/chromium') else None   # the preinstalled Chromium, like the other modules' checks
+PP = pathlib.Path(__file__).resolve().parent.parent.parent / 'purchase-point' / 'index.html'   # Purchase Point checked out next to this repo (the crew's-side link)
+HTTP = None   # the crew's-side link is "../purchase-point/", a folder: it works on the web site, not under file://, so that one row is served the way GitHub Pages serves it
+if PP.exists():
+    class Quiet(SimpleHTTPRequestHandler):
+        def log_message(self, *a): pass
+    srv = ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(Quiet, directory=str(PP.parent.parent))); threading.Thread(target=srv.serve_forever, daemon=True).start()
+    HTTP = f'http://127.0.0.1:{srv.server_address[1]}/patient-contact/index.html'
 errs, rows = [], []
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = p.chromium.launch(executable_path=EXE) if EXE else p.chromium.launch()
     for w in (320, 390):
         for n in range(1, 12):
             pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True)
@@ -60,9 +69,9 @@ with sync_playwright() as p:
     # the next piece of shock care a person would tap, by its visible text, while her shock is getting worse
     SHOCK_NEXT = "(()=>{const d=detOpen('shock');if(!d||S.m.act)return '';const m=S.m;if(!d.found)return 'Reassess vitals';if(!m.recheck)return 'Rapid recheck';if(!d.told)return 'Tell the medic';if(!m.stab)return 'Pad the thigh';if(V.pelvis&&!m.binder)return 'pelvic binder';if(!m.rigWarm)return 'Heat up';if(!m.ivSet)return 'Set up the IV';return '';})()"
     # car versus tree: her shock gets worse in the back (unstable pelvis), handled with slow real taps on the shock care, to the debrief
-    for w in (320, 390):
+    for w, base in ((320, URL), (390, HTTP or URL)):   # the 390 px run is served over HTTP so the crew's-side link can be followed for real
         pg = b.new_page(viewport={'width': w, 'height': 800}, device_scale_factor=2, is_mobile=True, has_touch=True); pg.on('pageerror', lambda e: errs.append(str(e)))
-        pg.goto(URL); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={mva:{loss:600,pelvis:true}}"); pg.click('#b-call2'); pg.wait_for_timeout(200)
+        pg.goto(base); pg.wait_for_timeout(250); pg.click('#b-start'); pg.evaluate("window.FORCE_V={mva:{loss:600,pelvis:true}}"); pg.click('#b-call2'); pg.wait_for_timeout(200)
         pg.evaluate("(()=>{Object.assign(S.m,{sized:true,inside:true,cspine:true,survey:true,ctrl:2,tqAsked:true,marked:true,o2:true,warm:true,protected:true,moved:true,loaded:true,alsArr:true,vitCount:1,vitExtr:1});Object.assign(S.m.extr,{done:true,stage:4});S.mon.four=true;loadMission(3);})()")
         pg.wait_for_timeout(300)
         if pg.is_visible('#briefov'): pg.click('#brief-go', delay=200); pg.wait_for_timeout(400)
@@ -77,7 +86,20 @@ with sync_playwright() as p:
             if pg.is_visible('#b-ff'): try_ff(pg)
             pg.wait_for_timeout(300)
         log = pg.evaluate("S.log.map(e=>e.msg).join(' ')"); inc = pg.evaluate('S.incidents')
-        rows.append((w, 'shock worse, handled (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and 'bleeding into the thigh' in log and 'Binder going on' in log and 'Fluids are running' in log and 'Got worse in your care' in pg.inner_html('#done-b') and not any(('nothing changed' in x) or ('without a binder' in x) or ('getting worse' in x) for x in inc) else 99))); pg.close()
+        rows.append((w, 'shock worse, handled (full)', pg.evaluate(OVER) + 1000 * pg.evaluate(SMALL) + (0 if pg.is_visible('#done') and 'bleeding into the thigh' in log and 'Binder going on' in log and 'Fluids are running' in log and 'Got worse in your care' in pg.inner_html('#done-b') and not any(('nothing changed' in x) or ('without a binder' in x) or ('getting worse' in x) for x in inc) else 99))); 
+        # the last debrief ends with "See it from the crew's side": the unstable pelvis is Purchase Point's layout C; a real tap on the link opens that scenario's first card
+        link = pg.locator('#done-b a', has_text="layout C")
+        ok = pg.is_visible('#done') and link.count() == 1 and link.get_attribute('href') == '../purchase-point/?scn=tree&v=C' and (link.bounding_box() or {'height': 0})['height'] >= 20
+        if ok and base == HTTP:
+            link.first.click(delay=260)
+            try: pg.wait_for_url('**/purchase-point/?scn=tree&v=C', timeout=8000); pg.wait_for_selector('#decov', state='visible', timeout=8000); pg.wait_for_timeout(300)
+            except Exception as e: print('   detail: crew link navigation', str(e)[:120])
+            ok = pg.url.endswith('/purchase-point/?scn=tree&v=C') and pg.is_visible('#decov') and pg.evaluate("typeof S!=='undefined'&&!!S&&S.mode==='scenario'&&S.id==='tree'&&S.v==='C'") and 'tree' in pg.inner_text('#pp-title').lower()
+            if not ok: print('   detail: crew link landed on', pg.url, pg.evaluate("String(typeof S!=='undefined'&&S&&S.mode)"))
+            rows.append((w, "crew's-side link (real tap)", 0 if ok else 99))
+        elif ok and w == 390: print('   note: Purchase Point is not checked out next to this repo; the link was found but not followed')
+        elif not ok: print('   detail: crew link', link.count(), link.get_attribute('href') if link.count() else None)
+        rows.append((w, "crew's-side link on the debrief", 0 if ok else 99)); pg.close()
     # pass 2: each call's deterioration in the back (or on scene), answered with slow real taps on buttons found by their visible text
     def run_steps(pg, steps):
         for st in steps:
