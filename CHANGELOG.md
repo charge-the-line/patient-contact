@@ -2,6 +2,9 @@
 
 Medical first responder calls. Plain-language history, newest first. Practice, not certification; protocols pending the Bay County MCA review.
 
+## 0.33.1 — October 12, 2026 — the crew's side
+- `?call=mva&v=A|B|C` opens Car versus tree on Purchase Point's layout (A the standard patient, B the warm day with heavier bleeding, C the unstable pelvis), and the call's debrief links back to Purchase Point's car versus tree on the same layout: the same patient, seen from inside and from the crew.
+
 ## 0.33.0 — October 11, 2026 — tester release
 - Every activity (the lesson, eight drills and all eleven calls from the start) is played to the end with real taps at 390 px before a release.
 - CHANGELOG added; the post-pilot backlog recorded in CLAUDE.md.

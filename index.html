@@ -303,7 +303,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
   <p>You're the medical first responder. You get there first, work the patient until the medic arrives, then work for the medic.</p>
   <table class="pc-table" style="margin-bottom:12px"><tr><td class="l">Guided</td><td>every step listed</td></tr><tr><td class="l">Recall</td><td>no list, you know it</td></tr><tr><td class="l">Chaos</td><td>things go wrong</td></tr></table>
   <p style="font-size:15px;color:var(--soft)">Turn on <b>Sound</b> in Settings for monitor beeps, the CPR metronome, and AED voice prompts.</p>
-  <p style="font-size:15px;color:var(--soft)">Version 0.33.0 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
+  <p style="font-size:15px;color:var(--soft)">Version 0.33.1 · Practice, not certification · Follows current guidelines; protocols vary, so follow your medical control.</p>
   <div style="display:flex;gap:8px"><button class="go" id="b-start" style="flex:1;font-size:18px">Start</button><button id="b-howmore">How to play</button></div>
 </div></div>
 <div class="overlay hidden" id="howov" style="z-index:14"><div class="box">
@@ -320,7 +320,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 
 <div class="overlay hidden" id="menu"><div class="box">
   <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px"><a href="../" style="display:inline-flex;align-items:center;min-height:44px;font-size:15px;font-weight:700;letter-spacing:.5px;color:#ff8a3d;text-decoration:none;margin:0">◂ PRECONNECT</a><a href="../feedback.html?from=pc" style="display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-size:15px;font-weight:700;color:#9aa3ad;text-decoration:none">Feedback</a><button class="gear" id="h-set" style="margin-left:12px">Settings</button></div>
-  <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door. <span class="ver" style="font-size:15px;color:var(--soft)">v0.33.0</span></h1></div>
+  <div style="margin:4px 0 10px"><div class="brand" style="font-size:34px;letter-spacing:3px">PATIENT CONTACT</div><h1 style="font-size:19px;font-weight:400;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;margin:2px 0 0">First through the door. <span class="ver" style="font-size:15px;color:var(--soft)">v0.33.1</span></h1></div>
   <div class="card rdy" id="rdy"><div class="flex"><div style="min-width:0"><div class="small">Your readiness</div><b id="rdy-t" style="display:block;font-family:'Saira Condensed';font-size:22px;line-height:1.05"></b><div class="small" id="rdy-s"></div></div><div class="sp"></div><div class="num" id="rdy-n"></div></div></div>
   <button id="b-resume" class="go hidden" style="width:100%;margin-bottom:8px">Resume call</button>
   <div class="card"><div class="small">What this is</div><p style="margin:4px 0 0;font-size:15px;line-height:1.45">Medical first response for the firefighter who gets there before the ambulance: eleven calls with a working cardiac monitor, patients that change every run, quick drills and a lesson. You are the medical first responder; the EMT drives and the medic works the patient. <b>Protocols vary. On a real call, follow your medical control.</b></p></div>
@@ -439,7 +439,7 @@ textarea,input{font-family:inherit;font-size:16px;padding:10px;border-radius:8px
 <script>
 /* ================= core ================= */
 const pca=(f,...a)=>{try{const P=typeof window!=='undefined'&&window.PCA;if(P&&P[f])return P[f](...a);}catch(e){}};
-const APP_VERSION='0.33.0';
+const APP_VERSION='0.33.1';
 /* Screen wake lock (Milestone 1): keeps the phone from dimming or locking during a timed skill.
    On only while an activity runs: keepAwake(true) when it starts, keepAwake(false) back at the menu or on the result screen. */
 const WAKE={s:null,want:false};
@@ -1406,7 +1406,8 @@ function mvaDebrief(){const m=S.m,v=mvaV();const ctrlT=m.ctrlT!==null?mmss(m.ctr
   const rows=[['Blood loss at arrival',`${Math.round(m.lost)} mL · ${Math.round(v.loss*100)}%`],['Shock class at arrival',shockClass(v.loss)],['Direct pressure on',ctrlT+' after arrival'],['Tourniquet on',tqT+' after arrival'],['Tourniquet time marked',m.marked?'yes':'no'],['Kept warm',m.warm?'yes, at '+mmss(m.warmT):'no'],['Extrication',m.extr.rapid?'rapid':'controlled'],['On-scene time',scene],['Vitals on scene / en route',`${m.vitCount} / ${m.tx.reass}`]];
   {const dd=(S.dets||[]).filter(x=>x.id==='shock');if(dd.length)rows.push(['Got worse in your care',dd.map(x=>`${mmss(x.t0)}: ${x.found?'cause found':'cause not found'}${x.told?', medic told':''}`).join(' · ')],['Thigh padded and held still',m.stab?'yes':'no'],...(V.pelvis?[['Pelvic binder (unstable pelvis)',m.binder?'yes':'no']]:[]),['Medic\'s fluids',m.fluidT!==null?'started '+mmss(m.fluidT)+(m.ivSet?' (IV set up for the medic)':''):'no']);}
   const msg=v.loss<.3?'She arrived compensating — fast bleeding control and warmth kept her out of the worst of shock. The trauma team can fix what\'s left.':v.loss<.4?'She arrived in significant shock. Look at the time to bleeding control and scene time — that\'s where minutes turn into blood.':'She arrived in severe shock. The biggest driver is how long the arterial bleed ran before it was controlled.';
-  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:15px;color:var(--soft);margin-top:10px">${msg}</p>`;}
+  const lay=V.pelvis?'C':V.warm?'B':'A';/* Purchase Point's car-versus-tree layouts: A the standard patient, B the warm day with heavier bleeding, C the unstable pelvis */
+  return `<div style="margin-top:6px">`+rows.map(([a,b])=>`<div class="mrow"><span>${a}</span><b>${b}</b></div>`).join('')+`</div><p style="font-size:15px;color:var(--soft);margin-top:10px">${msg}</p><p style="font-size:15px;margin-top:10px">See it from the crew\'s side: <a href="../purchase-point/?scn=tree&v=${lay}" style="color:var(--acc)">Purchase Point\'s car versus tree, the same patient, layout ${lay} ▸</a></p>`;}
 
 /* ================= Overdose call ================= */
 const ODG=['vitals-od','od-line','g-od-a','g-od-b','g-od-n','g-od-t'];
@@ -3626,7 +3627,7 @@ if(load().seen){$('intro').classList.add('hidden');showMenu();}
 /* the home page's daily drill deep-links here: patient-contact/?drill=med */
 {const q=new URLSearchParams((typeof location!=='undefined'&&location.search)||'').get('drill');if(q&&DRILLS.find(x=>x.id===q)){$('intro').classList.add('hidden');$('menu').classList.add('hidden');drillMenu();drillStart(q);}}
 /* other modules deep-link to a call: patient-contact/?call=fl opens the elderly fall (Bleed Control's blood-thinner debrief, 0.30.1); unknown ids are ignored */
-{const P=new URLSearchParams((typeof location!=='undefined'&&location.search)||'');const c=P.get('call');if(c&&!P.get('drill')&&Object.prototype.hasOwnProperty.call(CALLNAME,c))loadCall(c);else if(P.get('lesson')&&!P.get('drill')){$('intro').classList.add('hidden');lessonStart();}/* ?lesson=1: the hub's Continue (milestone 8) */}
+{const P=new URLSearchParams((typeof location!=='undefined'&&location.search)||'');const c=P.get('call');const MVA_V={A:{warm:false,loss:300,pelvis:false},B:{warm:true,loss:600,pelvis:false},C:{warm:false,loss:300,pelvis:true}};/* Purchase Point's car-versus-tree layouts are this call's patients (0.33.1): ?call=mva&v=A|B|C */if(c==='mva'&&MVA_V[P.get('v')]){window.FORCE_V=Object.assign({},window.FORCE_V||{},{mva:MVA_V[P.get('v')]});}if(c&&!P.get('drill')&&Object.prototype.hasOwnProperty.call(CALLNAME,c))loadCall(c);else if(P.get('lesson')&&!P.get('drill')){$('intro').classList.add('hidden');lessonStart();}/* ?lesson=1: the hub's Continue (milestone 8) */}
 let last=performance.now();setInterval(()=>{const now=performance.now();const dt=Math.min(.5,(now-last)/1000);last=now;if(S.running)tick(dt);else if(S.active)render();/* nothing to redraw on the home list */if(typeof monSync==='function')monSync();if(typeof instSync==='function')instSync();ffSync();},250);
 MV.raf=true;requestAnimationFrame(drawWave);
 /* rule 15: the two timed drills (CPR tempo, lead placement) run on the real clock; it stops while the screen is off */
